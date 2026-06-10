@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calentamiento de Línea - TUBOSA</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#001f5b;color:white;min-height:100vh;padding:16px;}
+.container{max-width:650px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.logo{font-size:32px;font-weight:900;}
+.back{color:white;text-decoration:none;font-size:32px;}
+.card{background:#0b3475;border-radius:20px;padding:18px;border:1px solid rgba(255,255,255,.15);margin-bottom:14px;}
+h1{font-size:25px;margin-bottom:6px;}
+h2{font-size:21px;margin-bottom:12px;}
+.subtitle{opacity:.85;font-size:14px;margin-bottom:18px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+label{display:block;font-weight:bold;font-size:14px;margin-bottom:5px;}
+input,select,textarea{width:100%;padding:12px;border-radius:12px;border:none;font-size:15px;color:#001f5b;}
+textarea{min-height:70px;resize:vertical;}
+.readonly{background:#dbe4f5;}
+.zona{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.15);}
+.zona-title{font-weight:900;font-size:17px;margin-bottom:10px;}
+button{width:100%;padding:17px;border:none;border-radius:16px;background:white;color:#001f5b;font-size:20px;font-weight:900;margin-top:18px;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:20px;}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="header">
+<a class="back" href="rutas.html">‹</a>
+<div class="logo">TUBOSA</div>
+<div style="width:32px;"></div>
+</div>
+
+<div class="card">
+<h1>Calentamiento de Línea</h1>
+<div class="subtitle">Check list digital previo al arranque de línea</div>
+
+<div class="grid">
+<div>
+<label>Fecha</label>
+<input id="fecha" class="readonly" readonly>
+</div>
+<div>
+<label>Hora</label>
+<input id="hora" class="readonly" readonly>
+</div>
+</div>
+
+<div class="grid">
+<div>
+<label>Técnico</label>
+<input class="readonly" value="Luis Cambindo" readonly>
+</div>
+<div>
+<label>Turno</label>
+<input id="turno" class="readonly" readonly>
+</div>
+</div>
+
+<label>Línea</label>
+<select id="linea">
+<option value="">Seleccione...</option>
+<option>Línea 01</option>
+<option>Línea 04</option>
+<option>Línea 05</option>
+<option>Línea 07</option>
+<option>Línea 08</option>
+<option>Línea 09</option>
+<option>Línea 10 - Extrusora 65</option>
+<option>Línea 10 - Extrusora 80</option>
+<option>Línea 11</option>
+<option>Línea 13</option>
+<option>Línea 14</option>
+<option>Línea 15</option>
+<option>Línea 16</option>
+<option>Línea 18</option>
+<option>Línea 19</option>
+<option>Línea 20</option>
+<option>Línea 21</option>
+</select>
+</div>
+
+<div class="card">
+<h2>Barril</h2>
+<div id="barril"></div>
+</div>
+
+<div class="card">
+<h2>Adaptador</h2>
+<div id="adaptador"></div>
+</div>
+
+<div class="card">
+<h2>Cabezal</h2>
+<div id="cabezal"></div>
+</div>
+
+<div class="card">
+<label>Observaciones generales</label>
+<textarea id="observaciones" placeholder="Ingrese novedades del calentamiento o condiciones anormales..."></textarea>
+</div>
+
+<button onclick="guardarCalentamiento()">GUARDAR CHECK LIST</button>
+
+<div class="footer">
+TUBOSA - Sistema de Mantenimiento<br>
+Versión 1.0
+</div>
+
+</div>
+
+<script>
+function calcularTurno(){
+const h = new Date().getHours();
+if(h >= 6 && h < 14) return "Turno A";
+if(h >= 14 && h < 22) return "Turno B";
+return "Turno C";
+}
+
+function cargarFechaHora(){
+const ahora = new Date();
+document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
+document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
+document.getElementById("turno").value = calcularTurno();
+}
+
+function crearZona(nombre, contenedorId, cantidad){
+const contenedor = document.getElementById(contenedorId);
+
+for(let i=1; i<=cantidad; i++){
+const div = document.createElement("div");
+div.className = "zona";
+
+div.innerHTML = `
+<div class="zona-title">${nombre} Zona ${i}</div>
+
+<div class="grid">
+<div>
+<label>50°C Inicio</label>
+<input type="time">
+</div>
+<div>
+<label>50°C Final</label>
+<input type="time">
+</div>
+</div>
+
+<div class="grid">
+<div>
+<label>100°C Inicio</label>
+<input type="time">
+</div>
+<div>
+<label>100°C Final</label>
+<input type="time">
+</div>
+</div>
+
+<div class="grid">
+<div>
+<label>140°C Inicio</label>
+<input type="time">
+</div>
+<div>
+<label>140°C Final</label>
+<input type="time">
+</div>
+</div>
+
+<label>Amperaje</label>
+<div class="grid3">
+<input type="number" placeholder="R">
+<input type="number" placeholder="S">
+<input type="number" placeholder="T">
+</div>
+`;
+
+contenedor.appendChild(div);
+}
+}
+
+function guardarCalentamiento(){
+const linea = document.getElementById("linea").value;
+
+if(!linea){
+alert("Debe seleccionar la línea.");
+return;
+}
+
+alert("Check list de calentamiento guardado. En la siguiente fase se enviará a Google Sheets.");
+window.location.href = "rutas.html";
+}
+
+cargarFechaHora();
+crearZona("Barril", "barril", 8);
+crearZona("Adaptador", "adaptador", 2);
+crearZona("Cabezal", "cabezal", 13);
+</script>
+
+</body>
+</html>
