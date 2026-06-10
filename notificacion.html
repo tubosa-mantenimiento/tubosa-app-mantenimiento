@@ -212,7 +212,7 @@ async function cargarEquiposFormulario(){
     equiposBD
       .map(eq => eq.Linea)
       .filter(linea => linea && linea !== "")
-  )];
+  )].sort();
 
   lineasUnicas.forEach(linea => {
     const option = document.createElement("option");
@@ -224,7 +224,8 @@ async function cargarEquiposFormulario(){
   document.getElementById("equipo").innerHTML =
     '<option value="">Seleccione primero una línea...</option>';
 }
-  function cargarEquiposPorLinea(){
+
+function cargarEquiposPorLinea(){
 
   const lineaSeleccionada = document.getElementById("linea").value;
   const selectEquipo = document.getElementById("equipo");
@@ -246,7 +247,6 @@ async function cargarEquiposFormulario(){
     selectEquipo.appendChild(option);
   });
 }
-}
 
 function llenarDatosEquipo(){
 
@@ -255,10 +255,6 @@ function llenarDatosEquipo(){
 
   document.getElementById("idEquipo").value = opt.dataset.id || "";
   document.getElementById("area").value = opt.dataset.area || "";
-
-  if(opt.dataset.linea){
-    document.getElementById("linea").value = opt.dataset.linea;
-  }
 }
 
 function guardarNotificacion(){
