@@ -203,21 +203,17 @@ function calcularTurno(){
 
 function cargarFechaHora(){
   const ahora = new Date();
-
   document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
-
   document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO", {
     hour: "2-digit",
     minute: "2-digit"
   });
-
   document.getElementById("turno").value = calcularTurno();
 }
 
 function llenarDatosEquipo(){
   const select = document.getElementById("equipo");
   const opt = select.options[select.selectedIndex];
-
   document.getElementById("idEquipo").value = opt.getAttribute("data-id") || "";
   document.getElementById("area").value = opt.getAttribute("data-area") || "";
 }
@@ -256,16 +252,15 @@ function guardarNotificacion(){
     return;
   }
 
-  const formData = new URLSearchParams();
-  formData.append("payload", JSON.stringify(datos));
+  const params = new URLSearchParams(datos);
+  const urlFinal = URL_SCRIPT + "?" + params.toString();
 
-  fetch(URL_SCRIPT, {
-    method: "POST",
-    mode: "no-cors",
-    body: formData
+  fetch(urlFinal, {
+    method: "GET",
+    mode: "no-cors"
   })
   .then(() => {
-    alert("Novedad enviada. Revisa la hoja Notificaciones.");
+    alert("Novedad guardada. Revisa la hoja Notificaciones.");
     window.location.href = "menu.html";
   })
   .catch(error => {
