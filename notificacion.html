@@ -253,6 +253,8 @@ function guardarNotificacion(){
   const params = new URLSearchParams(datos);
   const urlFinal = URL_SCRIPT + "?" + params.toString();
 
+  window.open(urlFinal, "_blank");
+
   alert("Novedad enviada. Verifica la hoja Notificaciones.");
   window.location.href = "menu.html";
 }
