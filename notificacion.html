@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notificar Novedad - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+
+body{
+background:#001f5b;
+color:white;
+min-height:100vh;
+padding:18px;
+}
+
+.container{
+max-width:520px;
+margin:auto;
+}
+
+.header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:20px;
+}
+
+.logo{
+font-size:34px;
+font-weight:900;
+}
+
+.back{
+color:white;
+text-decoration:none;
+font-size:28px;
+}
+
+.card{
+background:#0b3475;
+border-radius:22px;
+padding:20px;
+border:1px solid rgba(255,255,255,.15);
+margin-bottom:18px;
+}
+
+h1{
+font-size:26px;
+margin-bottom:8px;
+}
+
+.subtitle{
+opacity:.85;
+font-size:15px;
+margin-bottom:20px;
+}
+
+label{
+display:block;
+margin-top:15px;
+margin-bottom:6px;
+font-weight:bold;
+font-size:15px;
+}
+
+input, select, textarea{
+width:100%;
+padding:15px;
+border-radius:14px;
+border:none;
+outline:none;
+font-size:16px;
+background:white;
+color:#001f5b;
+}
+
+textarea{
+min-height:100px;
+resize:vertical;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.readonly{
+background:#dbe4f5;
+}
+
+button{
+width:100%;
+padding:18px;
+border:none;
+border-radius:16px;
+background:white;
+color:#001f5b;
+font-size:21px;
+font-weight:900;
+margin-top:20px;
+cursor:pointer;
+}
+
+.footer{
+text-align:center;
+opacity:.7;
+font-size:13px;
+margin-top:20px;
+}
+
+.hidden{
+display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<a class="back" href="menu.html">‹</a>
+<div class="logo">TUBOSA</div>
+<div style="width:28px;"></div>
+</div>
+
+<div class="card">
+<h1>Notificar Novedad</h1>
+<div class="subtitle">Registro digital de novedades correctivas del turno</div>
+
+<div class="grid">
+<div>
+<label>Fecha</label>
+<input id="fecha" class="readonly" readonly>
+</div>
+
+<div>
+<label>Hora</label>
+<input id="hora" class="readonly" readonly>
+</div>
+</div>
+
+<div class="grid">
+<div>
+<label>Técnico</label>
+<input id="reportadoPor" class="readonly" value="Luis Cambindo" readonly>
+</div>
+
+<div>
+<label>Turno</label>
+<input id="turno" class="readonly" readonly>
+</div>
+</div>
+
+<label>Origen del reporte</label>
+<select id="origenReporte">
+<option value="">Seleccione...</option>
+<option>Producción</option>
+<option>Operario</option>
+<option>Supervisor Producción</option>
+<option>Técnico</option>
+</select>
+
+<label>Línea</label>
+<select id="linea">
+<option value="">Seleccione...</option>
+<option>Línea 01</option>
+<option>Línea 04</option>
+<option>Línea 05</option>
+<option>Línea 07</option>
+<option>Línea 10</option>
+<option>Línea 11</option>
+<option>Línea 15</option>
+<option>Línea 16</option>
+<option>Línea 18</option>
+<option>Línea 19</option>
+<option>Línea 20</option>
+</select>
+
+<label>Equipo</label>
+<select id="equipo" onchange="llenarDatosEquipo()">
+<option value="">Seleccione...</option>
+<option data-id="3000ACA00004" data-area="Extrusión">Acampanadora Línea 11</option>
+<option data-id="3000EXT00008" data-area="Extrusión">Extrusora Línea 15</option>
+<option data-id="3000COM00009" data-area="Servicios Industriales">Compresor Kaeser CSD75</option>
+<option data-id="3000CHI00012" data-area="Servicios Industriales">Chiller Carrier 280T</option>
+</select>
+
+<div class="grid">
+<div>
+<label>Área</label>
+<input id="area" class="readonly" readonly>
+</div>
+
+<div>
+<label>ID Equipo</label>
+<input id="idEquipo" class="readonly" readonly>
+</div>
+</div>
+
+<label>Descripción de la falla</label>
+<textarea id="descripcionFalla" placeholder="Ejemplo: Acampanadora no realiza traslados en Línea 11"></textarea>
+
+<div class="grid">
+<div>
+<label>Equipo parado</label>
+<select id="equipoParado">
+<option>No</option>
+<option>Sí</option>
+</select>
+</div>
+
+<div>
+<label>Tiempo parada inicial</label>
+<input id="tiempoParadaInicial" placeholder="Ej: 30 min">
+</div>
+</div>
+
+<div class="grid">
+<div>
+<label>Queda pendiente</label>
+<select id="quedaPendiente">
+<option>No</option>
+<option>Sí</option>
+</select>
+</div>
+
+<div>
+<label>Prioridad</label>
+<select id="prioridad">
+<option>Media</option>
+<option>Baja</option>
+<option>Alta</option>
+<option>Crítica</option>
+</select>
+</div>
+</div>
+
+<label>Modo de falla</label>
+<select id="modoFalla">
+<option value="">Seleccione...</option>
+<option>No arranca</option>
+<option>No realiza movimiento</option>
+<option>Fuga</option>
+<option>Ruido anormal</option>
+<option>Temperatura alta</option>
+<option>Falla eléctrica</option>
+<option>Falla mecánica</option>
+</select>
+
+<label>Causa probable</label>
+<select id="causaProbable">
+<option value="">Seleccione...</option>
+<option>Desgaste</option>
+<option>Falta de ajuste</option>
+<option>Falla eléctrica</option>
+<option>Falla neumática</option>
+<option>Falta de lubricación</option>
+<option>Por definir</option>
+</select>
+
+<label>Consecuencia producción</label>
+<select id="consecuenciaProduccion">
+<option value="">Seleccione...</option>
+<option>Sin afectación</option>
+<option>Paro parcial</option>
+<option>Paro total</option>
+<option>Baja velocidad</option>
+<option>Producto no conforme</option>
+</select>
+
+<div class="grid">
+<div>
+<label>Orden SAP</label>
+<input id="ordenSAP" placeholder="Opcional">
+</div>
+
+<div>
+<label>Aviso SAP</label>
+<input id="avisoSAP" placeholder="Opcional">
+</div>
+</div>
+
+<button onclick="guardarNotificacion()">GUARDAR NOVEDAD</button>
+
+</div>
+
+<div class="footer">
+TUBOSA - Sistema de Mantenimiento<br>
+Versión 1.0
+</div>
+
+</div>
+
+<script>
+function calcularTurno(){
+const ahora = new Date();
+const hora = ahora.getHours();
+
+if(hora >= 6 && hora < 14){
+return "Turno A";
+}
+
+if(hora >= 14 && hora < 22){
+return "Turno B";
+}
+
+return "Turno C";
+}
+
+function cargarFechaHora(){
+const ahora = new Date();
+
+document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
+document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO", {
+hour: "2-digit",
+minute: "2-digit"
+});
+
+document.getElementById("turno").value = calcularTurno();
+}
+
+function llenarDatosEquipo(){
+const equipo = document.getElementById("equipo");
+const seleccionado = equipo.options[equipo.selectedIndex];
+
+document.getElementById("idEquipo").value = seleccionado.getAttribute("data-id") || "";
+document.getElementById("area").value = seleccionado.getAttribute("data-area") || "";
+}
+
+function guardarNotificacion(){
+alert("Novedad guardada correctamente. En la siguiente fase se conectará con Google Sheets.");
+window.location.href = "menu.html";
+}
+
+cargarFechaHora();
+</script>
+
+</body>
+</html>
