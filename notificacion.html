@@ -180,7 +180,7 @@ Versión 1.0
 
 </div>
   
-<script src="api.js?v=5"></script>
+<script src="./api.js?v=7"></script>
   
 <script>
 const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwXekczQdDzjVBLWC8GPefjtKWYc1_j8XwQLuFdDjEFuHaC3aiL3Ocixo7EL2nRJ3C0ag/exec";
@@ -303,9 +303,9 @@ img.src = urlFinal;
 
 document.addEventListener("DOMContentLoaded", async function(){
 
-  cargarFechaHora();
+  alert("JS iniciado");
 
-  alert("Iniciando carga de líneas");
+  cargarFechaHora();
 
   try {
     await cargarEquiposFormulario();
@@ -313,6 +313,8 @@ document.addEventListener("DOMContentLoaded", async function(){
   } catch(error) {
     alert("Error cargando equipos: " + error);
   }
+
+});
 
 });
 
