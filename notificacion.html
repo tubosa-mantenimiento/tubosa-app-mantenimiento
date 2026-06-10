@@ -85,11 +85,7 @@ button{width:100%;padding:18px;border:none;border-radius:16px;background:white;c
 
 <label>Equipo</label>
 <select id="equipo" onchange="llenarDatosEquipo()">
-<option value="">Seleccione...</option>
-<option value="Acampanadora Línea 11" data-id="3000ACA00005" data-area="Extrusión">Acampanadora Línea 11</option>
-<option value="Extrusora Línea 15" data-id="3000EXT00008" data-area="Extrusión">Extrusora Línea 15</option>
-<option value="Compresor Kaeser CSD75" data-id="3000COM00009" data-area="Servicios Industriales">Compresor Kaeser CSD75</option>
-<option value="Chiller Carrier 280T" data-id="3000CHI00012" data-area="Servicios Industriales">Chiller Carrier 280T</option>
+<option value="">Cargando equipos...</option>
 </select>
 
 <div class="grid">
@@ -210,12 +206,37 @@ function cargarFechaHora(){
   document.getElementById("turno").value = calcularTurno();
 }
 
+let equiposBD = [];
+
+async function cargarEquiposFormulario(){
+
+  equiposBD = await cargarEquipos();
+
+  const selectEquipo = document.getElementById("equipo");
+  selectEquipo.innerHTML = '<option value="">Seleccione...</option>';
+
+  equiposBD.forEach(eq => {
+    const option = document.createElement("option");
+    option.value = eq.NombreEquipo;
+    option.textContent = eq.NombreEquipo;
+    option.dataset.id = eq.ID_Equipo;
+    option.dataset.area = eq.Area;
+    option.dataset.linea = eq.Linea || "";
+    selectEquipo.appendChild(option);
+  });
+}
+
 function llenarDatosEquipo(){
+
   const select = document.getElementById("equipo");
   const opt = select.options[select.selectedIndex];
 
-  document.getElementById("idEquipo").value = opt.getAttribute("data-id") || "";
-  document.getElementById("area").value = opt.getAttribute("data-area") || "";
+  document.getElementById("idEquipo").value = opt.dataset.id || "";
+  document.getElementById("area").value = opt.dataset.area || "";
+
+  if(opt.dataset.linea){
+    document.getElementById("linea").value = opt.dataset.linea;
+  }
 }
 
 function guardarNotificacion(){
@@ -262,7 +283,10 @@ img.src = urlFinal;
   window.location.href = "menu.html";
 }
 
-document.addEventListener("DOMContentLoaded", cargarFechaHora);
+document.addEventListener("DOMContentLoaded", async function(){
+  cargarFechaHora();
+  await cargarEquiposFormulario();
+});
 </script>
 
 </body>
