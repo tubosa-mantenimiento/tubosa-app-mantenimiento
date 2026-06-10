@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menú Técnico - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+
+body{
+background:#001F5B;
+color:white;
+min-height:100vh;
+padding:20px;
+}
+
+.container{
+max-width:430px;
+margin:auto;
+}
+
+.logo{
+text-align:center;
+font-size:44px;
+font-weight:bold;
+margin:20px 0 25px;
+}
+
+.card{
+background:#07306f;
+border:1px solid rgba(255,255,255,0.2);
+border-radius:18px;
+padding:20px;
+margin-bottom:18px;
+box-shadow:0 8px 20px rgba(0,0,0,0.2);
+}
+
+.user h2{
+font-size:26px;
+margin-bottom:8px;
+}
+
+.user p{
+font-size:17px;
+opacity:.9;
+margin:6px 0;
+}
+
+.menu-btn{
+display:block;
+width:100%;
+background:#07306f;
+color:white;
+text-decoration:none;
+border:1px solid rgba(255,255,255,0.25);
+border-radius:18px;
+padding:22px;
+margin-bottom:16px;
+font-size:21px;
+font-weight:bold;
+}
+
+.menu-btn span{
+display:block;
+font-size:15px;
+font-weight:normal;
+opacity:.85;
+margin-top:6px;
+}
+
+.logout{
+background:white;
+color:#001F5B;
+text-align:center;
+}
+
+.footer{
+text-align:center;
+opacity:.7;
+font-size:14px;
+margin-top:25px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="logo">TUBOSA</div>
+
+<div class="card user">
+<h2>¡Bienvenido!</h2>
+<p><strong>Técnico:</strong> Luis Cambindo</p>
+<p><strong>Turno:</strong> A (06:00 - 14:00)</p>
+<p><strong>Área:</strong> Extrusión</p>
+</div>
+
+<a class="menu-btn" href="#">
+🔔 Notificar Novedad
+<span>Registre fallas o novedades del turno</span>
+</a>
+
+<a class="menu-btn" href="#">
+📋 Actividades Disponibles
+<span>Consulte y tome actividades programadas</span>
+</a>
+
+<a class="menu-btn" href="#">
+🛠 Mis Actividades
+<span>Consulte sus actividades asignadas</span>
+</a>
+
+<a class="menu-btn" href="#">
+⏱ Mis Ejecuciones
+<span>Registre tiempos y trabajos realizados</span>
+</a>
+
+<a class="menu-btn logout" href="index.html">
+Cerrar Sesión
+</a>
+
+<div class="footer">
+TUBOSA - Sistema de Mantenimiento<br>
+Versión 1.0
+</div>
+
+</div>
+
+</body>
+</html>
