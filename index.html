@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>TUBOSA Mantenimiento</title>
 
 <style>
-
 *{
 margin:0;
 padding:0;
@@ -17,8 +14,12 @@ font-family:Arial, sans-serif;
 }
 
 body{
-background:#001F5B;
-height:100vh;
+min-height:100vh;
+background:
+linear-gradient(rgba(0,31,91,.92), rgba(0,31,91,.98)),
+url('https://images.unsplash.com/photo-1513828583688-c52646db42da?auto=format&fit=crop&w=1200&q=80');
+background-size:cover;
+background-position:center;
 display:flex;
 justify-content:center;
 align-items:center;
@@ -26,88 +27,149 @@ color:white;
 }
 
 .container{
-width:90%;
-max-width:400px;
+width:100%;
+max-width:430px;
+min-height:100vh;
+padding:40px 28px 25px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:space-between;
+}
+
+.top{
 text-align:center;
+margin-top:40px;
 }
 
 .logo{
-font-size:60px;
-font-weight:bold;
-margin-bottom:10px;
+font-size:58px;
+font-weight:900;
+letter-spacing:1px;
 }
 
 .subtitulo{
 font-size:18px;
-letter-spacing:2px;
-margin-bottom:60px;
+letter-spacing:3px;
+margin-top:12px;
+opacity:.95;
+}
+
+.worker{
+font-size:92px;
+margin-top:70px;
+filter:drop-shadow(0 8px 12px rgba(0,0,0,.35));
+}
+
+.login-area{
+width:100%;
+text-align:center;
+}
+
+.login-title{
+font-size:24px;
+font-weight:bold;
+margin-bottom:25px;
 }
 
 .pin{
 display:flex;
 justify-content:center;
-gap:10px;
+gap:12px;
 margin-bottom:40px;
 }
 
 .pin input{
-width:60px;
-height:60px;
-font-size:24px;
+width:68px;
+height:68px;
+border-radius:12px;
+border:1px solid rgba(255,255,255,.35);
+background:rgba(0,20,70,.45);
+color:white;
+font-size:30px;
 text-align:center;
-border-radius:10px;
-border:none;
+outline:none;
+}
+
+.pin input:focus{
+border:2px solid white;
 }
 
 button{
 width:100%;
-padding:18px;
+height:70px;
 border:none;
-border-radius:12px;
+border-radius:14px;
 background:white;
-color:#001F5B;
-font-size:22px;
-font-weight:bold;
+color:#001f5b;
+font-size:24px;
+font-weight:900;
+letter-spacing:.5px;
+box-shadow:0 10px 20px rgba(0,0,0,.25);
 cursor:pointer;
 }
 
 .version{
-margin-top:40px;
-opacity:0.7;
+font-size:16px;
+opacity:.75;
+text-align:center;
+margin-bottom:15px;
 }
 
+@media (min-width:700px){
+.container{
+max-width:460px;
+}
+}
 </style>
-
 </head>
 
 <body>
 
 <div class="container">
 
-<div class="logo">
-TUBOSA
+<div class="top">
+<div class="logo">TUBOSA</div>
+<div class="subtitulo">SISTEMA DE MANTENIMIENTO</div>
+<div class="worker">👷‍♂️🔧</div>
 </div>
 
-<div class="subtitulo">
-SISTEMA DE MANTENIMIENTO
-</div>
+<div class="login-area">
+<div class="login-title">Ingrese su PIN</div>
 
 <div class="pin">
-<input maxlength="1">
-<input maxlength="1">
-<input maxlength="1">
-<input maxlength="1">
+<input maxlength="1" inputmode="numeric">
+<input maxlength="1" inputmode="numeric">
+<input maxlength="1" inputmode="numeric">
+<input maxlength="1" inputmode="numeric">
 </div>
 
 <button onclick="window.location.href='menu.html'">
 INGRESAR
 </button>
-
-<div class="version">
-Versión 1.0
 </div>
 
+<div class="version">Versión 1.0</div>
+
 </div>
+
+<script>
+const inputs = document.querySelectorAll('.pin input');
+
+inputs.forEach((input, index) => {
+input.addEventListener('input', () => {
+if(input.value.length === 1 && index < inputs.length - 1){
+inputs[index + 1].focus();
+}
+});
+
+input.addEventListener('keydown', (e) => {
+if(e.key === 'Backspace' && input.value === '' && index > 0){
+inputs[index - 1].focus();
+}
+});
+});
+</script>
 
 </body>
 </html>
