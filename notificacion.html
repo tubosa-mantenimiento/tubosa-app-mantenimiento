@@ -253,11 +253,8 @@ function guardarNotificacion(){
   const params = new URLSearchParams(datos);
   const urlFinal = URL_SCRIPT + "?" + params.toString();
 
-  const img = new Image();
-img.src = urlFinal;
-
-alert("Novedad guardada correctamente.");
-window.location.href = "menu.html";
+  alert("Novedad enviada. Verifica la hoja Notificaciones.");
+  window.location.href = "menu.html";
 }
 
 document.addEventListener("DOMContentLoaded", cargarFechaHora);
