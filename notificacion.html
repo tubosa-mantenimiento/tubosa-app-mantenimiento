@@ -72,15 +72,8 @@ button{width:100%;padding:18px;border:none;border-radius:16px;background:white;c
 </select>
 
 <label>Línea</label>
-<select id="linea">
-<option value="">Seleccione...</option>
-<option>Línea 10</option>
-<option>Línea 11</option>
-<option>Línea 15</option>
-<option>Línea 16</option>
-<option>Línea 18</option>
-<option>Línea 19</option>
-<option>Línea 20</option>
+<select id="linea" onchange="cargarEquiposPorLinea()">
+<option value="">Cargando líneas...</option>
 </select>
 
 <label>Equipo</label>
@@ -212,10 +205,37 @@ async function cargarEquiposFormulario(){
 
   equiposBD = await cargarEquipos();
 
+  const selectLinea = document.getElementById("linea");
+  selectLinea.innerHTML = '<option value="">Seleccione...</option>';
+
+  const lineasUnicas = [...new Set(
+    equiposBD
+      .map(eq => eq.Linea)
+      .filter(linea => linea && linea !== "")
+  )];
+
+  lineasUnicas.forEach(linea => {
+    const option = document.createElement("option");
+    option.value = linea;
+    option.textContent = linea;
+    selectLinea.appendChild(option);
+  });
+
+  document.getElementById("equipo").innerHTML =
+    '<option value="">Seleccione primero una línea...</option>';
+}function cargarEquiposPorLinea(){
+
+  const lineaSeleccionada = document.getElementById("linea").value;
   const selectEquipo = document.getElementById("equipo");
+
   selectEquipo.innerHTML = '<option value="">Seleccione...</option>';
 
-  equiposBD.forEach(eq => {
+  document.getElementById("area").value = "";
+  document.getElementById("idEquipo").value = "";
+
+  const equiposFiltrados = equiposBD.filter(eq => eq.Linea === lineaSeleccionada);
+
+  equiposFiltrados.forEach(eq => {
     const option = document.createElement("option");
     option.value = eq.NombreEquipo;
     option.textContent = eq.NombreEquipo;
@@ -224,6 +244,7 @@ async function cargarEquiposFormulario(){
     option.dataset.linea = eq.Linea || "";
     selectEquipo.appendChild(option);
   });
+}
 }
 
 function llenarDatosEquipo(){
