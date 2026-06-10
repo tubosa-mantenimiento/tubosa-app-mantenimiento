@@ -236,95 +236,52 @@ function llenarDatosEquipo() {
 
 function guardarNotificacion() {
 
+<script>
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwXekczQdDzjVBLWC8GPefjtKWYc1_j8XwQLuFdDjEFuHaC3aiL3Ocixo7EL2nRJ3C0ag/exec";
+
+function guardarNotificacion() {
+
   const datos = {
-
     hoja: "Notificaciones",
-
     ID_Notificacion: "NOT-" + Date.now(),
-
-    FechaReporte:
-      document.getElementById("fecha").value,
-
-    Horareporte:
-      document.getElementById("hora").value,
-
-    ReportadoPor:
-      document.getElementById("reportadoPor").value,
-
-    Turno:
-      document.getElementById("turno").value,
-
-    Origenreporte:
-      document.getElementById("origenReporte").value,
-
-    ClaseTrabajo:
-      "CT01",
-
-    Linea:
-      document.getElementById("linea").value,
-
-    Equipo:
-      document.getElementById("equipo").value,
-
-    Area:
-      document.getElementById("area").value,
-
-    ID_Equipo:
-      document.getElementById("idEquipo").value,
-
-    DescripcionFalla:
-      document.getElementById("descripcionFalla").value,
-
-    TrabajoRealizado:
-      "",
-
-    EquipoParado:
-      document.getElementById("equipoParado").value,
-
-    TiempoParadaInicial:
-      document.getElementById("tiempoParadaInicial").value,
-
-    QuedaPendiente:
-      document.getElementById("quedaPendiente").value,
-
-    Prioridad:
-      document.getElementById("prioridad").value,
-
-    ModoFalla:
-      document.getElementById("modoFalla").value,
-
-    CausaProbable:
-      document.getElementById("causaProbable").value,
-
-    ConsecuenciaProduccion:
-      document.getElementById("consecuenciaProduccion").value,
-
-    Estado:
-      "ES06",
-
-    OrdenSAP:
-      document.getElementById("ordenSAP").value,
-
-    AvisoSAP:
-      document.getElementById("avisoSAP").value
+    FechaReporte: document.getElementById("fecha").value,
+    Horareporte: document.getElementById("hora").value,
+    ReportadoPor: document.getElementById("reportadoPor").value,
+    Turno: document.getElementById("turno").value,
+    Origenreporte: document.getElementById("origenReporte").value,
+    ClaseTrabajo: "CT01",
+    Linea: document.getElementById("linea").value,
+    Equipo: document.getElementById("equipo").value,
+    Area: document.getElementById("area").value,
+    ID_Equipo: document.getElementById("idEquipo").value,
+    DescripcionFalla: document.getElementById("descripcionFalla").value,
+    TrabajoRealizado: "",
+    EquipoParado: document.getElementById("equipoParado").value,
+    TiempoParadaInicial: document.getElementById("tiempoParadaInicial").value,
+    QuedaPendiente: document.getElementById("quedaPendiente").value,
+    Prioridad: document.getElementById("prioridad").value,
+    ModoFalla: document.getElementById("modoFalla").value,
+    CausaProbable: document.getElementById("causaProbable").value,
+    ConsecuenciaProduccion: document.getElementById("consecuenciaProduccion").value,
+    Estado: "ES06",
+    OrdenSAP: document.getElementById("ordenSAP").value,
+    AvisoSAP: document.getElementById("avisoSAP").value
   };
 
-  if (
-    !datos.Origenreporte ||
-    !datos.Linea ||
-    !datos.Equipo ||
-    !datos.DescripcionFalla
-  ) {
+  if (!datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla) {
     alert("Debe completar Origen, Línea, Equipo y Descripción.");
     return;
   }
 
-  const formData = new URLSearchParams();
+  const params = new URLSearchParams(datos);
+  const urlFinal = URL_SCRIPT + "?" + params.toString();
 
-  formData.append(
-    "payload",
-    JSON.stringify(datos)
-  );
+  window.open(urlFinal, "_blank");
+
+  alert("Novedad enviada. Verifica la hoja Notificaciones.");
+  window.location.href = "menu.html";
+}
+</script>;
 
   fetch(URL_SCRIPT, {
     method: "POST",
