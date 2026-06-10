@@ -302,10 +302,19 @@ img.src = urlFinal;
 }
 
 document.addEventListener("DOMContentLoaded", async function(){
+
   cargarFechaHora();
-  await cargarEquiposFormulario();
+
+  alert("Iniciando carga de líneas");
+
+  try {
+    await cargarEquiposFormulario();
+    alert("Equipos cargados: " + equiposBD.length);
+  } catch(error) {
+    alert("Error cargando equipos: " + error);
+  }
+
 });
-</script>
 
 </body>
 </html>
