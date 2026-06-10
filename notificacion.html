@@ -7,113 +7,21 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-
-body{
-background:#001f5b;
-color:white;
-min-height:100vh;
-padding:18px;
-}
-
-.container{
-max-width:520px;
-margin:auto;
-}
-
-.header{
-display:flex;
-align-items:center;
-justify-content:space-between;
-margin-bottom:20px;
-}
-
-.logo{
-font-size:34px;
-font-weight:900;
-}
-
-.back{
-color:white;
-text-decoration:none;
-font-size:28px;
-}
-
-.card{
-background:#0b3475;
-border-radius:22px;
-padding:20px;
-border:1px solid rgba(255,255,255,.15);
-margin-bottom:18px;
-}
-
-h1{
-font-size:26px;
-margin-bottom:8px;
-}
-
-.subtitle{
-opacity:.85;
-font-size:15px;
-margin-bottom:20px;
-}
-
-label{
-display:block;
-margin-top:15px;
-margin-bottom:6px;
-font-weight:bold;
-font-size:15px;
-}
-
-input, select, textarea{
-width:100%;
-padding:15px;
-border-radius:14px;
-border:none;
-outline:none;
-font-size:16px;
-background:white;
-color:#001f5b;
-}
-
-textarea{
-min-height:100px;
-resize:vertical;
-}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-}
-
-.readonly{
-background:#dbe4f5;
-}
-
-button{
-width:100%;
-padding:18px;
-border:none;
-border-radius:16px;
-background:white;
-color:#001f5b;
-font-size:21px;
-font-weight:900;
-margin-top:20px;
-cursor:pointer;
-}
-
-.footer{
-text-align:center;
-opacity:.7;
-font-size:13px;
-margin-top:20px;
-}
-
-.hidden{
-display:none;
-}
+body{background:#001f5b;color:white;min-height:100vh;padding:18px;}
+.container{max-width:520px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.logo{font-size:36px;font-weight:900;}
+.back{color:white;text-decoration:none;font-size:34px;}
+.card{background:#0b3475;border-radius:22px;padding:20px;border:1px solid rgba(255,255,255,.15);}
+h1{font-size:28px;margin-bottom:8px;}
+.subtitle{opacity:.85;margin-bottom:20px;}
+label{display:block;margin-top:14px;margin-bottom:6px;font-weight:bold;}
+input,select,textarea{width:100%;padding:14px;border-radius:14px;border:none;font-size:16px;color:#001f5b;}
+textarea{min-height:95px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.readonly{background:#dbe4f5;}
+button{width:100%;padding:18px;border:none;border-radius:16px;background:white;color:#001f5b;font-size:20px;font-weight:900;margin-top:22px;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:20px;}
 </style>
 </head>
 
@@ -124,10 +32,11 @@ display:none;
 <div class="header">
 <a class="back" href="menu.html">‹</a>
 <div class="logo">TUBOSA</div>
-<div style="width:28px;"></div>
+<div style="width:34px;"></div>
 </div>
 
 <div class="card">
+
 <h1>Notificar Novedad</h1>
 <div class="subtitle">Registro digital de novedades correctivas del turno</div>
 
@@ -136,7 +45,6 @@ display:none;
 <label>Fecha</label>
 <input id="fecha" class="readonly" readonly>
 </div>
-
 <div>
 <label>Hora</label>
 <input id="hora" class="readonly" readonly>
@@ -148,7 +56,6 @@ display:none;
 <label>Técnico</label>
 <input id="reportadoPor" class="readonly" value="Luis Cambindo" readonly>
 </div>
-
 <div>
 <label>Turno</label>
 <input id="turno" class="readonly" readonly>
@@ -167,10 +74,6 @@ display:none;
 <label>Línea</label>
 <select id="linea">
 <option value="">Seleccione...</option>
-<option>Línea 01</option>
-<option>Línea 04</option>
-<option>Línea 05</option>
-<option>Línea 07</option>
 <option>Línea 10</option>
 <option>Línea 11</option>
 <option>Línea 15</option>
@@ -183,7 +86,7 @@ display:none;
 <label>Equipo</label>
 <select id="equipo" onchange="llenarDatosEquipo()">
 <option value="">Seleccione...</option>
-<option data-id="3000ACA00004" data-area="Extrusión">Acampanadora Línea 11</option>
+<option data-id="3000ACA00005" data-area="Extrusión">Acampanadora Línea 11</option>
 <option data-id="3000EXT00008" data-area="Extrusión">Extrusora Línea 15</option>
 <option data-id="3000COM00009" data-area="Servicios Industriales">Compresor Kaeser CSD75</option>
 <option data-id="3000CHI00012" data-area="Servicios Industriales">Chiller Carrier 280T</option>
@@ -194,15 +97,14 @@ display:none;
 <label>Área</label>
 <input id="area" class="readonly" readonly>
 </div>
-
 <div>
 <label>ID Equipo</label>
 <input id="idEquipo" class="readonly" readonly>
 </div>
 </div>
 
-<label>Descripción de la falla</label>
-<textarea id="descripcionFalla" placeholder="Ejemplo: Acampanadora no realiza traslados en Línea 11"></textarea>
+<label>Descripción falla</label>
+<textarea id="descripcionFalla" placeholder="Describa la novedad..."></textarea>
 
 <div class="grid">
 <div>
@@ -212,7 +114,6 @@ display:none;
 <option>Sí</option>
 </select>
 </div>
-
 <div>
 <label>Tiempo parada inicial</label>
 <input id="tiempoParadaInicial" placeholder="Ej: 30 min">
@@ -227,7 +128,6 @@ display:none;
 <option>Sí</option>
 </select>
 </div>
-
 <div>
 <label>Prioridad</label>
 <select id="prioridad">
@@ -239,32 +139,29 @@ display:none;
 </div>
 </div>
 
-<label>Modo de falla</label>
+<label>Modo falla</label>
 <select id="modoFalla">
-<option value="">Seleccione...</option>
+<option>Por definir</option>
 <option>No arranca</option>
 <option>No realiza movimiento</option>
 <option>Fuga</option>
 <option>Ruido anormal</option>
-<option>Temperatura alta</option>
 <option>Falla eléctrica</option>
 <option>Falla mecánica</option>
 </select>
 
 <label>Causa probable</label>
 <select id="causaProbable">
-<option value="">Seleccione...</option>
+<option>Por definir</option>
 <option>Desgaste</option>
 <option>Falta de ajuste</option>
 <option>Falla eléctrica</option>
 <option>Falla neumática</option>
 <option>Falta de lubricación</option>
-<option>Por definir</option>
 </select>
 
 <label>Consecuencia producción</label>
 <select id="consecuenciaProduccion">
-<option value="">Seleccione...</option>
 <option>Sin afectación</option>
 <option>Paro parcial</option>
 <option>Paro total</option>
@@ -277,7 +174,6 @@ display:none;
 <label>Orden SAP</label>
 <input id="ordenSAP" placeholder="Opcional">
 </div>
-
 <div>
 <label>Aviso SAP</label>
 <input id="avisoSAP" placeholder="Opcional">
@@ -296,46 +192,32 @@ Versión 1.0
 </div>
 
 <script>
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwXekczQdDzjVBLWC8GPefjtKWYc1_j8XwQLuFdDjEFuHaC3aiL3Ocixo7EL2nRJ3C0ag/exec";
+
 function calcularTurno(){
-const ahora = new Date();
-const hora = ahora.getHours();
-
-if(hora >= 6 && hora < 14){
-return "Turno A";
-}
-
-if(hora >= 14 && hora < 22){
-return "Turno B";
-}
-
+const h = new Date().getHours();
+if(h >= 6 && h < 14) return "Turno A";
+if(h >= 14 && h < 22) return "Turno B";
 return "Turno C";
 }
 
 function cargarFechaHora(){
 const ahora = new Date();
-
 document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
-document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO", {
-hour: "2-digit",
-minute: "2-digit"
-});
-
+document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
 document.getElementById("turno").value = calcularTurno();
 }
 
 function llenarDatosEquipo(){
-const equipo = document.getElementById("equipo");
-const seleccionado = equipo.options[equipo.selectedIndex];
-
-document.getElementById("idEquipo").value = seleccionado.getAttribute("data-id") || "";
-document.getElementById("area").value = seleccionado.getAttribute("data-area") || "";
+const select = document.getElementById("equipo");
+const opt = select.options[select.selectedIndex];
+document.getElementById("idEquipo").value = opt.getAttribute("data-id") || "";
+document.getElementById("area").value = opt.getAttribute("data-area") || "";
 }
-
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwXekczQdDzjVBLWC8GPefjtKWYc1_j8XwQLuFdDjEFuHaC3aiL3Ocixo7EL2nRJ3C0ag/exec";
 
 function guardarNotificacion(){
 
-alert("Probando botón guardar");
+alert("Botón funcionando. Enviando a Google Sheets...");
 
 const datos = {
 hoja: "Notificaciones",
@@ -371,11 +253,16 @@ mode: "no-cors",
 body: formData
 })
 .then(() => {
-alert("Novedad enviada. Verifica la hoja Notificaciones.");
-window.location.href = "menu.html";
+alert("Novedad enviada. Revisa Google Sheets.");
 })
 .catch(error => {
-alert("Error de conexión: " + error);
+alert("Error: " + error);
 });
 
 }
+
+window.onload = cargarFechaHora;
+</script>
+
+</body>
+</html>
