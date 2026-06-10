@@ -192,54 +192,31 @@ Versión 1.0
 </div>
 
 <script>
-
 const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwXekczQdDzjVBLWC8GPefjtKWYc1_j8XwQLuFdDjEFuHaC3aiL3Ocixo7EL2nRJ3C0ag/exec";
 
-function calcularTurno() {
-
+function calcularTurno(){
   const h = new Date().getHours();
-
-  if (h >= 6 && h < 14) return "Turno A";
-  if (h >= 14 && h < 22) return "Turno B";
-
+  if(h >= 6 && h < 14) return "Turno A";
+  if(h >= 14 && h < 22) return "Turno B";
   return "Turno C";
 }
 
-function cargarFechaHora() {
-
+function cargarFechaHora(){
   const ahora = new Date();
-
-  document.getElementById("fecha").value =
-    ahora.toLocaleDateString("es-CO");
-
-  document.getElementById("hora").value =
-    ahora.toLocaleTimeString("es-CO", {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-
-  document.getElementById("turno").value =
-    calcularTurno();
+  document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
+  document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("turno").value = calcularTurno();
 }
 
-function llenarDatosEquipo() {
-
+function llenarDatosEquipo(){
   const select = document.getElementById("equipo");
   const opt = select.options[select.selectedIndex];
 
-  document.getElementById("idEquipo").value =
-    opt.getAttribute("data-id") || "";
-
-  document.getElementById("area").value =
-    opt.getAttribute("data-area") || "";
+  document.getElementById("idEquipo").value = opt.getAttribute("data-id") || "";
+  document.getElementById("area").value = opt.getAttribute("data-area") || "";
 }
 
-function guardarNotificacion() {
-
-<script>
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwXekczQdDzjVBLWC8GPefjtKWYc1_j8XwQLuFdDjEFuHaC3aiL3Ocixo7EL2nRJ3C0ag/exec";
-
-function guardarNotificacion() {
+function guardarNotificacion(){
 
   const datos = {
     hoja: "Notificaciones",
@@ -268,7 +245,7 @@ function guardarNotificacion() {
     AvisoSAP: document.getElementById("avisoSAP").value
   };
 
-  if (!datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla) {
+  if(!datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla){
     alert("Debe completar Origen, Línea, Equipo y Descripción.");
     return;
   }
@@ -281,33 +258,9 @@ function guardarNotificacion() {
   alert("Novedad enviada. Verifica la hoja Notificaciones.");
   window.location.href = "menu.html";
 }
-</script>;
 
-  fetch(URL_SCRIPT, {
-    method: "POST",
-    body: formData
-  })
-  .then(response => response.text())
-  .then(resultado => {
-
-    console.log(resultado);
-
-    alert("Novedad enviada correctamente");
-
-    location.reload();
-
-  })
-  .catch(error => {
-
-    console.error(error);
-
-    alert("Error enviando información");
-  });
-}
-
-document.addEventListener(
-  "DOMContentLoaded",
-  cargarFechaHora
-);
-
+document.addEventListener("DOMContentLoaded", cargarFechaHora);
 </script>
+
+</body>
+</html>
