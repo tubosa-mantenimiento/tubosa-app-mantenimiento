@@ -220,56 +220,21 @@ function llenarDatosEquipo(){
 
 function guardarNotificacion(){
 
+  alert("ENTRO A GUARDAR");
+
   const datos = {
     hoja: "Notificaciones",
-    ID_Notificacion: "NOT-" + Date.now(),
+    ID_Notificacion: "TEST-" + Date.now(),
     FechaReporte: document.getElementById("fecha").value,
-    Horareporte: document.getElementById("hora").value,
-    ReportadoPor: document.getElementById("reportadoPor").value,
-    Turno: document.getElementById("turno").value,
-    Origenreporte: document.getElementById("origenReporte").value,
-    ClaseTrabajo: "CT01",
-    Linea: document.getElementById("linea").value,
-    Equipo: document.getElementById("equipo").value,
-    Area: document.getElementById("area").value,
-    ID_Equipo: document.getElementById("idEquipo").value,
-    DescripcionFalla: document.getElementById("descripcionFalla").value,
-    TrabajoRealizado: "",
-    EquipoParado: document.getElementById("equipoParado").value,
-    TiempoParadaInicial: document.getElementById("tiempoParadaInicial").value,
-    QuedaPendiente: document.getElementById("quedaPendiente").value,
-    Prioridad: document.getElementById("prioridad").value,
-    ModoFalla: document.getElementById("modoFalla").value,
-    CausaProbable: document.getElementById("causaProbable").value,
-    ConsecuenciaProduccion: document.getElementById("consecuenciaProduccion").value,
-    Estado: "ES06",
-    OrdenSAP: document.getElementById("ordenSAP").value,
-    AvisoSAP: document.getElementById("avisoSAP").value
+    Horareporte: document.getElementById("hora").value
   };
 
-  if(!datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla){
-    alert("Debe llenar origen, línea, equipo y descripción de falla.");
-    return;
-  }
-
   const params = new URLSearchParams(datos);
+
   const urlFinal = URL_SCRIPT + "?" + params.toString();
 
-  fetch(urlFinal, {
-    method: "GET",
-    mode: "no-cors"
-  })
-  .then(() => {
-    alert("Novedad guardada. Revisa la hoja Notificaciones.");
-    window.location.href = "menu.html";
-  })
-  .catch(error => {
-    alert("Error al enviar: " + error);
-  });
+  alert(urlFinal);
+
+  window.open(urlFinal, "_blank");
+
 }
-
-document.addEventListener("DOMContentLoaded", cargarFechaHora);
-</script>
-
-</body>
-</html>
