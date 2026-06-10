@@ -6,80 +6,113 @@
 <title>Menú Técnico - TUBOSA</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
 
 body{
-background:#001F5B;
+background:#001f5b;
 color:white;
 min-height:100vh;
-padding:20px;
 }
 
 .container{
-max-width:430px;
+max-width:500px;
 margin:auto;
+padding:20px;
 }
 
 .logo{
+font-size:58px;
+font-weight:bold;
 text-align:center;
-font-size:44px;
-font-weight:bold;
-margin:20px 0 25px;
+margin-top:20px;
+margin-bottom:25px;
 }
 
-.card{
-background:#07306f;
-border:1px solid rgba(255,255,255,0.2);
-border-radius:18px;
+.user-card{
+display:flex;
+align-items:center;
+background:#0b3475;
 padding:20px;
-margin-bottom:18px;
-box-shadow:0 8px 20px rgba(0,0,0,0.2);
+border-radius:22px;
+margin-bottom:25px;
+border:1px solid rgba(255,255,255,.15);
 }
 
-.user h2{
-font-size:26px;
-margin-bottom:8px;
+.avatar{
+font-size:50px;
+margin-right:20px;
 }
 
-.user p{
-font-size:17px;
-opacity:.9;
-margin:6px 0;
+.user-info h2{
+margin-bottom:10px;
 }
 
-.menu-btn{
-display:block;
-width:100%;
-background:#07306f;
-color:white;
-text-decoration:none;
-border:1px solid rgba(255,255,255,0.25);
-border-radius:18px;
-padding:22px;
-margin-bottom:16px;
-font-size:21px;
-font-weight:bold;
-}
-
-.menu-btn span{
-display:block;
-font-size:15px;
-font-weight:normal;
-opacity:.85;
+.info-line{
 margin-top:6px;
+opacity:.95;
+}
+
+.menu-card{
+display:flex;
+align-items:center;
+background:#0b3475;
+padding:20px;
+border-radius:22px;
+margin-bottom:18px;
+text-decoration:none;
+color:white;
+border:1px solid rgba(255,255,255,.15);
+transition:.2s;
+}
+
+.menu-card:hover{
+transform:translateY(-2px);
+}
+
+.icon{
+font-size:38px;
+margin-right:18px;
+}
+
+.text{
+flex:1;
+}
+
+.text h3{
+font-size:26px;
+margin-bottom:5px;
+}
+
+.text p{
+font-size:16px;
+opacity:.85;
+}
+
+.arrow{
+font-size:40px;
 }
 
 .logout{
-background:white;
-color:#001F5B;
+display:block;
 text-align:center;
+background:white;
+color:#001f5b;
+padding:18px;
+border-radius:18px;
+font-weight:bold;
+text-decoration:none;
+margin-top:15px;
 }
 
 .footer{
 text-align:center;
-opacity:.7;
-font-size:14px;
 margin-top:25px;
+opacity:.7;
 }
 </style>
 </head>
@@ -88,44 +121,87 @@ margin-top:25px;
 
 <div class="container">
 
-<div class="logo">TUBOSA</div>
-
-<div class="card user">
-<h2>¡Bienvenido!</h2>
-<p><strong>Técnico:</strong> Luis Cambindo</p>
-<p><strong>Turno:</strong> A (06:00 - 14:00)</p>
-<p><strong>Área:</strong> Extrusión</p>
+<div class="header">
+    <div class="logo">TUBOSA</div>
 </div>
 
-<a class="menu-btn" href="#">
-🔔 Notificar Novedad
-<span>Registre fallas o novedades del turno</span>
+<div class="user-card">
+
+    <div class="avatar">
+        👤
+    </div>
+
+    <div class="user-info">
+
+        <h2>¡Bienvenido!</h2>
+
+        <div class="info-line">
+            Luis Cambindo
+        </div>
+
+        <div class="info-line">
+            Turno A (06:00 - 14:00)
+        </div>
+
+        <div class="info-line">
+            Área Extrusión
+        </div>
+
+    </div>
+
+</div>
+
+<a class="menu-card" href="#">
+    <div class="icon">📄</div>
+
+    <div class="text">
+        <h3>Notificar Novedad</h3>
+        <p>Registre fallas o novedades del turno</p>
+    </div>
+
+    <div class="arrow">›</div>
 </a>
 
-<a class="menu-btn" href="#">
-📋 Actividades Disponibles
-<span>Consulte y tome actividades programadas</span>
+<a class="menu-card" href="#">
+    <div class="icon">📅</div>
+
+    <div class="text">
+        <h3>Actividades Disponibles</h3>
+        <p>Consulte y tome actividades programadas</p>
+    </div>
+
+    <div class="arrow">›</div>
 </a>
 
-<a class="menu-btn" href="#">
-🛠 Mis Actividades
-<span>Consulte sus actividades asignadas</span>
+<a class="menu-card" href="#">
+    <div class="icon">🛠</div>
+
+    <div class="text">
+        <h3>Mis Actividades</h3>
+        <p>Consulte sus actividades asignadas</p>
+    </div>
+
+    <div class="arrow">›</div>
 </a>
 
-<a class="menu-btn" href="#">
-⏱ Mis Ejecuciones
-<span>Registre tiempos y trabajos realizados</span>
+<a class="menu-card" href="#">
+    <div class="icon">⏱</div>
+
+    <div class="text">
+        <h3>Mis Ejecuciones</h3>
+        <p>Registre tiempos y trabajos realizados</p>
+    </div>
+
+    <div class="arrow">›</div>
 </a>
 
-<a class="menu-btn logout" href="index.html">
-Cerrar Sesión
+<a class="logout" href="index.html">
+    Cerrar Sesión
 </a>
 
 <div class="footer">
 TUBOSA - Sistema de Mantenimiento<br>
 Versión 1.0
-</div>
-
 </div>
 
 </body>
