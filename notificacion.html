@@ -360,25 +360,21 @@ OrdenSAP: document.getElementById("ordenSAP").value,
 AvisoSAP: document.getElementById("avisoSAP").value
 };
 
+const formData = new URLSearchParams();
+formData.append("payload", JSON.stringify(datos));
+
 fetch(URL_SCRIPT, {
-method: "POST",
-mode: "no-cors",
-headers: {
-"Content-Type": "text/plain"
-},
-body: JSON.stringify(datos)
+  method: "POST",
+  mode: "no-cors",
+  body: formData
 })
 .then(() => {
-alert("Novedad enviada. Verifica la hoja Notificaciones.");
-window.location.href = "menu.html";
+  alert("Novedad enviada. Verifica la hoja Notificaciones.");
+  window.location.href = "menu.html";
 })
 .catch(error => {
-alert("Error de conexión: " + error);
+  alert("Error de conexión: " + error);
 });
-
-}
-
-cargarFechaHora();
 </script>
 
 </body>
