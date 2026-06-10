@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Actividades - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+
+body{
+background:#001f5b;
+color:white;
+min-height:100vh;
+padding:18px;
+}
+
+.container{
+max-width:520px;
+margin:auto;
+}
+
+.header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:20px;
+}
+
+.logo{
+font-size:34px;
+font-weight:900;
+}
+
+.back{
+color:white;
+text-decoration:none;
+font-size:32px;
+}
+
+h1{
+font-size:28px;
+margin-bottom:6px;
+}
+
+.subtitle{
+opacity:.85;
+margin-bottom:20px;
+}
+
+.activity-card{
+background:#0b3475;
+border-radius:22px;
+padding:20px;
+border:1px solid rgba(255,255,255,.15);
+margin-bottom:18px;
+}
+
+.estado{
+display:inline-block;
+padding:8px 14px;
+border-radius:20px;
+font-weight:bold;
+font-size:13px;
+margin-bottom:12px;
+}
+
+.asignada{
+background:#f9c74f;
+color:#001f5b;
+}
+
+.ejecucion{
+background:#43aa8b;
+color:white;
+}
+
+.title{
+font-size:22px;
+font-weight:900;
+margin-bottom:10px;
+}
+
+.row{
+margin:8px 0;
+}
+
+.btn{
+width:100%;
+padding:16px;
+border:none;
+border-radius:14px;
+background:white;
+color:#001f5b;
+font-size:18px;
+font-weight:900;
+cursor:pointer;
+margin-top:15px;
+}
+
+.footer{
+text-align:center;
+opacity:.7;
+font-size:13px;
+margin-top:25px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<a class="back" href="menu.html">‹</a>
+<div class="logo">TUBOSA</div>
+<div style="width:32px;"></div>
+</div>
+
+<h1>Mis Actividades</h1>
+
+<div class="subtitle">
+Actividades asignadas al técnico
+</div>
+
+<div class="activity-card">
+
+<div class="estado asignada">
+ASIGNADA
+</div>
+
+<div class="title">
+Cambio sello mecánico
+</div>
+
+<div class="row">
+<strong>Orden SAP:</strong> 40010001
+</div>
+
+<div class="row">
+<strong>Operación:</strong> 0010
+</div>
+
+<div class="row">
+<strong>Línea:</strong> Línea 10
+</div>
+
+<div class="row">
+<strong>Equipo:</strong> Bomba de vacío Línea 10
+</div>
+
+<button class="btn" onclick="iniciarActividad()">
+INICIAR ACTIVIDAD
+</button>
+
+</div>
+
+<div class="activity-card">
+
+<div class="estado ejecucion">
+EN EJECUCIÓN
+</div>
+
+<div class="title">
+PM Compresor CSD75
+</div>
+
+<div class="row">
+<strong>Orden SAP:</strong> 40010002
+</div>
+
+<div class="row">
+<strong>Operación:</strong> 0010
+</div>
+
+<div class="row">
+<strong>Área:</strong> Servicios Industriales
+</div>
+
+<div class="row">
+<strong>Equipo:</strong> Compresor Kaeser CSD75
+</div>
+
+<button class="btn" onclick="window.location.href='ejecuciones.html'">
+REGISTRAR EJECUCIÓN
+</button>
+
+</div>
+
+<div class="footer">
+TUBOSA - Sistema de Mantenimiento<br>
+Versión 1.0
+</div>
+
+</div>
+
+<script>
+
+function iniciarActividad(){
+
+alert("Actividad iniciada correctamente");
+
+}
+
+</script>
+
+</body>
+</html>
