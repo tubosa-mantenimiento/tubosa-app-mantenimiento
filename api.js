@@ -30,6 +30,7 @@ function cargarHoja(nombreHoja) {
 };
 
     document.body.appendChild(script);
+    alert(script.src);
   });
 }
 
