@@ -54,7 +54,7 @@ button{width:100%;padding:18px;border:none;border-radius:16px;background:white;c
 <div class="grid">
 <div>
 <label>Técnico</label>
-<input id="reportadoPor" class="readonly" value="Luis Cambindo" readonly>
+<input id="reportadoPor" class="readonly" value="TEC001" readonly>
 </div>
 <div>
 <label>Turno</label>
@@ -86,10 +86,10 @@ button{width:100%;padding:18px;border:none;border-radius:16px;background:white;c
 <label>Equipo</label>
 <select id="equipo" onchange="llenarDatosEquipo()">
 <option value="">Seleccione...</option>
-<option data-id="3000ACA00005" data-area="Extrusión">Acampanadora Línea 11</option>
-<option data-id="3000EXT00008" data-area="Extrusión">Extrusora Línea 15</option>
-<option data-id="3000COM00009" data-area="Servicios Industriales">Compresor Kaeser CSD75</option>
-<option data-id="3000CHI00012" data-area="Servicios Industriales">Chiller Carrier 280T</option>
+<option value="Acampanadora Línea 11" data-id="3000ACA00005" data-area="Extrusión">Acampanadora Línea 11</option>
+<option value="Extrusora Línea 15" data-id="3000EXT00008" data-area="Extrusión">Extrusora Línea 15</option>
+<option value="Compresor Kaeser CSD75" data-id="3000COM00009" data-area="Servicios Industriales">Compresor Kaeser CSD75</option>
+<option value="Chiller Carrier 280T" data-id="3000CHI00012" data-area="Servicios Industriales">Chiller Carrier 280T</option>
 </select>
 
 <div class="grid">
@@ -180,7 +180,7 @@ button{width:100%;padding:18px;border:none;border-radius:16px;background:white;c
 </div>
 </div>
 
-<button onclick="guardarNotificacion()">GUARDAR NOVEDAD</button>
+<button type="button" onclick="guardarNotificacion()">GUARDAR NOVEDAD</button>
 
 </div>
 
@@ -195,73 +195,85 @@ Versión 1.0
 const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwXekczQdDzjVBLWC8GPefjtKWYc1_j8XwQLuFdDjEFuHaC3aiL3Ocixo7EL2nRJ3C0ag/exec";
 
 function calcularTurno(){
-const h = new Date().getHours();
-if(h >= 6 && h < 14) return "Turno A";
-if(h >= 14 && h < 22) return "Turno B";
-return "Turno C";
+  const h = new Date().getHours();
+  if(h >= 6 && h < 14) return "Turno A";
+  if(h >= 14 && h < 22) return "Turno B";
+  return "Turno C";
 }
 
 function cargarFechaHora(){
-const ahora = new Date();
-document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
-document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
-document.getElementById("turno").value = calcularTurno();
+  const ahora = new Date();
+
+  document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
+
+  document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  document.getElementById("turno").value = calcularTurno();
 }
 
 function llenarDatosEquipo(){
-const select = document.getElementById("equipo");
-const opt = select.options[select.selectedIndex];
-document.getElementById("idEquipo").value = opt.getAttribute("data-id") || "";
-document.getElementById("area").value = opt.getAttribute("data-area") || "";
+  const select = document.getElementById("equipo");
+  const opt = select.options[select.selectedIndex];
+
+  document.getElementById("idEquipo").value = opt.getAttribute("data-id") || "";
+  document.getElementById("area").value = opt.getAttribute("data-area") || "";
 }
 
 function guardarNotificacion(){
 
-alert("Botón funcionando. Enviando a Google Sheets...");
+  const datos = {
+    hoja: "Notificaciones",
+    ID_Notificacion: "NOT-" + Date.now(),
+    FechaReporte: document.getElementById("fecha").value,
+    Horareporte: document.getElementById("hora").value,
+    ReportadoPor: document.getElementById("reportadoPor").value,
+    Turno: document.getElementById("turno").value,
+    Origenreporte: document.getElementById("origenReporte").value,
+    ClaseTrabajo: "CT01",
+    Linea: document.getElementById("linea").value,
+    Equipo: document.getElementById("equipo").value,
+    Area: document.getElementById("area").value,
+    ID_Equipo: document.getElementById("idEquipo").value,
+    DescripcionFalla: document.getElementById("descripcionFalla").value,
+    TrabajoRealizado: "",
+    EquipoParado: document.getElementById("equipoParado").value,
+    TiempoParadaInicial: document.getElementById("tiempoParadaInicial").value,
+    QuedaPendiente: document.getElementById("quedaPendiente").value,
+    Prioridad: document.getElementById("prioridad").value,
+    ModoFalla: document.getElementById("modoFalla").value,
+    CausaProbable: document.getElementById("causaProbable").value,
+    ConsecuenciaProduccion: document.getElementById("consecuenciaProduccion").value,
+    Estado: "ES06",
+    OrdenSAP: document.getElementById("ordenSAP").value,
+    AvisoSAP: document.getElementById("avisoSAP").value
+  };
 
-const datos = {
-hoja: "Notificaciones",
-ID_Notificacion: "NOT-" + Date.now(),
-FechaReporte: document.getElementById("fecha").value,
-Horareporte: document.getElementById("hora").value,
-ReportadoPor: document.getElementById("reportadoPor").value,
-Turno: document.getElementById("turno").value,
-Origenreporte: document.getElementById("origenReporte").value,
-Linea: document.getElementById("linea").value,
-Equipo: document.getElementById("equipo").value,
-Area: document.getElementById("area").value,
-ID_Equipo: document.getElementById("idEquipo").value,
-DescripcionFalla: document.getElementById("descripcionFalla").value,
-EquipoParado: document.getElementById("equipoParado").value,
-TiempoParadaInicial: document.getElementById("tiempoParadaInicial").value,
-QuedaPendiente: document.getElementById("quedaPendiente").value,
-Prioridad: document.getElementById("prioridad").value,
-ModoFalla: document.getElementById("modoFalla").value,
-CausaProbable: document.getElementById("causaProbable").value,
-ConsecuenciaProduccion: document.getElementById("consecuenciaProduccion").value,
-Estado: "ES06",
-OrdenSAP: document.getElementById("ordenSAP").value,
-AvisoSAP: document.getElementById("avisoSAP").value
-};
+  if(!datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla){
+    alert("Debe llenar origen, línea, equipo y descripción de falla.");
+    return;
+  }
 
-const formData = new URLSearchParams();
-formData.append("payload", JSON.stringify(datos));
+  const formData = new URLSearchParams();
+  formData.append("payload", JSON.stringify(datos));
 
-fetch(URL_SCRIPT, {
-method: "POST",
-mode: "no-cors",
-body: formData
-})
-.then(() => {
-alert("Novedad enviada. Revisa Google Sheets.");
-})
-.catch(error => {
-alert("Error: " + error);
-});
-
+  fetch(URL_SCRIPT, {
+    method: "POST",
+    mode: "no-cors",
+    body: formData
+  })
+  .then(() => {
+    alert("Novedad enviada. Revisa la hoja Notificaciones.");
+    window.location.href = "menu.html";
+  })
+  .catch(error => {
+    alert("Error al enviar: " + error);
+  });
 }
 
-window.onload = cargarFechaHora;
+document.addEventListener("DOMContentLoaded", cargarFechaHora);
 </script>
 
 </body>
