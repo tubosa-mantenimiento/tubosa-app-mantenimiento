@@ -192,49 +192,165 @@ Versión 1.0
 </div>
 
 <script>
+
 const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwXekczQdDzjVBLWC8GPefjtKWYc1_j8XwQLuFdDjEFuHaC3aiL3Ocixo7EL2nRJ3C0ag/exec";
 
-function calcularTurno(){
+function calcularTurno() {
+
   const h = new Date().getHours();
-  if(h >= 6 && h < 14) return "Turno A";
-  if(h >= 14 && h < 22) return "Turno B";
+
+  if (h >= 6 && h < 14) return "Turno A";
+  if (h >= 14 && h < 22) return "Turno B";
+
   return "Turno C";
 }
 
-function cargarFechaHora(){
+function cargarFechaHora() {
+
   const ahora = new Date();
-  document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
-  document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO", {
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-  document.getElementById("turno").value = calcularTurno();
+
+  document.getElementById("fecha").value =
+    ahora.toLocaleDateString("es-CO");
+
+  document.getElementById("hora").value =
+    ahora.toLocaleTimeString("es-CO", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+  document.getElementById("turno").value =
+    calcularTurno();
 }
 
-function llenarDatosEquipo(){
+function llenarDatosEquipo() {
+
   const select = document.getElementById("equipo");
   const opt = select.options[select.selectedIndex];
-  document.getElementById("idEquipo").value = opt.getAttribute("data-id") || "";
-  document.getElementById("area").value = opt.getAttribute("data-area") || "";
+
+  document.getElementById("idEquipo").value =
+    opt.getAttribute("data-id") || "";
+
+  document.getElementById("area").value =
+    opt.getAttribute("data-area") || "";
 }
 
-function guardarNotificacion(){
-
-  alert("ENTRO A GUARDAR");
+function guardarNotificacion() {
 
   const datos = {
+
     hoja: "Notificaciones",
-    ID_Notificacion: "TEST-" + Date.now(),
-    FechaReporte: document.getElementById("fecha").value,
-    Horareporte: document.getElementById("hora").value
+
+    ID_Notificacion: "NOT-" + Date.now(),
+
+    FechaReporte:
+      document.getElementById("fecha").value,
+
+    Horareporte:
+      document.getElementById("hora").value,
+
+    ReportadoPor:
+      document.getElementById("reportadoPor").value,
+
+    Turno:
+      document.getElementById("turno").value,
+
+    Origenreporte:
+      document.getElementById("origenReporte").value,
+
+    ClaseTrabajo:
+      "CT01",
+
+    Linea:
+      document.getElementById("linea").value,
+
+    Equipo:
+      document.getElementById("equipo").value,
+
+    Area:
+      document.getElementById("area").value,
+
+    ID_Equipo:
+      document.getElementById("idEquipo").value,
+
+    DescripcionFalla:
+      document.getElementById("descripcionFalla").value,
+
+    TrabajoRealizado:
+      "",
+
+    EquipoParado:
+      document.getElementById("equipoParado").value,
+
+    TiempoParadaInicial:
+      document.getElementById("tiempoParadaInicial").value,
+
+    QuedaPendiente:
+      document.getElementById("quedaPendiente").value,
+
+    Prioridad:
+      document.getElementById("prioridad").value,
+
+    ModoFalla:
+      document.getElementById("modoFalla").value,
+
+    CausaProbable:
+      document.getElementById("causaProbable").value,
+
+    ConsecuenciaProduccion:
+      document.getElementById("consecuenciaProduccion").value,
+
+    Estado:
+      "ES06",
+
+    OrdenSAP:
+      document.getElementById("ordenSAP").value,
+
+    AvisoSAP:
+      document.getElementById("avisoSAP").value
   };
 
-  const params = new URLSearchParams(datos);
+  if (
+    !datos.Origenreporte ||
+    !datos.Linea ||
+    !datos.Equipo ||
+    !datos.DescripcionFalla
+  ) {
+    alert("Debe completar Origen, Línea, Equipo y Descripción.");
+    return;
+  }
 
-  const urlFinal = URL_SCRIPT + "?" + params.toString();
+  const formData = new URLSearchParams();
 
-  alert(urlFinal);
+  formData.append(
+    "payload",
+    JSON.stringify(datos)
+  );
 
-  window.open(urlFinal, "_blank");
+  fetch(URL_SCRIPT, {
+    method: "POST",
+    body: formData
+  })
+  .then(response => response.text())
+  .then(resultado => {
 
+    console.log(resultado);
+
+    alert("Novedad enviada correctamente");
+
+    location.reload();
+
+  })
+  .catch(error => {
+
+    console.error(error);
+
+    alert("Error enviando información");
+  });
 }
+
+document.addEventListener(
+  "DOMContentLoaded",
+  cargarFechaHora
+);
+
+</script>
