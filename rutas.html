@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rutas de Inspección - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#001f5b;color:white;min-height:100vh;padding:18px;}
+.container{max-width:520px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.logo{font-size:34px;font-weight:900;}
+.back{color:white;text-decoration:none;font-size:32px;}
+h1{font-size:28px;margin-bottom:6px;}
+.subtitle{opacity:.85;margin-bottom:20px;}
+.route-card{
+background:#0b3475;
+border-radius:22px;
+padding:20px;
+border:1px solid rgba(255,255,255,.15);
+margin-bottom:18px;
+}
+.route-title{font-size:22px;font-weight:900;margin-bottom:10px;}
+.row{margin:7px 0;font-size:16px;}
+.tag{
+display:inline-block;
+background:white;
+color:#001f5b;
+padding:6px 12px;
+border-radius:20px;
+font-weight:bold;
+font-size:13px;
+margin-bottom:12px;
+}
+button{
+width:100%;
+padding:16px;
+border:none;
+border-radius:15px;
+background:white;
+color:#001f5b;
+font-size:18px;
+font-weight:900;
+margin-top:16px;
+cursor:pointer;
+}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:25px;}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="header">
+<a class="back" href="menu.html">‹</a>
+<div class="logo">TUBOSA</div>
+<div style="width:32px;"></div>
+</div>
+
+<h1>Rutas de Inspección</h1>
+<div class="subtitle">Seleccione la ruta que va a diligenciar</div>
+
+<div class="route-card">
+<div class="tag">Diaria</div>
+<div class="route-title">Bombas PIAB</div>
+<div class="row"><strong>Área:</strong> Extrusión</div>
+<div class="row"><strong>Frecuencia:</strong> Por turno / diaria</div>
+<button onclick="window.location.href='ruta-piab.html'">ABRIR RUTA</button>
+</div>
+
+<div class="route-card">
+<div class="tag">Diaria</div>
+<div class="route-title">Servicios Industriales</div>
+<div class="row"><strong>Área:</strong> Servicios Industriales</div>
+<div class="row"><strong>Incluye:</strong> Compresores, Chillers, Bombas, Subestación</div>
+<button onclick="alert('Esta ruta la construiremos en el siguiente paso')">ABRIR RUTA</button>
+</div>
+
+<div class="route-card">
+<div class="tag">Por arranque</div>
+<div class="route-title">Calentamiento de Línea</div>
+<div class="row"><strong>Área:</strong> Extrusión</div>
+<div class="row"><strong>Uso:</strong> Antes del arranque de línea</div>
+<button onclick="alert('Esta ruta la construiremos después de Bombas PIAB')">ABRIR RUTA</button>
+</div>
+
+<div class="route-card">
+<div class="tag">Semanal</div>
+<div class="route-title">Planta de Emergencia</div>
+<div class="row"><strong>Área:</strong> Servicios Industriales</div>
+<div class="row"><strong>Uso:</strong> Chequeo y prueba de planta</div>
+<button onclick="alert('Esta ruta la construiremos después')">ABRIR RUTA</button>
+</div>
+
+<div class="footer">
+TUBOSA - Sistema de Mantenimiento<br>
+Versión 1.0
+</div>
+
+</div>
+</body>
+</html>
