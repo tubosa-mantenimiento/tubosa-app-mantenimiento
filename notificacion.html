@@ -335,14 +335,16 @@ const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwXekczQdDzjVBLWC8GP
 
 function guardarNotificacion(){
 
+alert("Probando botón guardar");
+
 const datos = {
 hoja: "Notificaciones",
 ID_Notificacion: "NOT-" + Date.now(),
 FechaReporte: document.getElementById("fecha").value,
-HoraReporte: document.getElementById("hora").value,
+Horareporte: document.getElementById("hora").value,
 ReportadoPor: document.getElementById("reportadoPor").value,
 Turno: document.getElementById("turno").value,
-OrigenReporte: document.getElementById("origenReporte").value,
+Origenreporte: document.getElementById("origenReporte").value,
 Linea: document.getElementById("linea").value,
 Equipo: document.getElementById("equipo").value,
 Area: document.getElementById("area").value,
@@ -364,18 +366,16 @@ const formData = new URLSearchParams();
 formData.append("payload", JSON.stringify(datos));
 
 fetch(URL_SCRIPT, {
-  method: "POST",
-  mode: "no-cors",
-  body: formData
+method: "POST",
+mode: "no-cors",
+body: formData
 })
 .then(() => {
-  alert("Novedad enviada. Verifica la hoja Notificaciones.");
-  window.location.href = "menu.html";
+alert("Novedad enviada. Verifica la hoja Notificaciones.");
+window.location.href = "menu.html";
 })
 .catch(error => {
-  alert("Error de conexión: " + error);
+alert("Error de conexión: " + error);
 });
-</script>
 
-</body>
-</html>
+}
