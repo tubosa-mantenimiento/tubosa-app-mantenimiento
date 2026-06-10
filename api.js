@@ -20,9 +20,14 @@ function cargarHoja(nombreHoja) {
       "&callback=" +
       callbackName;
 
-    script.onerror = function() {
-      reject("Error cargando hoja " + nombreHoja);
-    };
+   script.onerror = function(e) {
+
+  alert("ERROR SCRIPT");
+
+  console.log(e);
+
+  reject("Error cargando hoja " + nombreHoja);
+};
 
     document.body.appendChild(script);
   });
