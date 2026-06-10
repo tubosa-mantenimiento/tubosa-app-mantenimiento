@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Calentamiento de Línea - TUBOSA</title>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 body{background:#001f5b;color:white;min-height:100vh;padding:16px;}
@@ -23,6 +24,7 @@ textarea{min-height:70px;resize:vertical;}
 .readonly{background:#dbe4f5;}
 .zona{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.15);}
 .zona-title{font-weight:900;font-size:17px;margin-bottom:10px;}
+.ref{font-size:13px;opacity:.85;margin:8px 0;}
 button{width:100%;padding:17px;border:none;border-radius:16px;background:white;color:#001f5b;font-size:20px;font-weight:900;margin-top:18px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:20px;}
 </style>
@@ -143,41 +145,51 @@ div.innerHTML = `
 <div class="grid">
 <div>
 <label>50°C Inicio</label>
-<input type="time">
+<input type="time" name="${contenedorId}_${i}_50_inicio">
 </div>
 <div>
 <label>50°C Final</label>
-<input type="time">
+<input type="time" name="${contenedorId}_${i}_50_final">
 </div>
 </div>
 
 <div class="grid">
 <div>
 <label>100°C Inicio</label>
-<input type="time">
+<input type="time" name="${contenedorId}_${i}_100_inicio">
 </div>
 <div>
 <label>100°C Final</label>
-<input type="time">
+<input type="time" name="${contenedorId}_${i}_100_final">
 </div>
 </div>
 
 <div class="grid">
 <div>
 <label>140°C Inicio</label>
-<input type="time">
+<input type="time" name="${contenedorId}_${i}_140_inicio">
 </div>
 <div>
 <label>140°C Final</label>
-<input type="time">
+<input type="time" name="${contenedorId}_${i}_140_final">
 </div>
 </div>
 
-<label>Amperaje</label>
+<div class="ref">Amperaje único por zona. Si no aplica una fase, dejarla vacía.</div>
+
 <div class="grid3">
-<input type="number" placeholder="R">
-<input type="number" placeholder="S">
-<input type="number" placeholder="T">
+<div>
+<label>R</label>
+<input type="number" step="0.01" placeholder="Amp R" name="${contenedorId}_${i}_amp_r">
+</div>
+<div>
+<label>S</label>
+<input type="number" step="0.01" placeholder="Amp S" name="${contenedorId}_${i}_amp_s">
+</div>
+<div>
+<label>T</label>
+<input type="number" step="0.01" placeholder="Amp T" name="${contenedorId}_${i}_amp_t">
+</div>
 </div>
 `;
 
