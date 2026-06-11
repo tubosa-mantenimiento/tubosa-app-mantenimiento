@@ -169,8 +169,8 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
       </div>
     </div>
 
-    <button onclick="guardarNovedad()">GUARDAR NOVEDAD</button>
-
+   <button id="btnGuardar" onclick="guardarNovedad()">GUARDAR NOVEDAD</button>
+    
   </div>
 
   <div class="footer">
@@ -261,6 +261,10 @@ function llenarEquipo(){
 
 async function guardarNovedad(){
 
+  const btn = document.getElementById("btnGuardar");
+btn.disabled = true;
+btn.innerText = "GUARDANDO...";
+  
   const datos = {
     hoja: "Notificaciones",
     ID_Notificacion: "NOT-" + Date.now(),
@@ -306,8 +310,10 @@ async function guardarNovedad(){
     }
 
   }catch(error){
-    alert("Error guardando novedad: " + error);
-  }
+  alert("Error guardando novedad: " + error);
+  btn.disabled = false;
+  btn.innerText = "GUARDAR NOVEDAD";
+}
 }
 
 cargarInicial();
