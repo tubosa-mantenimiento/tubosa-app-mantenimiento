@@ -26,6 +26,7 @@ textarea{min-height:90px;resize:vertical;}
 .zona{border-top:1px solid rgba(255,255,255,.18);padding-top:14px;margin-top:14px;}
 .ref{font-size:13px;opacity:.8;margin-bottom:6px;}
 button{width:100%;padding:19px;border:none;border-radius:16px;background:white;color:#001f5b;font-size:21px;font-weight:900;margin-top:20px;}
+.btn-secundario{background:#dbe4f5;color:#001f5b;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
 </style>
 </head>
@@ -86,9 +87,13 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
 <label>Observaciones</label>
 <textarea id="Observaciones" placeholder="Ingrese observaciones del calentamiento..."></textarea>
 
+<button id="btnGuardar" onclick="guardarCalentamiento()">GUARDAR Y GENERAR PDF</button>
+
 <div id="resultadoPDF" style="display:none;margin-top:20px;">
-  <button id="btnVerPDF" onclick="verPDF()">VER PDF</button>
-  <button id="btnCompartirPDF" onclick="compartirPDF()">COMPARTIR PDF</button>
+  <button class="btn-secundario" id="btnVerPDF" onclick="verPDF()">VER PDF</button>
+  <button class="btn-secundario" id="btnCompartirPDF" onclick="compartirPDF()">COMPARTIR PDF</button>
+  <button class="btn-secundario" onclick="window.location.href='rutas.html'">VOLVER A RUTAS</button>
+</div>
 </div>
 
 <div class="footer">
@@ -255,26 +260,21 @@ async function guardarCalentamiento(){
 
     if(resultado.ok){
 
-  btn.innerText = "GUARDADO";
-  
-  if(resultado.pdfUrl){
-    localStorage.setItem("ultimoPDFCalentamiento", resultado.pdfUrl);
+      btn.innerText = "GUARDADO";
 
-    alert("Check List guardado y PDF generado correctamente.");
+      if(resultado.pdfUrl){
+        localStorage.setItem("ultimoPDFCalentamiento", resultado.pdfUrl);
 
-    document.getElementById("resultadoPDF").style.display = "block";
-    document.getElementById("btnVerPDF").style.display = "block";
-    document.getElementById("btnCompartirPDF").style.display = "block";
+        alert("Check List guardado y PDF generado correctamente.");
 
-  }else{
-    alert("Check List guardado, pero no se recibió enlace PDF.");
-  }
+        document.getElementById("resultadoPDF").style.display = "block";
 
-}else{
-  alert("Error: " + resultado.mensaje);
-  btn.disabled = false;
-  btn.innerText = "GUARDAR Y GENERAR PDF";
-}
+      }else{
+        alert("Check List guardado, pero no se recibió enlace PDF.");
+        btn.disabled = false;
+        btn.innerText = "GUARDAR Y GENERAR PDF";
+      }
+
     }else{
       alert("Error: " + resultado.mensaje);
       btn.disabled = false;
@@ -287,6 +287,7 @@ async function guardarCalentamiento(){
     btn.innerText = "GUARDAR Y GENERAR PDF";
   }
 }
+
 function verPDF(){
   const url = localStorage.getItem("ultimoPDFCalentamiento");
 
@@ -316,7 +317,7 @@ function compartirPDF(){
     window.open("https://wa.me/?text=" + encodeURIComponent("PDF Check List de calentamiento: " + url), "_blank");
   }
 }
-  
+
 cargarInicial();
 cargarLineas();
 
