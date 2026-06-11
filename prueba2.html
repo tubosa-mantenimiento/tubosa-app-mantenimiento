@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prueba JSON</title>
+</head>
+
+<body style="background:#001f5b;color:white;font-family:Arial;padding:20px;">
+
+<h1>TUBOSA</h1>
+
+<button onclick="probar()"
+style="padding:15px;font-size:20px;">
+Cargar cantidad equipos
+</button>
+
+<h2 id="resultado"></h2>
+
+<script>
+
+const URL_API =
+"https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+async function probar(){
+
+  const respuesta =
+  await fetch(URL_API + "?accion=listar&hoja=Equipos");
+
+  const datos =
+  await respuesta.json();
+
+  document.getElementById("resultado").innerHTML =
+  "Equipos encontrados: " +
+  datos.datos.length;
+
+}
+
+</script>
+
+</body>
+</html>
