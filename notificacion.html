@@ -182,7 +182,7 @@ let equiposBD = [];
   select.innerHTML = '<option value="">Cargando...</option>';
 
   try{
-    const respuesta = await fetch(URL_API + "?accion=listar&hoja=" + nombreHoja);
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=" + encodeURIComponent(nombreHoja));
     const data = await respuesta.json();
 
     select.innerHTML = '<option value="">Seleccione...</option>';
@@ -308,8 +308,11 @@ btn.innerText = "GUARDANDO...";
   };
 
   if(!datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla){
-    alert("Debe completar origen, línea, equipo y descripción.");
-    return;
+  alert("Debe completar origen, línea, equipo y descripción.");
+  btn.disabled = false;
+  btn.innerText = "GUARDAR NOVEDAD";
+  return;
+}
   }
 
   try{
