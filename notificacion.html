@@ -130,33 +130,18 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
 
     <label>Modo falla</label>
     <select id="modoFalla">
-      <option>Por definir</option>
-      <option>No arranca</option>
-      <option>No realiza movimiento</option>
-      <option>Fuga</option>
-      <option>Ruido anormal</option>
-      <option>Falla eléctrica</option>
-      <option>Falla mecánica</option>
-    </select>
+  <option value="">Cargando modos de falla...</option>
+</select>
 
     <label>Causa probable</label>
     <select id="causaProbable">
-      <option>Por definir</option>
-      <option>Desgaste</option>
-      <option>Falta de ajuste</option>
-      <option>Falla eléctrica</option>
-      <option>Falla neumática</option>
-      <option>Falta de lubricación</option>
-    </select>
+  <option value="">Cargando causas...</option>
+</select>
 
     <label>Consecuencia producción</label>
-    <select id="consecuenciaProduccion">
-      <option>Sin afectación</option>
-      <option>Paro parcial</option>
-      <option>Paro total</option>
-      <option>Baja velocidad</option>
-      <option>Producto no conforme</option>
-    </select>
+   <select id="consecuenciaProduccion">
+  <option value="">Cargando consecuencias...</option>
+</select>
 
     <div class="grid">
       <div>
@@ -191,6 +176,36 @@ if(!usuario){
 
 let equiposBD = [];
 
+  async function cargarCatalogo(nombreHoja, idSelect){
+
+  const select = document.getElementById(idSelect);
+  select.innerHTML = '<option value="">Cargando...</option>';
+
+  try{
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=" + nombreHoja);
+    const data = await respuesta.json();
+
+    select.innerHTML = '<option value="">Seleccione...</option>';
+
+    data.datos.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.Codigo;
+      option.textContent = item.Descripcion;
+      select.appendChild(option);
+    });
+
+  }catch(error){
+    alert("Error cargando catálogo " + nombreHoja + ": " + error);
+    select.innerHTML = '<option value="">Error cargando</option>';
+  }
+}
+
+async function cargarCatalogos(){
+  await cargarCatalogo("Catalogo_ModoFalla", "modoFalla");
+  await cargarCatalogo("Catalogo_Causa", "causaProbable");
+  await cargarCatalogo("Catalogo_Consecuencia", "consecuenciaProduccion");
+}
+  
 function cargarInicial(){
   const ahora = new Date();
 
@@ -318,6 +333,7 @@ btn.innerText = "GUARDANDO...";
 
 cargarInicial();
 cargarEquipos();
+cargarCatalogos();
 </script>
 
 </body>
