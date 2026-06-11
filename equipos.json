@@ -1,0 +1,44 @@
+[
+  {
+    "id":"EXT-L10",
+    "nombre":"Extrusora Línea 10",
+    "linea":"Linea 10",
+    "area":"Extrusión"
+  },
+  {
+    "id":"EXT-L10",
+    "nombre":"Cortadora Línea 10",
+    "linea":"Linea 10",
+    "area":"Extrusión"
+  }
+  {
+    "id":"ACA-L10",
+    "nombre":"Acampanadora Línea 10",
+    "linea":"Linea 10",
+    "area":"Extrusión"
+  },
+  {
+    "id":"HAL-L10",
+    "nombre":"Halador Línea 10",
+    "linea":"Linea 10",
+    "area":"Extrusión"
+  },
+  {
+    "id":"EXT-L11",
+    "nombre":"Extrusora Línea 11",
+    "linea":"Linea 11",
+    "area":"Extrusión"
+  },
+  {
+    "id":"ACA-L11",
+    "nombre":"Acampanadora Línea 11",
+    "linea":"Linea 11",
+    "area":"Extrusión"
+  },
+  {
+    "id":"COR-L11",
+    "nombre":"Cortadora Línea 11",
+    "linea":"Linea 11",
+    "area":"Extrusión"
+  }
+]
