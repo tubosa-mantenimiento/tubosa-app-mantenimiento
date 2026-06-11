@@ -211,7 +211,7 @@ function cargarInicial(){
 
   document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
   document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
-  document.getElementById("tecnico").value = usuario.codigo + " - " + usuario.nombre;
+  document.getElementById("tecnico").value = usuario.nombre;
   document.getElementById("turno").value = usuario.turno;
 }
 
@@ -313,7 +313,6 @@ btn.innerText = "GUARDANDO...";
   btn.innerText = "GUARDAR NOVEDAD";
   return;
 }
-  }
 
   try{
     const params = new URLSearchParams(datos);
