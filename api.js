@@ -2,36 +2,39 @@
 "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
 
 function cargarHoja(nombreHoja) {
+
   return new Promise((resolve, reject) => {
+
     const callbackName = "callback_" + Date.now();
 
-    window[callbackName] = function(data) {
+    window[callbackName] = function(data){
       resolve(data);
       delete window[callbackName];
-      document.body.removeChild(script);
     };
 
     const script = document.createElement("script");
 
     script.src =
       URL_API +
-      "?accion=listar&hoja=" +
-      encodeURIComponent(nombreHoja) +
-      "&callback=" +
-      callbackName;
+      "?accion=listar" +
+      "&hoja=" + encodeURIComponent(nombreHoja) +
+      "&callback=" + callbackName;
 
-   script.onerror = function(e) {
-
-  alert("ERROR SCRIPT");
-
-  console.log(e);
-
-  reject("Error cargando hoja " + nombreHoja);
-};
-
-    document.body.appendChild(script);
     alert(script.src);
+
+    script.onload = function(){
+      console.log("JSONP cargado");
+    };
+
+    script.onerror = function(){
+      alert("ERROR SCRIPT");
+      reject("Error cargando hoja " + nombreHoja);
+    };
+
+    document.head.appendChild(script);
+
   });
+
 }
 
 async function cargarEquipos() {
