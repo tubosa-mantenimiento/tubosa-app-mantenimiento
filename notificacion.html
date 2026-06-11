@@ -7,106 +7,21 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-
-body{
-  background:#001f5b;
-  color:white;
-  min-height:100vh;
-  padding:22px;
-}
-
-.container{
-  max-width:520px;
-  margin:auto;
-}
-
-.header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:22px;
-}
-
-.back{
-  color:white;
-  text-decoration:none;
-  font-size:42px;
-  font-weight:bold;
-}
-
-.logo{
-  font-size:46px;
-  font-weight:900;
-}
-
-.card{
-  background:#0b3475;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:24px;
-  padding:22px;
-}
-
-h1{
-  font-size:30px;
-  margin-bottom:8px;
-}
-
-.subtitle{
-  font-size:17px;
-  opacity:.85;
-  margin-bottom:24px;
-}
-
-label{
-  display:block;
-  font-weight:bold;
-  font-size:17px;
-  margin-top:16px;
-  margin-bottom:7px;
-}
-
-input,select,textarea{
-  width:100%;
-  padding:16px;
-  border:none;
-  border-radius:15px;
-  font-size:17px;
-  color:#001f5b;
-}
-
-textarea{
-  min-height:110px;
-  resize:vertical;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-
-.readonly{
-  background:#dbe4f5;
-}
-
-button{
-  width:100%;
-  padding:19px;
-  border:none;
-  border-radius:16px;
-  background:white;
-  color:#001f5b;
-  font-size:21px;
-  font-weight:900;
-  margin-top:26px;
-}
-
-.footer{
-  text-align:center;
-  opacity:.7;
-  font-size:13px;
-  margin-top:24px;
-}
+body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
+.container{max-width:520px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
+.logo{font-size:46px;font-weight:900;}
+.card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;}
+h1{font-size:30px;margin-bottom:8px;}
+.subtitle{font-size:17px;opacity:.85;margin-bottom:24px;}
+label{display:block;font-weight:bold;font-size:17px;margin-top:16px;margin-bottom:7px;}
+input,select,textarea{width:100%;padding:16px;border:none;border-radius:15px;font-size:17px;color:#001f5b;}
+textarea{min-height:110px;resize:vertical;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.readonly{background:#dbe4f5;}
+button{width:100%;padding:19px;border:none;border-radius:16px;background:white;color:#001f5b;font-size:21px;font-weight:900;margin-top:26px;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
 </style>
 </head>
 
@@ -157,15 +72,8 @@ button{
     </select>
 
     <label>Línea</label>
-    <select id="linea" onchange="cargarEquipos()">
-      <option value="">Seleccione...</option>
-      <option value="Linea 10">Línea 10</option>
-      <option value="Linea 11">Línea 11</option>
-      <option value="Linea 15">Línea 15</option>
-      <option value="Linea 16">Línea 16</option>
-      <option value="Linea 18">Línea 18</option>
-      <option value="Linea 19">Línea 19</option>
-      <option value="Linea 20">Línea 20</option>
+    <select id="linea" onchange="cargarEquiposPorLinea()">
+      <option value="">Cargando líneas...</option>
     </select>
 
     <label>Equipo</label>
@@ -201,16 +109,65 @@ button{
       </div>
     </div>
 
-    <label>Prioridad</label>
-    <select id="prioridad">
-      <option>Media</option>
-      <option>Baja</option>
-      <option>Alta</option>
-      <option>Crítica</option>
+    <div class="grid">
+      <div>
+        <label>Queda pendiente</label>
+        <select id="quedaPendiente">
+          <option>No</option>
+          <option>Sí</option>
+        </select>
+      </div>
+      <div>
+        <label>Prioridad</label>
+        <select id="prioridad">
+          <option>Media</option>
+          <option>Baja</option>
+          <option>Alta</option>
+          <option>Crítica</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Modo falla</label>
+    <select id="modoFalla">
+      <option>Por definir</option>
+      <option>No arranca</option>
+      <option>No realiza movimiento</option>
+      <option>Fuga</option>
+      <option>Ruido anormal</option>
+      <option>Falla eléctrica</option>
+      <option>Falla mecánica</option>
     </select>
 
-    <label>Foto / evidencia</label>
-    <input id="foto" type="file" accept="image/*" capture="environment">
+    <label>Causa probable</label>
+    <select id="causaProbable">
+      <option>Por definir</option>
+      <option>Desgaste</option>
+      <option>Falta de ajuste</option>
+      <option>Falla eléctrica</option>
+      <option>Falla neumática</option>
+      <option>Falta de lubricación</option>
+    </select>
+
+    <label>Consecuencia producción</label>
+    <select id="consecuenciaProduccion">
+      <option>Sin afectación</option>
+      <option>Paro parcial</option>
+      <option>Paro total</option>
+      <option>Baja velocidad</option>
+      <option>Producto no conforme</option>
+    </select>
+
+    <div class="grid">
+      <div>
+        <label>Orden SAP</label>
+        <input id="ordenSAP" placeholder="Opcional">
+      </div>
+      <div>
+        <label>Aviso SAP</label>
+        <input id="avisoSAP" placeholder="Opcional">
+      </div>
+    </div>
 
     <button onclick="guardarNovedad()">GUARDAR NOVEDAD</button>
 
@@ -224,45 +181,15 @@ button{
 </div>
 
 <script>
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
 const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
 
 if(!usuario){
   window.location.href = "index.html";
 }
 
-const equipos = {
-  "Linea 10": [
-    {nombre:"Extrusora Línea 10", id:"EXT-L10", area:"Extrusión"},
-    {nombre:"Acampanadora Línea 10", id:"ACA-L10", area:"Extrusión"},
-    {nombre:"Halador Línea 10", id:"HAL-L10", area:"Extrusión"}
-  ],
-  "Linea 11": [
-    {nombre:"Extrusora Línea 11", id:"EXT-L11", area:"Extrusión"},
-    {nombre:"Acampanadora Línea 11", id:"ACA-L11", area:"Extrusión"},
-    {nombre:"Cortadora Línea 11", id:"COR-L11", area:"Extrusión"}
-  ],
-  "Linea 15": [
-    {nombre:"Extrusora Línea 15", id:"EXT-L15", area:"Extrusión"},
-    {nombre:"Tina Línea 15", id:"TIN-L15", area:"Extrusión"},
-    {nombre:"Halador Línea 15", id:"HAL-L15", area:"Extrusión"}
-  ],
-  "Linea 16": [
-    {nombre:"Extrusora Línea 16", id:"EXT-L16", area:"Extrusión"},
-    {nombre:"Acampanadora Línea 16", id:"ACA-L16", area:"Extrusión"}
-  ],
-  "Linea 18": [
-    {nombre:"Extrusora Línea 18", id:"EXT-L18", area:"Extrusión"},
-    {nombre:"Halador Línea 18", id:"HAL-L18", area:"Extrusión"}
-  ],
-  "Linea 19": [
-    {nombre:"Corrugadora Línea 19", id:"CORR-L19", area:"Corrugado"},
-    {nombre:"Extrusora Línea 19", id:"EXT-L19", area:"Corrugado"}
-  ],
-  "Linea 20": [
-    {nombre:"Corrugadora Línea 20", id:"CORR-L20", area:"Corrugado"},
-    {nombre:"Extrusora Línea 20", id:"EXT-L20", area:"Corrugado"}
-  ]
-};
+let equiposBD = [];
 
 function cargarInicial(){
   const ahora = new Date();
@@ -273,23 +200,54 @@ function cargarInicial(){
   document.getElementById("turno").value = usuario.turno;
 }
 
-function cargarEquipos(){
-  const linea = document.getElementById("linea").value;
-  const select = document.getElementById("equipo");
+async function cargarEquipos(){
+  const selectLinea = document.getElementById("linea");
+  selectLinea.innerHTML = '<option value="">Cargando líneas...</option>';
 
-  select.innerHTML = '<option value="">Seleccione...</option>';
+  try{
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Equipos");
+    const data = await respuesta.json();
+
+    equiposBD = data.datos || [];
+
+    const lineas = [...new Set(
+      equiposBD
+        .map(e => e.Linea)
+        .filter(l => l && l !== "")
+    )].sort();
+
+    selectLinea.innerHTML = '<option value="">Seleccione...</option>';
+
+    lineas.forEach(linea => {
+      const option = document.createElement("option");
+      option.value = linea;
+      option.textContent = linea;
+      selectLinea.appendChild(option);
+    });
+
+  }catch(error){
+    alert("Error cargando equipos: " + error);
+    selectLinea.innerHTML = '<option value="">Error cargando líneas</option>';
+  }
+}
+
+function cargarEquiposPorLinea(){
+  const linea = document.getElementById("linea").value;
+  const selectEquipo = document.getElementById("equipo");
+
+  selectEquipo.innerHTML = '<option value="">Seleccione...</option>';
   document.getElementById("area").value = "";
   document.getElementById("idEquipo").value = "";
 
-  if(!linea || !equipos[linea]) return;
+  const filtrados = equiposBD.filter(e => e.Linea === linea);
 
-  equipos[linea].forEach(eq => {
+  filtrados.forEach(eq => {
     const option = document.createElement("option");
-    option.value = eq.nombre;
-    option.textContent = eq.nombre;
-    option.dataset.id = eq.id;
-    option.dataset.area = eq.area;
-    select.appendChild(option);
+    option.value = eq.NombreEquipo;
+    option.textContent = eq.NombreEquipo;
+    option.dataset.id = eq.ID_Equipo;
+    option.dataset.area = eq.Area;
+    selectEquipo.appendChild(option);
   });
 }
 
@@ -301,40 +259,59 @@ function llenarEquipo(){
   document.getElementById("area").value = opt.dataset.area || "";
 }
 
-function guardarNovedad(){
+async function guardarNovedad(){
+
   const datos = {
-    id: "NOT-" + Date.now(),
-    fecha: document.getElementById("fecha").value,
-    hora: document.getElementById("hora").value,
-    tecnico: usuario.codigo,
-    nombre: usuario.nombre,
-    turno: usuario.turno,
-    origen: document.getElementById("origen").value,
-    linea: document.getElementById("linea").value,
-    equipo: document.getElementById("equipo").value,
-    idEquipo: document.getElementById("idEquipo").value,
-    area: document.getElementById("area").value,
-    descripcion: document.getElementById("descripcion").value,
-    equipoParado: document.getElementById("equipoParado").value,
-    tiempoParada: document.getElementById("tiempoParada").value,
-    prioridad: document.getElementById("prioridad").value,
-    estado: "Reportado"
+    hoja: "Notificaciones",
+    ID_Notificacion: "NOT-" + Date.now(),
+    FechaReporte: document.getElementById("fecha").value,
+    Horareporte: document.getElementById("hora").value,
+    ReportadoPor: usuario.codigo,
+    Turno: document.getElementById("turno").value,
+    Origenreporte: document.getElementById("origen").value,
+    ClaseTrabajo: "CT01",
+    Linea: document.getElementById("linea").value,
+    Equipo: document.getElementById("equipo").value,
+    Area: document.getElementById("area").value,
+    ID_Equipo: document.getElementById("idEquipo").value,
+    DescripcionFalla: document.getElementById("descripcion").value,
+    TrabajoRealizado: "",
+    EquipoParado: document.getElementById("equipoParado").value,
+    TiempoParadaInicial: document.getElementById("tiempoParada").value,
+    quedapendiente: document.getElementById("quedaPendiente").value,
+    Prioridad: document.getElementById("prioridad").value,
+    ModoFalla: document.getElementById("modoFalla").value,
+    CausaProbable: document.getElementById("causaProbable").value,
+    ConsecuenciaProduccion: document.getElementById("consecuenciaProduccion").value,
+    Estado: "ES06",
+    OrdenSAP: document.getElementById("ordenSAP").value,
+    AvisoSap: document.getElementById("avisoSAP").value
   };
 
-  if(!datos.origen || !datos.linea || !datos.equipo || !datos.descripcion){
+  if(!datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla){
     alert("Debe completar origen, línea, equipo y descripción.");
     return;
   }
 
-  let novedades = JSON.parse(localStorage.getItem("novedades")) || [];
-  novedades.push(datos);
-  localStorage.setItem("novedades", JSON.stringify(novedades));
+  try{
+    const params = new URLSearchParams(datos);
+    const respuesta = await fetch(URL_API + "?" + params.toString());
+    const resultado = await respuesta.json();
 
-  alert("Novedad guardada correctamente en esta prueba local.");
-  window.location.href = "menu.html";
+    if(resultado.ok){
+      alert("Novedad guardada correctamente.");
+      window.location.href = "menu.html";
+    }else{
+      alert("Error: " + resultado.mensaje);
+    }
+
+  }catch(error){
+    alert("Error guardando novedad: " + error);
+  }
 }
 
 cargarInicial();
+cargarEquipos();
 </script>
 
 </body>
