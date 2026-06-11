@@ -16,7 +16,8 @@ body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
 h1{font-size:30px;margin-bottom:8px;}
 h2{font-size:22px;margin:12px 0;}
 .subtitle{font-size:17px;opacity:.85;margin-bottom:20px;}
-label{display:block;font-weight:bold;font-size:17px;margin-top:16px;margin-bottom:7px;}
+label{display:block;font-weight:bold;font-size:17px;margin-top:16px;margin-bottom:5px;}
+.ref{font-size:14px;opacity:.85;margin-bottom:7px;}
 input,textarea{width:100%;padding:16px;border:none;border-radius:15px;font-size:17px;color:#001f5b;}
 textarea{min-height:100px;resize:vertical;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
@@ -61,40 +62,49 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
 <div class="card">
 <h2>⚡ Subestación Eléctrica</h2>
 
-<label>Trafo 2000 KVA Sub Antigua</label>
-<input id="trafo2000Antigua" type="number" placeholder="Amperaje">
+<label>Amperaje Totalizador 2000 AMP Trafo 2000 KVA Sub Antigua</label>
+<div class="ref">Unidad: AMP | Referencia: 1600</div>
+<input id="trafo2000Antigua" type="number" placeholder="Ingrese amperaje AMP">
 
-<label>Trafo 1000 KVA Sub Antigua 1600A</label>
-<input id="trafo1000_1600" type="number" placeholder="Amperaje">
+<label>Amperaje Totalizador 1600 AMP Trafo 1000 KVA Sub Antigua</label>
+<div class="ref">Unidad: AMP | Referencia: 1200</div>
+<input id="trafo1000_1600" type="number" placeholder="Ingrese amperaje AMP">
 
-<label>Trafo 1000 KVA Sub Antigua 2000A</label>
-<input id="trafo1000_2000" type="number" placeholder="Amperaje">
+<label>Amperaje Totalizador 2000 AMP Trafo 1000 KVA Sub Antigua</label>
+<div class="ref">Unidad: AMP | Referencia: 1200</div>
+<input id="trafo1000_2000" type="number" placeholder="Ingrese amperaje AMP">
 
-<label>Trafo 2000 KVA Sub Nueva</label>
-<input id="trafo2000Nueva" type="number" placeholder="Amperaje">
+<label>Amperaje Totalizador 3200 AMP Trafo 2000 KVA Sub Nueva</label>
+<div class="ref">Unidad: AMP | Referencia: 2400</div>
+<input id="trafo2000Nueva" type="number" placeholder="Ingrese amperaje AMP">
 </div>
 
 <div class="card">
 <h2>🌀 Compresores de Aire</h2>
 
 <label>Presión Aire Comprimido SAM</label>
-<input id="presionAire" type="number" placeholder="PSI">
+<div class="ref">Unidad: PSI | Referencia: mínimo 100</div>
+<input id="presionAire" type="number" placeholder="Ingrese presión PSI">
 
-<label>Caudal Aire Comprimido</label>
-<input id="caudalAire" type="number" placeholder="CFM">
+<label>Caudal de Aire Comprimido</label>
+<div class="ref">Unidad: CFM | Referencia: N/A</div>
+<input id="caudalAire" type="number" placeholder="Ingrese caudal CFM">
 </div>
 
 <div class="card">
 <h2>❄️ Sistema Agua Fría</h2>
 
-<label>Presión agua bombas a planta</label>
-<input id="presionBombas" type="number" placeholder="PSI">
+<label>Presión de agua bombas a planta</label>
+<div class="ref">Unidad: PSI | Referencia: 50</div>
+<input id="presionBombas" type="number" placeholder="Ingrese presión PSI">
 
-<label>Temperatura agua salida Chiller</label>
-<input id="temperaturaChiller" type="number" placeholder="°F">
+<label>Temperatura de agua salida Chiller Nuevo</label>
+<div class="ref">Unidad: °C | Referencia: 15 °C</div>
+<input id="temperaturaChiller" type="number" placeholder="Ingrese temperatura °C">
 
-<label>% carga compresores Chiller</label>
-<input id="cargaCompresores" type="number" placeholder="%">
+<label>% de los compresores del Chiller Nuevo</label>
+<div class="ref">Unidad: % | Referencia: N/A</div>
+<input id="cargaCompresores" type="number" placeholder="Ingrese porcentaje %">
 </div>
 
 <div class="card">
@@ -142,15 +152,19 @@ async function guardarRuta(){
     Hora: document.getElementById("hora").value,
     Tecnico: usuario.codigo,
     Turno: document.getElementById("turno").value,
+
     Amperaje_Trafo2000_Antigua: document.getElementById("trafo2000Antigua").value,
     Amperaje_Trafo1000_1600: document.getElementById("trafo1000_1600").value,
     Amperaje_Trafo1000_2000: document.getElementById("trafo1000_2000").value,
     Amperaje_Trafo2000_Nueva: document.getElementById("trafo2000Nueva").value,
+
     Presion_Aire_SAM: document.getElementById("presionAire").value,
     Caudal_Aire: document.getElementById("caudalAire").value,
+
     Presion_Bombas: document.getElementById("presionBombas").value,
     Temperatura_Chiller: document.getElementById("temperaturaChiller").value,
     Carga_Compresores: document.getElementById("cargaCompresores").value,
+
     Observaciones: document.getElementById("observaciones").value
   };
 
