@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calentamiento de Línea - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
+.container{max-width:560px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
+.logo{font-size:46px;font-weight:900;}
+.card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
+h1{font-size:30px;margin-bottom:8px;}
+h2{font-size:23px;margin:12px 0;}
+h3{font-size:19px;margin:18px 0 8px;}
+.subtitle{font-size:17px;opacity:.85;margin-bottom:20px;}
+label{display:block;font-weight:bold;font-size:15px;margin-top:12px;margin-bottom:6px;}
+input,select,textarea{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
+textarea{min-height:90px;resize:vertical;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.readonly{background:#dbe4f5;}
+.zona{border-top:1px solid rgba(255,255,255,.18);padding-top:14px;margin-top:14px;}
+.ref{font-size:13px;opacity:.8;margin-bottom:6px;}
+button{width:100%;padding:19px;border:none;border-radius:16px;background:white;color:#001f5b;font-size:21px;font-weight:900;margin-top:20px;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<a class="back" href="rutas.html">‹</a>
+<div class="logo">TUBOSA</div>
+<div style="width:42px;"></div>
+</div>
+
+<div class="card">
+<h1>Calentamiento de Línea</h1>
+<div class="subtitle">Check List FMT03 - Registro de calentamiento</div>
+
+<div class="grid">
+<div>
+<label>Fecha</label>
+<input id="Fecha" class="readonly" readonly>
+</div>
+<div>
+<label>Hora</label>
+<input id="Hora" class="readonly" readonly>
+</div>
+</div>
+
+<label>Técnico</label>
+<input id="TecnicoVisible" class="readonly" readonly>
+
+<label>Turno</label>
+<input id="Turno" class="readonly" readonly>
+
+<label>Línea</label>
+<select id="Linea">
+<option value="">Cargando líneas...</option>
+</select>
+</div>
+
+<div class="card">
+<h2>🔥 Barril</h2>
+<div id="barril"></div>
+</div>
+
+<div class="card">
+<h2>🔥 Adaptador</h2>
+<div id="adaptador"></div>
+</div>
+
+<div class="card">
+<h2>🔥 Cabezal</h2>
+<div id="cabezal"></div>
+</div>
+
+<div class="card">
+<label>Observaciones</label>
+<textarea id="Observaciones" placeholder="Ingrese observaciones del calentamiento..."></textarea>
+
+<button id="btnGuardar" onclick="guardarCalentamiento()">GUARDAR Y GENERAR PDF</button>
+</div>
+
+<div class="footer">
+TUBOSA - Sistema de Mantenimiento<br>
+Versión 1.0
+</div>
+
+</div>
+
+<script>
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
+if(!usuario){
+  window.location.href = "index.html";
+}
+
+function cargarInicial(){
+  const ahora = new Date();
+
+  document.getElementById("Fecha").value = ahora.toLocaleDateString("es-CO");
+  document.getElementById("Hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("TecnicoVisible").value = usuario.nombre;
+  document.getElementById("Turno").value = usuario.turno;
+}
+
+async function cargarLineas(){
+  const select = document.getElementById("Linea");
+
+  try{
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Equipos");
+    const data = await respuesta.json();
+
+    const equipos = data.datos || [];
+
+    const lineas = [...new Set(
+      equipos
+        .map(e => e.Linea)
+        .filter(l => l && l !== "")
+    )].sort();
+
+    select.innerHTML = '<option value="">Seleccione...</option>';
+
+    lineas.forEach(linea => {
+      const option = document.createElement("option");
+      option.value = linea;
+      option.textContent = linea;
+      select.appendChild(option);
+    });
+
+  }catch(error){
+    alert("Error cargando líneas: " + error);
+    select.innerHTML = '<option value="">Error cargando líneas</option>';
+  }
+}
+
+function crearZona(grupo, contenedorId, cantidad){
+  const contenedor = document.getElementById(contenedorId);
+
+  for(let i = 1; i <= cantidad; i++){
+
+    const prefijo = grupo + "_Z" + i;
+
+    const div = document.createElement("div");
+    div.className = "zona";
+
+    div.innerHTML = `
+      <h3>${grupo} Zona ${i}</h3>
+
+      <div class="grid">
+        <div>
+          <label>50°C Inicio</label>
+          <input type="time" id="${prefijo}_50_Inicio">
+        </div>
+        <div>
+          <label>50°C Fin</label>
+          <input type="time" id="${prefijo}_50_Fin">
+        </div>
+      </div>
+
+      <div class="ref">Amperaje único por zona. Si una fase no aplica, dejar vacía.</div>
+
+      <div class="grid3">
+        <div>
+          <label>AMP R</label>
+          <input type="number" step="0.01" id="${prefijo}_AMP_R" placeholder="R">
+        </div>
+        <div>
+          <label>AMP S</label>
+          <input type="number" step="0.01" id="${prefijo}_AMP_S" placeholder="S">
+        </div>
+        <div>
+          <label>AMP T</label>
+          <input type="number" step="0.01" id="${prefijo}_AMP_T" placeholder="T">
+        </div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label>100°C Inicio</label>
+          <input type="time" id="${prefijo}_100_Inicio">
+        </div>
+        <div>
+          <label>100°C Fin</label>
+          <input type="time" id="${prefijo}_100_Fin">
+        </div>
+      </div>
+    `;
+
+    contenedor.appendChild(div);
+  }
+}
+
+function agregarDatosZona(datos, grupo, cantidad){
+  for(let i = 1; i <= cantidad; i++){
+    const prefijo = grupo + "_Z" + i;
+
+    datos[prefijo + "_50_Inicio"] = document.getElementById(prefijo + "_50_Inicio").value;
+    datos[prefijo + "_50_Fin"] = document.getElementById(prefijo + "_50_Fin").value;
+    datos[prefijo + "_AMP_R"] = document.getElementById(prefijo + "_AMP_R").value;
+    datos[prefijo + "_AMP_S"] = document.getElementById(prefijo + "_AMP_S").value;
+    datos[prefijo + "_AMP_T"] = document.getElementById(prefijo + "_AMP_T").value;
+    datos[prefijo + "_100_Inicio"] = document.getElementById(prefijo + "_100_Inicio").value;
+    datos[prefijo + "_100_Fin"] = document.getElementById(prefijo + "_100_Fin").value;
+  }
+}
+
+async function guardarCalentamiento(){
+
+  const btn = document.getElementById("btnGuardar");
+  btn.disabled = true;
+  btn.innerText = "GUARDANDO...";
+
+  const linea = document.getElementById("Linea").value;
+
+  if(!linea){
+    alert("Debe seleccionar la línea.");
+    btn.disabled = false;
+    btn.innerText = "GUARDAR Y GENERAR PDF";
+    return;
+  }
+
+  const datos = {
+    hoja: "Rutas_Calentamiento",
+    ID: "CAL-" + Date.now(),
+    Fecha: document.getElementById("Fecha").value,
+    Hora: document.getElementById("Hora").value,
+    Tecnico: usuario.codigo,
+    Turno: document.getElementById("Turno").value,
+    Linea: linea,
+    Observaciones: document.getElementById("Observaciones").value,
+    PDF_URL: ""
+  };
+
+  agregarDatosZona(datos, "Barril", 8);
+  agregarDatosZona(datos, "Adaptador", 2);
+  agregarDatosZona(datos, "Cabezal", 13);
+
+  try{
+    const params = new URLSearchParams(datos);
+    const respuesta = await fetch(URL_API + "?" + params.toString());
+    const resultado = await respuesta.json();
+
+    if(resultado.ok){
+      alert("Check List de calentamiento guardado correctamente. En el siguiente paso activaremos el PDF.");
+      window.location.href = "rutas.html";
+    }else{
+      alert("Error: " + resultado.mensaje);
+      btn.disabled = false;
+      btn.innerText = "GUARDAR Y GENERAR PDF";
+    }
+
+  }catch(error){
+    alert("Error guardando calentamiento: " + error);
+    btn.disabled = false;
+    btn.innerText = "GUARDAR Y GENERAR PDF";
+  }
+}
+
+cargarInicial();
+cargarLineas();
+
+crearZona("Barril", "barril", 8);
+crearZona("Adaptador", "adaptador", 2);
+crearZona("Cabezal", "cabezal", 13);
+</script>
+
+</body>
+</html>
