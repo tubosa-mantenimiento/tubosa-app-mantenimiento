@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TUBOSA - Sistema de Mantenimiento</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, sans-serif;
+}
+
+body{
+  min-height:100vh;
+  background:
+    linear-gradient(rgba(0,31,91,.92), rgba(0,31,91,.96)),
+    #001f5b;
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:24px;
+}
+
+.container{
+  width:100%;
+  max-width:420px;
+  text-align:center;
+}
+
+.logo{
+  font-size:58px;
+  font-weight:900;
+  letter-spacing:1px;
+  margin-bottom:14px;
+}
+
+.subtitle{
+  font-size:18px;
+  letter-spacing:3px;
+  margin-bottom:70px;
+  opacity:.95;
+}
+
+.icono{
+  font-size:82px;
+  margin-bottom:38px;
+}
+
+.label{
+  font-size:21px;
+  font-weight:700;
+  margin-bottom:20px;
+}
+
+.pin-box{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-bottom:34px;
+}
+
+.pin-input{
+  width:64px;
+  height:64px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.45);
+  background:rgba(255,255,255,.08);
+  color:white;
+  font-size:34px;
+  text-align:center;
+}
+
+.pin-input:focus{
+  outline:2px solid white;
+}
+
+button{
+  width:100%;
+  padding:20px;
+  border:none;
+  border-radius:14px;
+  background:white;
+  color:#001f5b;
+  font-size:22px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.version{
+  margin-top:70px;
+  font-size:14px;
+  opacity:.75;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo">TUBOSA</div>
+  <div class="subtitle">SISTEMA DE MANTENIMIENTO</div>
+
+  <div class="icono">⚙️</div>
+
+  <div class="label">Ingrese su PIN</div>
+
+  <div class="pin-box">
+    <input class="pin-input" maxlength="1" inputmode="numeric">
+    <input class="pin-input" maxlength="1" inputmode="numeric">
+    <input class="pin-input" maxlength="1" inputmode="numeric">
+    <input class="pin-input" maxlength="1" inputmode="numeric">
+  </div>
+
+  <button onclick="ingresar()">INGRESAR</button>
+
+  <div class="version">Versión 1.0</div>
+
+</div>
+
+<script>
+const usuarios = {
+  "9198": {
+    codigo: "TEC011",
+    nombre: "Luis Cambindo",
+    cargo: "Electromecánico Extrusión y Servicios",
+    area: "Extrusión / Servicios",
+    turno: "Turno A",
+    rol: "TECNICO"
+  },
+  "1989": {
+    codigo: "TEC001",
+    nombre: "Jose Suarez",
+    cargo: "Jefe Mantenimiento",
+    area: "General",
+    turno: "Administrativo",
+    rol: "ADMIN"
+  }
+};
+
+const inputs = document.querySelectorAll(".pin-input");
+
+inputs.forEach((input, index) => {
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/[^0-9]/g, "");
+
+    if(input.value && index < inputs.length - 1){
+      inputs[index + 1].focus();
+    }
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if(e.key === "Backspace" && !input.value && index > 0){
+      inputs[index - 1].focus();
+    }
+  });
+});
+
+function ingresar(){
+  const pin = Array.from(inputs).map(i => i.value).join("");
+
+  if(!usuarios[pin]){
+    alert("PIN incorrecto");
+    return;
+  }
+
+  localStorage.setItem("usuarioActivo", JSON.stringify(usuarios[pin]));
+  window.location.href = "menu.html";
+}
+</script>
+
+</body>
+</html>
