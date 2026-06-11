@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prueba API - TUBOSA</title>
+
+<style>
+body{
+  background:#001f5b;
+  color:white;
+  font-family:Arial, sans-serif;
+  padding:25px;
+}
+
+.container{
+  max-width:500px;
+  margin:auto;
+}
+
+h1{
+  font-size:34px;
+  margin-bottom:20px;
+}
+
+button{
+  width:100%;
+  padding:18px;
+  border:none;
+  border-radius:14px;
+  background:white;
+  color:#001f5b;
+  font-size:20px;
+  font-weight:900;
+  margin-bottom:20px;
+}
+
+.resultado{
+  background:#0b3475;
+  border-radius:18px;
+  padding:18px;
+  white-space:pre-wrap;
+  font-size:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>TUBOSA</h1>
+<h2>Prueba conexión API</h2>
+
+<button onclick="probarAPI()">CARGAR EQUIPOS</button>
+
+<div id="resultado" class="resultado">
+Esperando prueba...
+</div>
+
+</div>
+
+<script>
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+async function probarAPI(){
+
+  const salida = document.getElementById("resultado");
+
+  salida.innerText = "Consultando API...";
+
+  try{
+
+    const url = URL_API + "?accion=listar&hoja=Equipos";
+
+    const respuesta = await fetch(url);
+
+    const texto = await respuesta.text();
+
+    salida.innerText =
+      "Respuesta recibida:\n\n" +
+      texto.substring(0, 1500);
+
+  }catch(error){
+
+    salida.innerText =
+      "ERROR:\n\n" + error;
+
+  }
+
+}
+</script>
+
+</body>
+</html>
