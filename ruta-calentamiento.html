@@ -86,7 +86,9 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
 <label>Observaciones</label>
 <textarea id="Observaciones" placeholder="Ingrese observaciones del calentamiento..."></textarea>
 
-<button id="btnGuardar" onclick="guardarCalentamiento()">GUARDAR Y GENERAR PDF</button>
+<div id="resultadoPDF" style="display:none;margin-top:20px;">
+  <button id="btnVerPDF" onclick="verPDF()">VER PDF</button>
+  <button id="btnCompartirPDF" onclick="compartirPDF()">COMPARTIR PDF</button>
 </div>
 
 <div class="footer">
@@ -252,8 +254,27 @@ async function guardarCalentamiento(){
     const resultado = await respuesta.json();
 
     if(resultado.ok){
-      alert("Check List de calentamiento guardado correctamente. En el siguiente paso activaremos el PDF.");
-      window.location.href = "rutas.html";
+
+  btn.innerText = "GUARDADO";
+  
+  if(resultado.pdfUrl){
+    localStorage.setItem("ultimoPDFCalentamiento", resultado.pdfUrl);
+
+    alert("Check List guardado y PDF generado correctamente.");
+
+    document.getElementById("resultadoPDF").style.display = "block";
+    document.getElementById("btnVerPDF").style.display = "block";
+    document.getElementById("btnCompartirPDF").style.display = "block";
+
+  }else{
+    alert("Check List guardado, pero no se recibió enlace PDF.");
+  }
+
+}else{
+  alert("Error: " + resultado.mensaje);
+  btn.disabled = false;
+  btn.innerText = "GUARDAR Y GENERAR PDF";
+}
     }else{
       alert("Error: " + resultado.mensaje);
       btn.disabled = false;
@@ -266,7 +287,36 @@ async function guardarCalentamiento(){
     btn.innerText = "GUARDAR Y GENERAR PDF";
   }
 }
+function verPDF(){
+  const url = localStorage.getItem("ultimoPDFCalentamiento");
 
+  if(!url){
+    alert("No hay PDF disponible.");
+    return;
+  }
+
+  window.open(url, "_blank");
+}
+
+function compartirPDF(){
+  const url = localStorage.getItem("ultimoPDFCalentamiento");
+
+  if(!url){
+    alert("No hay PDF disponible.");
+    return;
+  }
+
+  if(navigator.share){
+    navigator.share({
+      title: "Check List Calentamiento TUBOSA",
+      text: "PDF Check List de calentamiento de línea",
+      url: url
+    });
+  }else{
+    window.open("https://wa.me/?text=" + encodeURIComponent("PDF Check List de calentamiento: " + url), "_blank");
+  }
+}
+  
 cargarInicial();
 cargarLineas();
 
