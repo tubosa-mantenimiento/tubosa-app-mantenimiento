@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notificar Novedad - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+
+body{
+  background:#001f5b;
+  color:white;
+  min-height:100vh;
+  padding:22px;
+}
+
+.container{
+  max-width:520px;
+  margin:auto;
+}
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:22px;
+}
+
+.back{
+  color:white;
+  text-decoration:none;
+  font-size:42px;
+  font-weight:bold;
+}
+
+.logo{
+  font-size:46px;
+  font-weight:900;
+}
+
+.card{
+  background:#0b3475;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:24px;
+  padding:22px;
+}
+
+h1{
+  font-size:30px;
+  margin-bottom:8px;
+}
+
+.subtitle{
+  font-size:17px;
+  opacity:.85;
+  margin-bottom:24px;
+}
+
+label{
+  display:block;
+  font-weight:bold;
+  font-size:17px;
+  margin-top:16px;
+  margin-bottom:7px;
+}
+
+input,select,textarea{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:15px;
+  font-size:17px;
+  color:#001f5b;
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.readonly{
+  background:#dbe4f5;
+}
+
+button{
+  width:100%;
+  padding:19px;
+  border:none;
+  border-radius:16px;
+  background:white;
+  color:#001f5b;
+  font-size:21px;
+  font-weight:900;
+  margin-top:26px;
+}
+
+.footer{
+  text-align:center;
+  opacity:.7;
+  font-size:13px;
+  margin-top:24px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <a class="back" href="menu.html">‹</a>
+    <div class="logo">TUBOSA</div>
+    <div style="width:42px;"></div>
+  </div>
+
+  <div class="card">
+
+    <h1>Notificar Novedad</h1>
+    <div class="subtitle">Registro de fallas o novedades del turno</div>
+
+    <div class="grid">
+      <div>
+        <label>Fecha</label>
+        <input id="fecha" class="readonly" readonly>
+      </div>
+      <div>
+        <label>Hora</label>
+        <input id="hora" class="readonly" readonly>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <label>Técnico</label>
+        <input id="tecnico" class="readonly" readonly>
+      </div>
+      <div>
+        <label>Turno</label>
+        <input id="turno" class="readonly" readonly>
+      </div>
+    </div>
+
+    <label>Origen del reporte</label>
+    <select id="origen">
+      <option value="">Seleccione...</option>
+      <option>Producción</option>
+      <option>Mantenimiento</option>
+      <option>Operario</option>
+      <option>Supervisor</option>
+    </select>
+
+    <label>Línea</label>
+    <select id="linea" onchange="cargarEquipos()">
+      <option value="">Seleccione...</option>
+      <option value="Linea 10">Línea 10</option>
+      <option value="Linea 11">Línea 11</option>
+      <option value="Linea 15">Línea 15</option>
+      <option value="Linea 16">Línea 16</option>
+      <option value="Linea 18">Línea 18</option>
+      <option value="Linea 19">Línea 19</option>
+      <option value="Linea 20">Línea 20</option>
+    </select>
+
+    <label>Equipo</label>
+    <select id="equipo" onchange="llenarEquipo()">
+      <option value="">Seleccione primero una línea...</option>
+    </select>
+
+    <div class="grid">
+      <div>
+        <label>Área</label>
+        <input id="area" class="readonly" readonly>
+      </div>
+      <div>
+        <label>ID Equipo</label>
+        <input id="idEquipo" class="readonly" readonly>
+      </div>
+    </div>
+
+    <label>Descripción de la falla</label>
+    <textarea id="descripcion" placeholder="Describa claramente la novedad..."></textarea>
+
+    <div class="grid">
+      <div>
+        <label>Equipo parado</label>
+        <select id="equipoParado">
+          <option>No</option>
+          <option>Sí</option>
+        </select>
+      </div>
+      <div>
+        <label>Tiempo parada</label>
+        <input id="tiempoParada" placeholder="Ej: 30 min">
+      </div>
+    </div>
+
+    <label>Prioridad</label>
+    <select id="prioridad">
+      <option>Media</option>
+      <option>Baja</option>
+      <option>Alta</option>
+      <option>Crítica</option>
+    </select>
+
+    <label>Foto / evidencia</label>
+    <input id="foto" type="file" accept="image/*" capture="environment">
+
+    <button onclick="guardarNovedad()">GUARDAR NOVEDAD</button>
+
+  </div>
+
+  <div class="footer">
+    TUBOSA - Sistema de Mantenimiento<br>
+    Versión 1.0
+  </div>
+
+</div>
+
+<script>
+const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
+if(!usuario){
+  window.location.href = "index.html";
+}
+
+const equipos = {
+  "Linea 10": [
+    {nombre:"Extrusora Línea 10", id:"EXT-L10", area:"Extrusión"},
+    {nombre:"Acampanadora Línea 10", id:"ACA-L10", area:"Extrusión"},
+    {nombre:"Halador Línea 10", id:"HAL-L10", area:"Extrusión"}
+  ],
+  "Linea 11": [
+    {nombre:"Extrusora Línea 11", id:"EXT-L11", area:"Extrusión"},
+    {nombre:"Acampanadora Línea 11", id:"ACA-L11", area:"Extrusión"},
+    {nombre:"Cortadora Línea 11", id:"COR-L11", area:"Extrusión"}
+  ],
+  "Linea 15": [
+    {nombre:"Extrusora Línea 15", id:"EXT-L15", area:"Extrusión"},
+    {nombre:"Tina Línea 15", id:"TIN-L15", area:"Extrusión"},
+    {nombre:"Halador Línea 15", id:"HAL-L15", area:"Extrusión"}
+  ],
+  "Linea 16": [
+    {nombre:"Extrusora Línea 16", id:"EXT-L16", area:"Extrusión"},
+    {nombre:"Acampanadora Línea 16", id:"ACA-L16", area:"Extrusión"}
+  ],
+  "Linea 18": [
+    {nombre:"Extrusora Línea 18", id:"EXT-L18", area:"Extrusión"},
+    {nombre:"Halador Línea 18", id:"HAL-L18", area:"Extrusión"}
+  ],
+  "Linea 19": [
+    {nombre:"Corrugadora Línea 19", id:"CORR-L19", area:"Corrugado"},
+    {nombre:"Extrusora Línea 19", id:"EXT-L19", area:"Corrugado"}
+  ],
+  "Linea 20": [
+    {nombre:"Corrugadora Línea 20", id:"CORR-L20", area:"Corrugado"},
+    {nombre:"Extrusora Línea 20", id:"EXT-L20", area:"Corrugado"}
+  ]
+};
+
+function cargarInicial(){
+  const ahora = new Date();
+
+  document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
+  document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("tecnico").value = usuario.codigo + " - " + usuario.nombre;
+  document.getElementById("turno").value = usuario.turno;
+}
+
+function cargarEquipos(){
+  const linea = document.getElementById("linea").value;
+  const select = document.getElementById("equipo");
+
+  select.innerHTML = '<option value="">Seleccione...</option>';
+  document.getElementById("area").value = "";
+  document.getElementById("idEquipo").value = "";
+
+  if(!linea || !equipos[linea]) return;
+
+  equipos[linea].forEach(eq => {
+    const option = document.createElement("option");
+    option.value = eq.nombre;
+    option.textContent = eq.nombre;
+    option.dataset.id = eq.id;
+    option.dataset.area = eq.area;
+    select.appendChild(option);
+  });
+}
+
+function llenarEquipo(){
+  const select = document.getElementById("equipo");
+  const opt = select.options[select.selectedIndex];
+
+  document.getElementById("idEquipo").value = opt.dataset.id || "";
+  document.getElementById("area").value = opt.dataset.area || "";
+}
+
+function guardarNovedad(){
+  const datos = {
+    id: "NOT-" + Date.now(),
+    fecha: document.getElementById("fecha").value,
+    hora: document.getElementById("hora").value,
+    tecnico: usuario.codigo,
+    nombre: usuario.nombre,
+    turno: usuario.turno,
+    origen: document.getElementById("origen").value,
+    linea: document.getElementById("linea").value,
+    equipo: document.getElementById("equipo").value,
+    idEquipo: document.getElementById("idEquipo").value,
+    area: document.getElementById("area").value,
+    descripcion: document.getElementById("descripcion").value,
+    equipoParado: document.getElementById("equipoParado").value,
+    tiempoParada: document.getElementById("tiempoParada").value,
+    prioridad: document.getElementById("prioridad").value,
+    estado: "Reportado"
+  };
+
+  if(!datos.origen || !datos.linea || !datos.equipo || !datos.descripcion){
+    alert("Debe completar origen, línea, equipo y descripción.");
+    return;
+  }
+
+  let novedades = JSON.parse(localStorage.getItem("novedades")) || [];
+  novedades.push(datos);
+  localStorage.setItem("novedades", JSON.stringify(novedades));
+
+  alert("Novedad guardada correctamente en esta prueba local.");
+  window.location.href = "menu.html";
+}
+
+cargarInicial();
+</script>
+
+</body>
+</html>
