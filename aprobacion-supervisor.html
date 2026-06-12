@@ -93,6 +93,15 @@ const usuarios = dataUsuarios.datos || [];
       return;
     }
 
+    const usuarioReporta = usuarios.find(
+  u => String(u.Codigo).trim() === String(n.ReportadoPor).trim()
+);
+
+const nombreReporta =
+  usuarioReporta
+    ? usuarioReporta.Nombre
+    : n.ReportadoPor;
+    
     pendientes.reverse().forEach(n => {
       const div = document.createElement("div");
       div.className = "item";
@@ -101,7 +110,7 @@ const usuarios = dataUsuarios.datos || [];
         <div class="titulo">${n.Linea || ""} - ${n.Equipo || "Equipo no definido"}</div>
         <div class="detalle"><strong>ID:</strong> ${n.ID_Notificacion || ""}</div>
         <div class="detalle"><strong>Fecha:</strong> ${n.FechaReporte || ""} ${n.Horareporte || ""}</div>
-        <div class="detalle"><strong>Reportado por:</strong> ${n.ReportadoPor || ""}</div>
+        <div class="detalle"><strong>Reportado por:</strong> ${nombreReporta}</div>
         <div class="detalle"><strong>Descripción:</strong> ${n.DescripcionFalla || ""}</div>
         <div class="detalle"><strong>Aviso SAP:</strong> ${n.AvisoSap || "Sin aviso"}</div>
 
