@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Ejecuciones - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
+.container{max-width:560px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
+.logo{font-size:46px;font-weight:900;}
+.card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
+h1{font-size:30px;margin-bottom:8px;}
+.subtitle{font-size:17px;opacity:.85;margin-bottom:20px;}
+.info{font-size:16px;opacity:.9;margin-top:6px;}
+.filtros{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;}
+button{width:100%;padding:14px;border:none;border-radius:14px;background:white;color:#001f5b;font-size:16px;font-weight:900;}
+button.activo{background:#dbe4f5;}
+.item{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:18px;margin-bottom:14px;}
+.tipo{font-size:20px;font-weight:900;margin-bottom:8px;}
+.detalle{font-size:16px;margin-top:5px;opacity:.95;}
+.fecha{font-size:14px;opacity:.8;margin-top:8px;}
+.pdf{display:inline-block;margin-top:12px;background:white;color:#001f5b;text-decoration:none;padding:12px 16px;border-radius:12px;font-weight:900;}
+.vacio{text-align:center;opacity:.85;margin-top:30px;font-size:17px;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<a class="back" href="menu.html">‹</a>
+<div class="logo">TUBOSA</div>
+<div style="width:42px;"></div>
+</div>
+
+<div class="card">
+<h1>Mis Ejecuciones</h1>
+<div class="subtitle">Historial de actividades registradas por el técnico</div>
+<div class="info" id="tecnico"></div>
+
+<div class="filtros">
+<button id="btnHoy" class="activo" onclick="cambiarFiltro('hoy')">Hoy</button>
+<button id="btnSemana" onclick="cambiarFiltro('semana')">Semana</button>
+<button id="btnTodas" onclick="cambiarFiltro('todas')">Todas</button>
+</div>
+</div>
+
+<div id="lista">
+<div class="vacio">Cargando ejecuciones...</div>
+</div>
+
+<div class="footer">
+TUBOSA - Sistema de Mantenimiento<br>
+Versión 1.0
+</div>
+
+</div>
+
+<script>
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
+if(!usuario){
+  window.location.href = "index.html";
+}
+
+let ejecuciones = [];
+let filtroActual = "hoy";
+
+document.getElementById("tecnico").innerText = usuario.nombre + " - " + usuario.codigo;
+
+function fechaISO(fechaTexto){
+  if(!fechaTexto) return null;
+
+  const partes = String(fechaTexto).split("/");
+
+  if(partes.length === 3){
+    const dia = partes[0].padStart(2,"0");
+    const mes = partes[1].padStart(2,"0");
+    const anio = partes[2];
+    return new Date(`${anio}-${mes}-${dia}T00:00:00`);
+  }
+
+  return new Date(fechaTexto);
+}
+
+function estaEnFiltro(fechaTexto){
+  if(filtroActual === "todas") return true;
+
+  const fecha = fechaISO(fechaTexto);
+  if(!fecha || isNaN(fecha)) return false;
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  const f = new Date(fecha);
+  f.setHours(0,0,0,0);
+
+  if(filtroActual === "hoy"){
+    return f.getTime() === hoy.getTime();
+  }
+
+  if(filtroActual === "semana"){
+    const hace7 = new Date(hoy);
+    hace7.setDate(hoy.getDate() - 7);
+    return f >= hace7 && f <= hoy;
+  }
+
+  return true;
+}
+
+async function cargarHoja(nombreHoja){
+  const respuesta = await fetch(URL_API + "?accion=listar&hoja=" + encodeURIComponent(nombreHoja));
+  const data = await respuesta.json();
+  return data.datos || [];
+}
+
+async function cargarEjecuciones(){
+
+  try{
+    const [notificaciones, servicios, calentamientos] = await Promise.all([
+      cargarHoja("Notificaciones"),
+      cargarHoja("Rutas_Servicios"),
+      cargarHoja("Rutas_Calentamiento")
+    ]);
+
+    ejecuciones = [];
+
+    notificaciones
+      .filter(n => String(n.ReportadoPor).trim() === String(usuario.codigo).trim())
+      .forEach(n => {
+        ejecuciones.push({
+          tipo:"📋 Novedad",
+          titulo:n.Equipo || "Novedad reportada",
+          detalle:n.DescripcionFalla || "",
+          fecha:n.FechaReporte || "",
+          hora:n.Horareporte || "",
+          pdf:""
+        });
+      });
+
+    servicios
+      .filter(s => String(s.Tecnico).trim() === String(usuario.codigo).trim())
+      .forEach(s => {
+        ejecuciones.push({
+          tipo:"⚡ Servicios Industriales",
+          titulo:"Ruta servicios industriales",
+          detalle:"Turno: " + (s.Turno || ""),
+          fecha:s.Fecha || "",
+          hora:s.Hora || "",
+          pdf:""
+        });
+      });
+
+    calentamientos
+      .filter(c => String(c.Tecnico).trim() === String(usuario.codigo).trim())
+      .forEach(c => {
+        ejecuciones.push({
+          tipo:"🔥 Calentamiento",
+          titulo:c.Linea || "Calentamiento de línea",
+          detalle:"Check List FMT03",
+          fecha:c.Fecha || "",
+          hora:c.Hora || "",
+          pdf:c.PDF_URL || ""
+        });
+      });
+
+    ejecuciones.sort((a,b) => {
+      const fa = fechaISO(a.fecha) || new Date(0);
+      const fb = fechaISO(b.fecha) || new Date(0);
+      return fb - fa;
+    });
+
+    renderizar();
+
+  }catch(error){
+    document.getElementById("lista").innerHTML =
+      '<div class="vacio">Error cargando ejecuciones: ' + error + '</div>';
+  }
+}
+
+function renderizar(){
+  const lista = document.getElementById("lista");
+  lista.innerHTML = "";
+
+  const filtradas = ejecuciones.filter(e => estaEnFiltro(e.fecha));
+
+  if(filtradas.length === 0){
+    lista.innerHTML = '<div class="vacio">No hay ejecuciones para este filtro.</div>';
+    return;
+  }
+
+  filtradas.forEach(e => {
+    const div = document.createElement("div");
+    div.className = "item";
+
+    div.innerHTML = `
+      <div class="tipo">${e.tipo}</div>
+      <div class="detalle"><strong>${e.titulo}</strong></div>
+      <div class="detalle">${e.detalle}</div>
+      <div class="fecha">${e.fecha} ${e.hora}</div>
+      ${e.pdf ? `<a class="pdf" href="${e.pdf}" target="_blank">VER PDF</a>` : ""}
+    `;
+
+    lista.appendChild(div);
+  });
+}
+
+function cambiarFiltro(filtro){
+  filtroActual = filtro;
+
+  document.getElementById("btnHoy").classList.remove("activo");
+  document.getElementById("btnSemana").classList.remove("activo");
+  document.getElementById("btnTodas").classList.remove("activo");
+
+  if(filtro === "hoy") document.getElementById("btnHoy").classList.add("activo");
+  if(filtro === "semana") document.getElementById("btnSemana").classList.add("activo");
+  if(filtro === "todas") document.getElementById("btnTodas").classList.add("activo");
+
+  renderizar();
+}
+
+cargarEjecuciones();
+</script>
+
+</body>
+</html>
