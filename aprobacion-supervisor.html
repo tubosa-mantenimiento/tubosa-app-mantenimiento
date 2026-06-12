@@ -73,10 +73,14 @@ async function cargarPendientes(){
   const lista = document.getElementById("lista");
 
   try{
-    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Notificaciones");
-    const data = await respuesta.json();
+   const respuesta = await fetch(URL_API + "?accion=listar&hoja=Notificaciones");
+const data = await respuesta.json();
 
-    const novedades = data.datos || [];
+const respuestaUsuarios = await fetch(URL_API + "?accion=listar&hoja=Usuarios");
+const dataUsuarios = await respuestaUsuarios.json();
+
+const novedades = data.datos || [];
+const usuarios = dataUsuarios.datos || [];
 
     const pendientes = novedades.filter(n =>
       !String(n.OrdenSAP || "").trim()
