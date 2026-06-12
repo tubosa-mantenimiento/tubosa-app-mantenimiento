@@ -68,22 +68,42 @@ if(!rolesPermitidos.includes(String(usuario.rol).trim().toUpperCase())){
   window.location.href = "menu.html";
 }
 
+function obtenerCampo(obj, nombre){
+  const clave = Object.keys(obj).find(k => k.trim() === nombre);
+  return clave ? obj[clave] : "";
+}
+
+function formatearFecha(fecha){
+  if(!fecha) return "";
+
+  const texto = String(fecha);
+
+  if(texto.includes("T")){
+    const d = new Date(texto);
+    if(!isNaN(d)){
+      return d.toLocaleDateString("es-CO");
+    }
+  }
+
+  return texto;
+}
+
 async function cargarPendientes(){
 
   const lista = document.getElementById("lista");
 
   try{
-   const respuesta = await fetch(URL_API + "?accion=listar&hoja=Notificaciones");
-const data = await respuesta.json();
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Notificaciones");
+    const data = await respuesta.json();
 
-const respuestaUsuarios = await fetch(URL_API + "?accion=listar&hoja=Usuarios");
-const dataUsuarios = await respuestaUsuarios.json();
+    const respuestaUsuarios = await fetch(URL_API + "?accion=listar&hoja=Usuarios");
+    const dataUsuarios = await respuestaUsuarios.json();
 
-const novedades = data.datos || [];
-const usuarios = dataUsuarios.datos || [];
+    const novedades = data.datos || [];
+    const usuarios = dataUsuarios.datos || [];
 
     const pendientes = novedades.filter(n =>
-      !String(n.OrdenSAP || "").trim()
+      !String(obtenerCampo(n, "OrdenSAP") || "").trim()
     );
 
     lista.innerHTML = "";
@@ -93,31 +113,43 @@ const usuarios = dataUsuarios.datos || [];
       return;
     }
 
-    const usuarioReporta = usuarios.find(
-  u => String(u.Codigo).trim() === String(n.ReportadoPor).trim()
-);
-
-const nombreReporta =
-  usuarioReporta
-    ? usuarioReporta.Nombre
-    : n.ReportadoPor;
-    
     pendientes.reverse().forEach(n => {
+
+      const idNotificacion = obtenerCampo(n, "ID_Notificacion");
+      const reportadoPor = obtenerCampo(n, "ReportadoPor");
+
+      const usuarioReporta = usuarios.find(u =>
+        String(obtenerCampo(u, "Codigo")).trim() === String(reportadoPor).trim() ||
+        String(obtenerCampo(u, "ID_Usuario")).trim() === String(reportadoPor).trim()
+      );
+
+      const nombreReporta = usuarioReporta
+        ? obtenerCampo(usuarioReporta, "Nombre")
+        : reportadoPor;
+
+      const linea = obtenerCampo(n, "Linea");
+      const equipo = obtenerCampo(n, "Equipo");
+      const fecha = obtenerCampo(n, "FechaReporte");
+      const hora = obtenerCampo(n, "Horareporte");
+      const descripcion = obtenerCampo(n, "DescripcionFalla");
+      const avisoSap = obtenerCampo(n, "AvisoSap") || obtenerCampo(n, "AvisoSAP");
+
       const div = document.createElement("div");
       div.className = "item";
 
       div.innerHTML = `
-        <div class="titulo">${n.Linea || ""} - ${n.Equipo || "Equipo no definido"}</div>
-        <div class="detalle"><strong>ID:</strong> ${n.ID_Notificacion || ""}</div>
-        <div class="detalle"><strong>Fecha:</strong> ${n.FechaReporte || ""} ${n.Horareporte || ""}</div>
-        <div class="detalle"><strong>Reportado por:</strong> ${nombreReporta}</div>
-        <div class="detalle"><strong>Descripción:</strong> ${n.DescripcionFalla || ""}</div>
-        <div class="detalle"><strong>Aviso SAP:</strong> ${n.AvisoSap || "Sin aviso"}</div>
+        <div class="titulo">${linea || ""} - ${equipo || "Equipo no definido"}</div>
+        <div class="detalle"><strong>ID:</strong> ${idNotificacion || ""}</div>
+        <div class="detalle"><strong>Fecha:</strong> ${formatearFecha(fecha)} ${hora || ""}</div>
+        <div class="detalle"><strong>Reportado por:</strong> ${nombreReporta || ""}</div>
+        <div class="detalle"><strong>Clase de trabajo:</strong> Correctivo (CT01)</div>
+        <div class="detalle"><strong>Descripción:</strong> ${descripcion || ""}</div>
+        <div class="detalle"><strong>Aviso SAP:</strong> ${avisoSap || "Sin aviso"}</div>
 
         <label>Orden SAP obligatoria</label>
-        <input id="orden_${n.ID_Notificacion}" placeholder="Ingrese Orden SAP">
+        <input id="orden_${idNotificacion}" placeholder="Ingrese Orden SAP">
 
-        <button onclick="aprobarNovedad('${n.ID_Notificacion}')">VALIDAR NOVEDAD</button>
+        <button onclick="aprobarNovedad('${idNotificacion}')">VALIDAR NOVEDAD</button>
       `;
 
       lista.appendChild(div);
