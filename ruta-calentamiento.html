@@ -131,10 +131,11 @@ async function cargarLineas(){
     const equipos = data.datos || [];
 
     const lineas = [...new Set(
-      equipos
-        .map(e => e.Linea)
-        .filter(l => l && l !== "")
-    )].sort();
+  equipos
+    .filter(e => String(e.Area).trim().toLowerCase() === "extrusión")
+    .map(e => e.Linea)
+    .filter(l => l && l !== "")
+)].sort();
 
     select.innerHTML = '<option value="">Seleccione...</option>';
 
