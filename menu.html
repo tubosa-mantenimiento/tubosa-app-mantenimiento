@@ -178,7 +178,18 @@ body{
     </div>
     <div class="arrow">›</div>
   </a>
-
+  
+<a class="menu-card solo-supervisor" href="aprobacion-supervisor.html">
+  <div class="menu-left">
+    <div class="icon">✅</div>
+    <div>
+      <div class="title">Aprobación Supervisor</div>
+      <div class="desc">Validar novedades con Orden SAP</div>
+    </div>
+  </div>
+  <div class="arrow">›</div>
+</a>
+  
   <a class="menu-card logout" onclick="cerrarSesion()">
     Cerrar Sesión
   </a>
@@ -206,6 +217,15 @@ function cerrarSesion(){
   localStorage.removeItem("usuarioActivo");
   window.location.href = "index.html";
 }
+
+const rolUsuario = String(usuario.rol || "").trim().toUpperCase();
+
+if(!["SUPERVISOR", "PLANEADOR", "ADMIN"].includes(rolUsuario)){
+  document.querySelectorAll(".solo-supervisor").forEach(el => {
+    el.style.display = "none";
+  });
+}
+  
 </script>
 
 </body>
