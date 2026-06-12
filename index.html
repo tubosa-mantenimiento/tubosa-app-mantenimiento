@@ -6,18 +6,11 @@
 <title>TUBOSA - Sistema de Mantenimiento</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial, sans-serif;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 
 body{
   min-height:100vh;
-  background:
-    linear-gradient(rgba(0,31,91,.92), rgba(0,31,91,.96)),
-    #001f5b;
+  background:linear-gradient(rgba(0,31,91,.92), rgba(0,31,91,.96)),#001f5b;
   color:white;
   display:flex;
   justify-content:center;
@@ -116,31 +109,14 @@ button{
     <input class="pin-input" maxlength="1" inputmode="numeric">
   </div>
 
-  <button onclick="ingresar()">INGRESAR</button>
+  <button id="btnIngresar" onclick="ingresar()">INGRESAR</button>
 
   <div class="version">Versión 1.0</div>
 
 </div>
 
 <script>
-const usuarios = {
-  "9198": {
-    codigo: "TEC011",
-    nombre: "Luis Cambindo",
-    cargo: "Electromecánico Extrusión y Servicios",
-    area: "Extrusión / Servicios",
-    turno: "Turno A",
-    rol: "TECNICO"
-  },
-  "1989": {
-    codigo: "TEC001",
-    nombre: "Jose Suarez",
-    cargo: "Jefe Mantenimiento",
-    area: "General",
-    turno: "Administrativo",
-    rol: "ADMIN"
-  }
-};
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
 
 const inputs = document.querySelectorAll(".pin-input");
 
@@ -160,16 +136,55 @@ inputs.forEach((input, index) => {
   });
 });
 
-function ingresar(){
-  const pin = Array.from(inputs).map(i => i.value).join("");
+async function ingresar(){
 
-  if(!usuarios[pin]){
-    alert("PIN incorrecto");
+  const pin = Array.from(inputs).map(i => i.value).join("");
+  const btn = document.getElementById("btnIngresar");
+
+  if(pin.length < 4){
+    alert("Ingrese el PIN completo.");
     return;
   }
 
-  localStorage.setItem("usuarioActivo", JSON.stringify(usuarios[pin]));
-  window.location.href = "menu.html";
+  btn.disabled = true;
+  btn.innerText = "VALIDANDO...";
+
+  try{
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Usuarios");
+    const data = await respuesta.json();
+
+    const usuarios = data.datos || [];
+
+    const usuario = usuarios.find(u =>
+      String(u.PIN).trim() === pin &&
+      String(u.Activo).trim().toUpperCase() === "SI"
+    );
+
+    if(!usuario){
+      alert("PIN incorrecto o usuario inactivo.");
+      btn.disabled = false;
+      btn.innerText = "INGRESAR";
+      return;
+    }
+
+    const usuarioActivo = {
+      codigo: usuario.ID_Usuario || usuario.Codigo || "",
+      nombre: usuario.Nombre || "",
+      cargo: usuario.Cargo || "",
+      area: usuario.Area || "",
+      rol: usuario.Rol || "",
+      turno: usuario.Turno || ""
+    };
+
+    localStorage.setItem("usuarioActivo", JSON.stringify(usuarioActivo));
+
+    window.location.href = "menu.html";
+
+  }catch(error){
+    alert("Error validando usuario: " + error);
+    btn.disabled = false;
+    btn.innerText = "INGRESAR";
+  }
 }
 </script>
 
