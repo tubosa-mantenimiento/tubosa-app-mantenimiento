@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aprobación Supervisor - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
+.container{max-width:560px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
+.logo{font-size:46px;font-weight:900;}
+.card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
+h1{font-size:30px;margin-bottom:8px;}
+.subtitle{font-size:17px;opacity:.85;margin-bottom:20px;}
+.item{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:18px;margin-bottom:16px;}
+.titulo{font-size:20px;font-weight:900;margin-bottom:8px;}
+.detalle{font-size:15px;margin-top:5px;opacity:.95;}
+label{display:block;font-weight:bold;font-size:15px;margin-top:14px;margin-bottom:6px;}
+input{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
+button{width:100%;padding:16px;border:none;border-radius:15px;background:white;color:#001f5b;font-size:18px;font-weight:900;margin-top:14px;}
+.vacio{text-align:center;opacity:.85;margin-top:30px;font-size:17px;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<a class="back" href="menu.html">‹</a>
+<div class="logo">TUBOSA</div>
+<div style="width:42px;"></div>
+</div>
+
+<div class="card">
+<h1>Aprobación Supervisor</h1>
+<div class="subtitle">Novedades pendientes por asignación de Orden SAP</div>
+</div>
+
+<div id="lista">
+<div class="vacio">Cargando novedades pendientes...</div>
+</div>
+
+<div class="footer">
+TUBOSA - Sistema de Mantenimiento<br>
+Versión 1.0
+</div>
+
+</div>
+
+<script>
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
+if(!usuario){
+  window.location.href = "index.html";
+}
+
+const rolesPermitidos = ["SUPERVISOR", "PLANEADOR", "ADMIN"];
+
+if(!rolesPermitidos.includes(String(usuario.rol).trim().toUpperCase())){
+  alert("No tiene permisos para ingresar a esta pantalla.");
+  window.location.href = "menu.html";
+}
+
+async function cargarPendientes(){
+
+  const lista = document.getElementById("lista");
+
+  try{
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Notificaciones");
+    const data = await respuesta.json();
+
+    const novedades = data.datos || [];
+
+    const pendientes = novedades.filter(n =>
+      !String(n.OrdenSAP || "").trim()
+    );
+
+    lista.innerHTML = "";
+
+    if(pendientes.length === 0){
+      lista.innerHTML = '<div class="vacio">No hay novedades pendientes por Orden SAP.</div>';
+      return;
+    }
+
+    pendientes.reverse().forEach(n => {
+      const div = document.createElement("div");
+      div.className = "item";
+
+      div.innerHTML = `
+        <div class="titulo">${n.Linea || ""} - ${n.Equipo || "Equipo no definido"}</div>
+        <div class="detalle"><strong>ID:</strong> ${n.ID_Notificacion || ""}</div>
+        <div class="detalle"><strong>Fecha:</strong> ${n.FechaReporte || ""} ${n.Horareporte || ""}</div>
+        <div class="detalle"><strong>Reportado por:</strong> ${n.ReportadoPor || ""}</div>
+        <div class="detalle"><strong>Descripción:</strong> ${n.DescripcionFalla || ""}</div>
+        <div class="detalle"><strong>Aviso SAP:</strong> ${n.AvisoSap || "Sin aviso"}</div>
+
+        <label>Orden SAP obligatoria</label>
+        <input id="orden_${n.ID_Notificacion}" placeholder="Ingrese Orden SAP">
+
+        <button onclick="aprobarNovedad('${n.ID_Notificacion}')">VALIDAR NOVEDAD</button>
+      `;
+
+      lista.appendChild(div);
+    });
+
+  }catch(error){
+    lista.innerHTML = '<div class="vacio">Error cargando novedades: ' + error + '</div>';
+  }
+}
+
+async function aprobarNovedad(id){
+
+  const input = document.getElementById("orden_" + id);
+  const ordenSAP = input.value.trim();
+
+  if(!ordenSAP){
+    alert("Debe ingresar la Orden SAP.");
+    return;
+  }
+
+  try{
+    const datos = {
+      accion: "aprobar_novedad",
+      ID_Notificacion: id,
+      OrdenSAP: ordenSAP,
+      Supervisor: usuario.codigo
+    };
+
+    const params = new URLSearchParams(datos);
+    const respuesta = await fetch(URL_API + "?" + params.toString());
+    const resultado = await respuesta.json();
+
+    if(resultado.ok){
+      alert("Novedad validada correctamente.");
+      cargarPendientes();
+    }else{
+      alert("Error: " + resultado.mensaje);
+    }
+
+  }catch(error){
+    alert("Error validando novedad: " + error);
+  }
+}
+
+cargarPendientes();
+</script>
+
+</body>
+</html>
