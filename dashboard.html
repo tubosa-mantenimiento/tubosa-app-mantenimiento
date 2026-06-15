@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
+.container{max-width:680px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
+.logo{font-size:46px;font-weight:900;}
+.card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
+h1{font-size:30px;margin-bottom:8px;}
+.subtitle{font-size:17px;opacity:.85;margin-bottom:18px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.kpi{background:white;color:#001f5b;border-radius:20px;padding:20px;text-align:center;}
+.kpi-num{font-size:38px;font-weight:900;}
+.kpi-label{font-size:15px;font-weight:bold;margin-top:6px;}
+.vacio{text-align:center;opacity:.85;margin-top:30px;font-size:17px;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <a class="back" href="menu.html">‹</a>
+    <div class="logo">TUBOSA</div>
+    <div style="width:42px;"></div>
+  </div>
+
+  <div class="card">
+    <h1>Dashboard</h1>
+    <div class="subtitle">Indicadores operativos de mantenimiento</div>
+    <div id="estadoCarga">Cargando información...</div>
+  </div>
+
+  <div class="grid">
+    <div class="kpi">
+      <div class="kpi-num" id="kpiNovedadesHoy">0</div>
+      <div class="kpi-label">Novedades hoy</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiAbiertas">0</div>
+      <div class="kpi-label">Novedades abiertas</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiCriticas">0</div>
+      <div class="kpi-label">Novedades críticas</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiPIABHoy">0</div>
+      <div class="kpi-label">Rutas PIAB hoy</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiServiciosHoy">0</div>
+      <div class="kpi-label">Servicios hoy</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiCalentamientoHoy">0</div>
+      <div class="kpi-label">Calentamientos hoy</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    TUBOSA - Sistema de Mantenimiento<br>
+    Versión 1.0
+  </div>
+
+</div>
+
+<script>
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
+if(!usuario){
+  window.location.href = "index.html";
+}
+
+function fechaISO(fechaTexto){
+  if(!fechaTexto) return null;
+
+  const texto = String(fechaTexto);
+
+  if(texto.includes("/")){
+    const partes = texto.split("/");
+    if(partes.length === 3){
+      const dia = partes[0].padStart(2,"0");
+      const mes = partes[1].padStart(2,"0");
+      const anio = partes[2];
+      return new Date(`${anio}-${mes}-${dia}T00:00:00`);
+    }
+  }
+
+  return new Date(texto);
+}
+
+function esHoy(fechaTexto){
+  const fecha = fechaISO(fechaTexto);
+  if(!fecha || isNaN(fecha)) return false;
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  const f = new Date(fecha);
+  f.setHours(0,0,0,0);
+
+  return f.getTime() === hoy.getTime();
+}
+
+async function cargarHoja(nombreHoja){
+  const respuesta = await fetch(URL_API + "?accion=listar&hoja=" + encodeURIComponent(nombreHoja));
+  const data = await respuesta.json();
+  return data.datos || [];
+}
+
+function esAbierta(estado){
+  const e = String(estado || "").trim().toLowerCase();
+
+  return ![
+    "terminado",
+    "cerrado",
+    "cancelado",
+    "finalizado"
+  ].includes(e);
+}
+
+async function cargarDashboard(){
+  try{
+    const [notificaciones, piab, servicios, calentamientos] = await Promise.all([
+      cargarHoja("Notificaciones"),
+      cargarHoja("Rutas_PIAB"),
+      cargarHoja("Rutas_Servicios"),
+      cargarHoja("Rutas_Calentamiento")
+    ]);
+
+    const novedadesHoy = notificaciones.filter(n => esHoy(n.FechaReporte)).length;
+
+    const abiertas = notificaciones.filter(n => esAbierta(n.Estado)).length;
+
+    const criticas = notificaciones.filter(n =>
+      String(n.Prioridad || "").trim().toLowerCase() === "crítica" &&
+      esAbierta(n.Estado)
+    ).length;
+
+    const piabHoy = piab.filter(r => esHoy(r.Fecha)).length;
+
+    const serviciosHoy = servicios.filter(r => esHoy(r.Fecha)).length;
+
+    const calentamientosHoy = calentamientos.filter(r => esHoy(r.Fecha)).length;
+
+    document.getElementById("kpiNovedadesHoy").innerText = novedadesHoy;
+    document.getElementById("kpiAbiertas").innerText = abiertas;
+    document.getElementById("kpiCriticas").innerText = criticas;
+    document.getElementById("kpiPIABHoy").innerText = piabHoy;
+    document.getElementById("kpiServiciosHoy").innerText = serviciosHoy;
+    document.getElementById("kpiCalentamientoHoy").innerText = calentamientosHoy;
+
+    document.getElementById("estadoCarga").innerText = "Información actualizada correctamente.";
+
+  }catch(error){
+    document.getElementById("estadoCarga").innerText = "Error cargando dashboard: " + error;
+  }
+}
+
+cargarDashboard();
+</script>
+
+</body>
+</html>
