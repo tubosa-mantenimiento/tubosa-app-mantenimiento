@@ -8,20 +8,24 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
-.container{max-width:520px;margin:auto;}
+.container{max-width:620px;margin:auto;}
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
 .back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
 .logo{font-size:46px;font-weight:900;}
 .card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
+.line-card{background:#123f86;border:1px solid rgba(255,255,255,.16);border-radius:20px;padding:18px;margin-top:18px;}
+.line-title{font-size:22px;font-weight:900;margin-bottom:6px;}
+.line-subtitle{font-size:14px;opacity:.8;margin-bottom:14px;}
 h1{font-size:30px;margin-bottom:8px;}
 .subtitle{font-size:17px;opacity:.85;margin-bottom:20px;}
 label{display:block;font-weight:bold;font-size:17px;margin-top:16px;margin-bottom:7px;}
 input,select,textarea{width:100%;padding:16px;border:none;border-radius:15px;font-size:17px;color:#001f5b;}
-textarea{min-height:100px;resize:vertical;}
+textarea{min-height:85px;resize:vertical;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .readonly{background:#dbe4f5;}
 button{width:100%;padding:19px;border:none;border-radius:16px;background:white;color:#001f5b;font-size:21px;font-weight:900;margin-top:22px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+.aviso{background:#eaf0ff;color:#001f5b;padding:14px;border-radius:16px;font-size:15px;margin-top:12px;font-weight:bold;}
 </style>
 </head>
 
@@ -29,77 +33,46 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
 
 <div class="container">
 
-<div class="header">
-<a class="back" href="rutas.html">‹</a>
-<div class="logo">TUBOSA</div>
-<div style="width:42px;"></div>
-</div>
+  <div class="header">
+    <a class="back" href="rutas.html">‹</a>
+    <div class="logo">TUBOSA</div>
+    <div style="width:42px;"></div>
+  </div>
 
-<div class="card">
-<h1>Bombas PIAB</h1>
-<div class="subtitle">Inspección de vacío por línea / extrusora</div>
+  <div class="card">
+    <h1>Bombas PIAB</h1>
+    <div class="subtitle">Inspección de vacío para las 21 líneas de extrusión</div>
 
-<div class="grid">
-<div>
-<label>Fecha</label>
-<input id="fecha" class="readonly" readonly>
-</div>
-<div>
-<label>Hora</label>
-<input id="hora" class="readonly" readonly>
-</div>
-</div>
+    <div class="grid">
+      <div>
+        <label>Fecha</label>
+        <input id="fecha" class="readonly" readonly>
+      </div>
+      <div>
+        <label>Hora</label>
+        <input id="hora" class="readonly" readonly>
+      </div>
+    </div>
 
-<label>Técnico</label>
-<input id="tecnico" class="readonly" readonly>
+    <label>Técnico</label>
+    <input id="tecnico" class="readonly" readonly>
 
-<label>Turno</label>
-<input id="turno" class="readonly" readonly>
+    <label>Turno</label>
+    <input id="turno" class="readonly" readonly>
 
-<label>Línea</label>
-<select id="linea" onchange="cargarExtrusorasPorLinea()">
-<option value="">Cargando líneas...</option>
-</select>
+    <div class="aviso">
+      Diligencie cada línea. Si la línea no tiene bomba PIAB instalada, seleccione “No”.
+    </div>
+  </div>
 
-<label>Extrusora</label>
-<select id="extrusora">
-<option value="">Seleccione primero una línea...</option>
-</select>
+  <div id="contenedorLineas"></div>
 
-<label>Bomba PIAB instalada</label>
-<select id="bombaInstalada">
-<option value="">Seleccione...</option>
-<option>Sí</option>
-<option>No</option>
-</select>
+  <button id="btnGuardar" onclick="guardarPIAB()">GUARDAR RUTA PIAB</button>
 
-<div class="grid">
-<div>
-<label>Vacío PIAB</label>
-<input id="vacioPIAB" type="number" step="0.01" placeholder="Ej: -0.65">
-</div>
-<div>
-<label>Unidad</label>
-<select id="unidadVacio">
-<option value="">Seleccione...</option>
-<option>bar</option>
-<option>inHg</option>
-<option>mmHg</option>
-<option>kPa</option>
-</select>
-</div>
-</div>
-
-<label>Observaciones</label>
-<textarea id="observaciones" placeholder="Ingrese fugas, filtros, mangueras, cambio de molde o novedades..."></textarea>
-
-<button id="btnGuardar" onclick="guardarPIAB()">GUARDAR RUTA PIAB</button>
-</div>
-
-<div class="footer">
-TUBOSA - Sistema de Mantenimiento<br>
-Versión 1.0
-</div>
+  <div class="footer">
+    TUBOSA - Sistema de Mantenimiento<br>
+    Versión 1.0
+  </div>
 
 </div>
 
@@ -114,117 +87,193 @@ if(!usuario){
 
 let equiposBD = [];
 
+const lineasProduccion = [
+  "L1","L2","L3","L4","L5","L6","L7",
+  "L8","L9","L10","L11","L12","L13","L14",
+  "L15","L16","L17","L18","L19","L20","L21"
+];
+
+function determinarTurno(){
+  const hora = new Date().getHours();
+
+  if(hora >= 6 && hora < 14){
+    return "Turno A - 6:00 am - 2:00 pm";
+  }
+
+  if(hora >= 14 && hora < 22){
+    return "Turno B - 2:00 pm - 10:00 pm";
+  }
+
+  return "Turno C - 10:00 pm - 6:00 am";
+}
+
 function cargarInicial(){
   const ahora = new Date();
 
   document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
   document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
   document.getElementById("tecnico").value = usuario.nombre;
-  document.getElementById("turno").value = usuario.turno;
+  document.getElementById("turno").value = usuario.turno || determinarTurno();
 }
 
-async function cargarLineas(){
-  const selectLinea = document.getElementById("linea");
-
+async function cargarEquipos(){
   try{
     const respuesta = await fetch(URL_API + "?accion=listar&hoja=Equipos");
     const data = await respuesta.json();
 
     equiposBD = data.datos || [];
-
-    const lineas = [...new Set(
-      equiposBD
-        .filter(e => String(e.Area).trim().toLowerCase() === "extrusión")
-        .map(e => e.Linea)
-        .filter(l => l && l !== "")
-    )].sort();
-
-    selectLinea.innerHTML = '<option value="">Seleccione...</option>';
-
-    lineas.forEach(linea => {
-      const option = document.createElement("option");
-      option.value = linea;
-      option.textContent = linea;
-      selectLinea.appendChild(option);
-    });
+    construirFormularioLineas();
 
   }catch(error){
-    alert("Error cargando líneas: " + error);
-    selectLinea.innerHTML = '<option value="">Error cargando líneas</option>';
+    alert("Error cargando equipos: " + error);
+    construirFormularioLineas();
   }
 }
 
-function cargarExtrusorasPorLinea(){
-  const linea = document.getElementById("linea").value;
-  const selectExtrusora = document.getElementById("extrusora");
+function construirFormularioLineas(){
+  const contenedor = document.getElementById("contenedorLineas");
+  contenedor.innerHTML = "";
 
-  selectExtrusora.innerHTML = '<option value="">Seleccione...</option>';
+  lineasProduccion.forEach(linea => {
+    const extrusoras = obtenerExtrusorasPorLinea(linea);
 
-  const filtrados = equiposBD.filter(e =>
-    String(e.Linea).trim() === String(linea).trim() &&
+    let opcionesExtrusoras = '<option value="">Seleccione...</option>';
+
+    if(extrusoras.length > 0){
+      extrusoras.forEach(eq => {
+        opcionesExtrusoras += `<option value="${eq.NombreEquipo}">${eq.NombreEquipo}</option>`;
+      });
+    }else{
+      opcionesExtrusoras += `<option value="N/A">No encontrada en maestro de equipos</option>`;
+    }
+
+    const html = `
+      <div class="line-card" id="card_${linea}">
+        <div class="line-title">${linea}</div>
+        <div class="line-subtitle">Inspección bomba PIAB / vacío de material</div>
+
+        <label>Extrusora</label>
+        <select id="extrusora_${linea}">
+          ${opcionesExtrusoras}
+        </select>
+
+        <label>Bomba PIAB instalada</label>
+        <select id="bombaInstalada_${linea}" onchange="controlarCamposPIAB('${linea}')">
+          <option value="">Seleccione...</option>
+          <option>Sí</option>
+          <option>No</option>
+        </select>
+
+        <div class="grid">
+          <div>
+            <label>Vacío PIAB</label>
+            <input id="vacioPIAB_${linea}" type="number" step="0.01" placeholder="Ej: -0.65">
+          </div>
+          <div>
+            <label>Unidad</label>
+            <select id="unidadVacio_${linea}">
+              <option value="">Seleccione...</option>
+              <option>bar</option>
+              <option>inHg</option>
+              <option>mmHg</option>
+              <option>kPa</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Observaciones</label>
+        <textarea id="observaciones_${linea}" placeholder="Ingrese fugas, filtros, mangueras, cambio de molde o novedades..."></textarea>
+      </div>
+    `;
+
+    contenedor.insertAdjacentHTML("beforeend", html);
+  });
+}
+
+function obtenerExtrusorasPorLinea(linea){
+  return equiposBD.filter(e =>
+    String(e.Linea).trim().toUpperCase() === String(linea).trim().toUpperCase() &&
     String(e.NombreEquipo).toLowerCase().includes("extrusora")
   );
+}
 
-  filtrados.forEach(eq => {
-    const option = document.createElement("option");
-    option.value = eq.NombreEquipo;
-    option.textContent = eq.NombreEquipo;
-    selectExtrusora.appendChild(option);
-  });
+function controlarCamposPIAB(linea){
+  const instalada = document.getElementById("bombaInstalada_" + linea).value;
+  const vacio = document.getElementById("vacioPIAB_" + linea);
+  const unidad = document.getElementById("unidadVacio_" + linea);
 
-  if(filtrados.length === 0){
-    selectExtrusora.innerHTML = '<option value="">No hay extrusoras asociadas</option>';
+  if(instalada === "No"){
+    vacio.value = "";
+    unidad.value = "";
+    vacio.disabled = true;
+    unidad.disabled = true;
+  }else{
+    vacio.disabled = false;
+    unidad.disabled = false;
   }
+}
+
+function validarFormulario(){
+  for(const linea of lineasProduccion){
+    const extrusora = document.getElementById("extrusora_" + linea).value;
+    const bombaInstalada = document.getElementById("bombaInstalada_" + linea).value;
+    const vacio = document.getElementById("vacioPIAB_" + linea).value;
+    const unidad = document.getElementById("unidadVacio_" + linea).value;
+
+    if(!extrusora || !bombaInstalada){
+      alert("Debe completar extrusora y bomba PIAB instalada en la línea " + linea + ".");
+      return false;
+    }
+
+    if(bombaInstalada === "Sí" && (!vacio || !unidad)){
+      alert("La línea " + linea + " tiene PIAB instalada. Debe registrar vacío y unidad.");
+      return false;
+    }
+  }
+
+  return true;
 }
 
 async function guardarPIAB(){
 
+  if(!validarFormulario()){
+    return;
+  }
+
   const btn = document.getElementById("btnGuardar");
   btn.disabled = true;
-  btn.innerText = "GUARDANDO...";
-
-  const datos = {
-    hoja: "Rutas_PIAB",
-    ID: "PIAB-" + Date.now(),
-    Fecha: document.getElementById("fecha").value,
-    Hora: document.getElementById("hora").value,
-    Tecnico: usuario.codigo,
-    Turno: document.getElementById("turno").value,
-    Linea: document.getElementById("linea").value,
-    Extrusora: document.getElementById("extrusora").value,
-    BombaInstalada: document.getElementById("bombaInstalada").value,
-    VacioPIAB: document.getElementById("vacioPIAB").value,
-    UnidadVacio: document.getElementById("unidadVacio").value,
-    Observaciones: document.getElementById("observaciones").value
-  };
-
-  if(!datos.Linea || !datos.Extrusora || !datos.BombaInstalada){
-    alert("Debe completar línea, extrusora y si la bomba está instalada.");
-    btn.disabled = false;
-    btn.innerText = "GUARDAR RUTA PIAB";
-    return;
-  }
-
-  if(datos.BombaInstalada === "Sí" && (!datos.VacioPIAB || !datos.UnidadVacio)){
-    alert("Si la bomba está instalada debe registrar el vacío y la unidad.");
-    btn.disabled = false;
-    btn.innerText = "GUARDAR RUTA PIAB";
-    return;
-  }
+  btn.innerText = "GUARDANDO RUTA...";
 
   try{
-    const params = new URLSearchParams(datos);
-    const respuesta = await fetch(URL_API + "?" + params.toString());
-    const resultado = await respuesta.json();
+    for(const linea of lineasProduccion){
 
-    if(resultado.ok){
-      alert("Ruta PIAB guardada correctamente.");
-      window.location.href = "rutas.html";
-    }else{
-      alert("Error: " + resultado.mensaje);
-      btn.disabled = false;
-      btn.innerText = "GUARDAR RUTA PIAB";
+      const datos = {
+        hoja: "Rutas_PIAB",
+        ID: "PIAB-" + linea + "-" + Date.now(),
+        Fecha: document.getElementById("fecha").value,
+        Hora: document.getElementById("hora").value,
+        Tecnico: usuario.codigo,
+        NombreTecnico: usuario.nombre,
+        Turno: document.getElementById("turno").value,
+        Linea: linea,
+        Extrusora: document.getElementById("extrusora_" + linea).value,
+        BombaInstalada: document.getElementById("bombaInstalada_" + linea).value,
+        VacioPIAB: document.getElementById("vacioPIAB_" + linea).value,
+        UnidadVacio: document.getElementById("unidadVacio_" + linea).value,
+        Observaciones: document.getElementById("observaciones_" + linea).value
+      };
+
+      const params = new URLSearchParams(datos);
+      const respuesta = await fetch(URL_API + "?" + params.toString());
+      const resultado = await respuesta.json();
+
+      if(!resultado.ok){
+        throw new Error(resultado.mensaje || "Error guardando línea " + linea);
+      }
     }
+
+    alert("Ruta PIAB guardada correctamente para las 21 líneas.");
+    window.location.href = "rutas.html";
 
   }catch(error){
     alert("Error guardando Ruta PIAB: " + error);
@@ -234,7 +283,7 @@ async function guardarPIAB(){
 }
 
 cargarInicial();
-cargarLineas();
+cargarEquipos();
 </script>
 
 </body>
