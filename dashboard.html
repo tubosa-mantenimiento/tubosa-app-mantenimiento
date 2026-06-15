@@ -26,6 +26,11 @@ h2{font-size:24px;margin-bottom:14px;}
 .bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;}
 .bar-bg{width:100%;height:16px;background:#dbe4f5;border-radius:20px;overflow:hidden;}
 .bar-fill{height:100%;background:#001f5b;border-radius:20px;}
+.chart-card{background:white;color:#001f5b;border-radius:18px;padding:14px;margin-bottom:14px;}
+.chart-title{font-size:18px;font-weight:900;margin-bottom:4px;}
+.chart-sub{font-size:13px;opacity:.75;margin-bottom:10px;}
+.chart-values{display:flex;justify-content:space-between;font-size:13px;font-weight:bold;margin-top:6px;}
+svg{width:100%;height:130px;background:#f1f5ff;border-radius:14px;}
 .vacio{text-align:center;opacity:.85;margin-top:12px;font-size:16px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
 </style>
@@ -57,6 +62,11 @@ h2{font-size:24px;margin-bottom:14px;}
   </div>
 
   <div class="card" style="margin-top:18px;">
+    <h2>Servicios Industriales</h2>
+    <div id="graficosServicios"><div class="vacio">Cargando tendencias...</div></div>
+  </div>
+
+  <div class="card">
     <h2>Top líneas con más fallas</h2>
     <div id="topLineas"><div class="vacio">Cargando...</div></div>
   </div>
@@ -157,12 +167,7 @@ function esAbierta(estado){
 
 function limpiarTexto(valor){
   let texto = String(valor || "").trim();
-
-  if(!texto){
-    texto = "Sin dato";
-  }
-
-  return texto;
+  return texto || "Sin dato";
 }
 
 function contarPorCampo(datos, campo){
@@ -236,13 +241,106 @@ function renderBarras(idContenedor, datos, etiqueta){
   });
 }
 
+function numero(valor){
+  if(valor === undefined || valor === null || valor === "") return null;
+  const n = Number(String(valor).replace(",", "."));
+  return isNaN(n) ? null : n;
+}
+
+function prepararSerieServicios(servicios, campo){
+  return servicios
+    .map(r => ({
+      fecha: r.Fecha || "",
+      hora: r.Hora || "",
+      valor: numero(r[campo]),
+      fechaObj: fechaISO(r.Fecha) || new Date(0)
+    }))
+    .filter(r => r.valor !== null)
+    .sort((a,b) => a.fechaObj - b.fechaObj)
+    .slice(-10);
+}
+
+function crearSVGSerie(datos){
+  if(datos.length === 0){
+    return '<div class="vacio">Sin datos registrados.</div>';
+  }
+
+  if(datos.length === 1){
+    return `
+      <svg viewBox="0 0 300 130">
+        <circle cx="150" cy="65" r="7" fill="#001f5b"></circle>
+      </svg>
+    `;
+  }
+
+  const valores = datos.map(d => d.valor);
+  const min = Math.min(...valores);
+  const max = Math.max(...valores);
+  const rango = max - min || 1;
+
+  const puntos = datos.map((d,i) => {
+    const x = 15 + (i * (270 / (datos.length - 1)));
+    const y = 110 - ((d.valor - min) / rango) * 90;
+    return `${x},${y}`;
+  }).join(" ");
+
+  const circulos = puntos.split(" ").map(p => {
+    const [x,y] = p.split(",");
+    return `<circle cx="${x}" cy="${y}" r="4" fill="#001f5b"></circle>`;
+  }).join("");
+
+  return `
+    <svg viewBox="0 0 300 130">
+      <polyline points="${puntos}" fill="none" stroke="#001f5b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+      ${circulos}
+    </svg>
+  `;
+}
+
+function renderGraficoServicio(titulo, subtitulo, datos, unidad){
+  const ultimo = datos.length ? datos[datos.length - 1].valor : "-";
+  const minimo = datos.length ? Math.min(...datos.map(d => d.valor)) : "-";
+  const maximo = datos.length ? Math.max(...datos.map(d => d.valor)) : "-";
+
+  return `
+    <div class="chart-card">
+      <div class="chart-title">${titulo}</div>
+      <div class="chart-sub">${subtitulo}</div>
+      ${crearSVGSerie(datos)}
+      <div class="chart-values">
+        <span>Min: ${minimo} ${unidad}</span>
+        <span>Último: ${ultimo} ${unidad}</span>
+        <span>Max: ${maximo} ${unidad}</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderServicios(servicios){
+  const contenedor = document.getElementById("graficosServicios");
+
+  const presion = prepararSerieServicios(servicios, "Presion_Aire_SAM");
+  const caudal = prepararSerieServicios(servicios, "Caudal_Aire");
+  const tempChiller = prepararSerieServicios(servicios, "Temperatura_Chiller");
+  const cargaChiller = prepararSerieServicios(servicios, "Carga_Compresores");
+  const presionBombas = prepararSerieServicios(servicios, "Presion_Bombas");
+
+  contenedor.innerHTML = `
+    ${renderGraficoServicio("Presión aire comprimido SAM", "Tendencia últimos 10 registros", presion, "PSI")}
+    ${renderGraficoServicio("Caudal aire comprimido", "CFM total salida sistema de compresores", caudal, "CFM")}
+    ${renderGraficoServicio("Temperatura chiller", "Lectura en pantalla del chiller", tempChiller, "°F")}
+    ${renderGraficoServicio("% carga compresores chiller", "Ocupación de capacidad del chiller", cargaChiller, "%")}
+    ${renderGraficoServicio("Presión bombas agua fría", "Presión de agua hacia planta", presionBombas, "PSI")}
+  `;
+}
+
 function obtenerUltimoVacioPIAB(piab){
   const registrosValidos = piab
     .filter(r => String(r.BombaInstalada || "").trim() === "Sí")
     .filter(r => r.VacioPIAB !== "" && r.VacioPIAB !== undefined && r.VacioPIAB !== null)
     .map(r => ({
       linea: r.PuntoInspeccion || r.Linea || "Sin dato",
-      vacio: Number(r.VacioPIAB),
+      vacio: Number(String(r.VacioPIAB).replace(",", ".")),
       fecha: fechaISO(r.Fecha) || new Date(0)
     }))
     .filter(r => !isNaN(r.vacio));
@@ -300,25 +398,16 @@ async function cargarDashboard(){
       cargarHoja("Rutas_Calentamiento")
     ]);
 
-    const novedadesHoy = notificaciones.filter(n => esHoy(n.FechaReporte)).length;
-    const abiertas = notificaciones.filter(n => esAbierta(n.Estado)).length;
-
-    const criticas = notificaciones.filter(n =>
-      String(n.Prioridad || "").trim().toLowerCase() === "crítica" &&
-      esAbierta(n.Estado)
+    document.getElementById("kpiNovedadesHoy").innerText = notificaciones.filter(n => esHoy(n.FechaReporte)).length;
+    document.getElementById("kpiAbiertas").innerText = notificaciones.filter(n => esAbierta(n.Estado)).length;
+    document.getElementById("kpiCriticas").innerText = notificaciones.filter(n =>
+      String(n.Prioridad || "").trim().toLowerCase() === "crítica" && esAbierta(n.Estado)
     ).length;
+    document.getElementById("kpiPIABHoy").innerText = piab.filter(r => esHoy(r.Fecha)).length;
+    document.getElementById("kpiServiciosHoy").innerText = servicios.filter(r => esHoy(r.Fecha)).length;
+    document.getElementById("kpiCalentamientoHoy").innerText = calentamientos.filter(r => esHoy(r.Fecha)).length;
 
-    const piabHoy = piab.filter(r => esHoy(r.Fecha)).length;
-    const serviciosHoy = servicios.filter(r => esHoy(r.Fecha)).length;
-    const calentamientosHoy = calentamientos.filter(r => esHoy(r.Fecha)).length;
-
-    document.getElementById("kpiNovedadesHoy").innerText = novedadesHoy;
-    document.getElementById("kpiAbiertas").innerText = abiertas;
-    document.getElementById("kpiCriticas").innerText = criticas;
-    document.getElementById("kpiPIABHoy").innerText = piabHoy;
-    document.getElementById("kpiServiciosHoy").innerText = serviciosHoy;
-    document.getElementById("kpiCalentamientoHoy").innerText = calentamientosHoy;
-
+    renderServicios(servicios);
     renderBarras("topLineas", ordenarConteo(contarPorCampo(notificaciones, "Linea"), 10), "fallas");
     renderRanking("topEquipos", ordenarConteo(contarPorCampo(notificaciones, "Equipo"), 5), "fallas");
     renderBarras("estadoNovedades", ordenarConteo(contarPorCampo(notificaciones, "Estado"), 10), "novedades");
