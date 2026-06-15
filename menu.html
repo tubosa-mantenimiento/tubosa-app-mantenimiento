@@ -135,7 +135,7 @@ body{
     <div class="arrow">›</div>
   </a>
 
- <a class="menu-card" href="actividades.html" style="display:none;">
+  <a class="menu-card" href="actividades.html" style="display:none;">
     <div class="menu-left">
       <div class="icon">📋</div>
       <div>
@@ -146,7 +146,7 @@ body{
     <div class="arrow">›</div>
   </a>
 
- <a class="menu-card" href="actividades.html" style="display:none;">
+  <a class="menu-card" href="actividades.html" style="display:none;">
     <div class="menu-left">
       <div class="icon">🛠</div>
       <div>
@@ -173,22 +173,33 @@ body{
       <div class="icon">⏱</div>
       <div>
         <div class="title">Mis Ejecuciones</div>
-        <div class="desc">Historicos de novedades y rutas</div>
+        <div class="desc">Históricos de novedades y rutas</div>
       </div>
     </div>
     <div class="arrow">›</div>
   </a>
-  
-<a class="menu-card solo-supervisor" href="aprobacion-supervisor.html">
-  <div class="menu-left">
-    <div class="icon">✅</div>
-    <div>
-      <div class="title">Aprobación Supervisor</div>
-      <div class="desc">Validar novedades con Orden SAP</div>
+
+  <a class="menu-card solo-supervisor" href="aprobacion-supervisor.html">
+    <div class="menu-left">
+      <div class="icon">✅</div>
+      <div>
+        <div class="title">Aprobación Supervisor</div>
+        <div class="desc">Validar novedades con Orden SAP</div>
+      </div>
     </div>
-  </div>
-  <div class="arrow">›</div>
-</a>
+    <div class="arrow">›</div>
+  </a>
+
+  <a class="menu-card solo-supervisor" href="dashboard.html">
+    <div class="menu-left">
+      <div class="icon">📈</div>
+      <div>
+        <div class="title">Dashboard</div>
+        <div class="desc">Indicadores, tendencias y KPIs de mantenimiento</div>
+      </div>
+    </div>
+    <div class="arrow">›</div>
+  </a>
   
   <a class="menu-card logout" onclick="cerrarSesion()">
     Cerrar Sesión
@@ -225,7 +236,6 @@ if(!["SUPERVISOR", "PLANEADOR", "ADMIN"].includes(rolUsuario)){
     el.style.display = "none";
   });
 }
-  
 </script>
 
 </body>
