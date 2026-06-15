@@ -182,6 +182,12 @@ if(!usuario){
 
 let equiposBD = [];
 
+function textoSelect(id){
+  const select = document.getElementById(id);
+  const opt = select.options[select.selectedIndex];
+  return opt ? opt.textContent : "";
+}
+
 async function cargarCatalogo(nombreHoja, idSelect){
 
   const select = document.getElementById(idSelect);
@@ -285,6 +291,10 @@ async function guardarNovedad(){
   btn.disabled = true;
   btn.innerText = "GUARDANDO...";
 
+  const modoFallaTexto = textoSelect("modoFalla");
+  const causaProbableTexto = textoSelect("causaProbable");
+  const consecuenciaTexto = textoSelect("consecuenciaProduccion");
+
   const datos = {
     hoja: "Notificaciones",
     ID_Notificacion: "NOT-" + Date.now(),
@@ -305,16 +315,23 @@ async function guardarNovedad(){
     TiempoParadaInicial: document.getElementById("tiempoParada").value,
     quedapendiente: document.getElementById("quedaPendiente").value,
     Prioridad: document.getElementById("prioridad").value,
-    ModoFalla: document.getElementById("modoFalla").value,
-    CausaProbable: document.getElementById("causaProbable").value,
-    ConsecuenciaProduccion: document.getElementById("consecuenciaProduccion").value,
-    Estado: "ES06",
+    ModoFalla: modoFallaTexto,
+    CausaProbable: causaProbableTexto,
+    ConsecuenciaProduccion: consecuenciaTexto,
+    Estado: "Reportado",
     OrdenSAP: document.getElementById("ordenSAP").value,
     AvisoSap: document.getElementById("avisoSAP").value
   };
 
   if(!datos.Turno || !datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla){
     alert("Debe completar turno, origen, línea, equipo y descripción.");
+    btn.disabled = false;
+    btn.innerText = "GUARDAR NOVEDAD";
+    return;
+  }
+
+  if(!document.getElementById("modoFalla").value || !document.getElementById("causaProbable").value || !document.getElementById("consecuenciaProduccion").value){
+    alert("Debe seleccionar modo de falla, causa probable y consecuencia.");
     btn.disabled = false;
     btn.innerText = "GUARDAR NOVEDAD";
     return;
