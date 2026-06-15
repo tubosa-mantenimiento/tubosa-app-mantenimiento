@@ -56,16 +56,16 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
         <label>Técnico</label>
         <input id="tecnico" class="readonly" readonly>
       </div>
-     <div>
-  <label>Turno</label>
-  <select id="turno">
-    <option value="">Seleccione...</option>
-    <option>Turno A - 6:00 am - 2:00 pm</option>
-    <option>Turno B - 2:00 pm - 10:00 pm</option>
-    <option>Turno C - 10:00 pm - 6:00 am</option>
-    <option>Administrativo</option>
-  </select>
-</div>
+      <div>
+        <label>Turno</label>
+        <select id="turno">
+          <option value="">Seleccione...</option>
+          <option>Turno A - 6:00 am - 2:00 pm</option>
+          <option>Turno B - 2:00 pm - 10:00 pm</option>
+          <option>Turno C - 10:00 pm - 6:00 am</option>
+          <option>Administrativo</option>
+        </select>
+      </div>
     </div>
 
     <label>Origen del reporte</label>
@@ -136,18 +136,18 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
 
     <label>Modo falla</label>
     <select id="modoFalla">
-  <option value="">Cargando modos de falla...</option>
-</select>
+      <option value="">Cargando modos de falla...</option>
+    </select>
 
     <label>Causa probable</label>
     <select id="causaProbable">
-  <option value="">Cargando causas...</option>
-</select>
+      <option value="">Cargando causas...</option>
+    </select>
 
     <label>Consecuencia producción</label>
-   <select id="consecuenciaProduccion">
-  <option value="">Cargando consecuencias...</option>
-</select>
+    <select id="consecuenciaProduccion">
+      <option value="">Cargando consecuencias...</option>
+    </select>
 
     <div class="grid">
       <div>
@@ -160,8 +160,8 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
       </div>
     </div>
 
-   <button id="btnGuardar" onclick="guardarNovedad()">GUARDAR NOVEDAD</button>
-    
+    <button id="btnGuardar" onclick="guardarNovedad()">GUARDAR NOVEDAD</button>
+
   </div>
 
   <div class="footer">
@@ -182,7 +182,7 @@ if(!usuario){
 
 let equiposBD = [];
 
-  async function cargarCatalogo(nombreHoja, idSelect){
+async function cargarCatalogo(nombreHoja, idSelect){
 
   const select = document.getElementById(idSelect);
   select.innerHTML = '<option value="">Cargando...</option>';
@@ -193,7 +193,7 @@ let equiposBD = [];
 
     select.innerHTML = '<option value="">Seleccione...</option>';
 
-    data.datos.forEach(item => {
+    (data.datos || []).forEach(item => {
       const option = document.createElement("option");
       option.value = item.Codigo;
       option.textContent = item.Descripcion;
@@ -211,14 +211,13 @@ async function cargarCatalogos(){
   await cargarCatalogo("Catalogo_Causa", "causaProbable");
   await cargarCatalogo("Catalogo_Consecuencia", "consecuenciaProduccion");
 }
-  
+
 function cargarInicial(){
   const ahora = new Date();
 
   document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
   document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
   document.getElementById("tecnico").value = usuario.nombre;
-
 }
 
 async function cargarEquipos(){
@@ -283,15 +282,16 @@ function llenarEquipo(){
 async function guardarNovedad(){
 
   const btn = document.getElementById("btnGuardar");
-btn.disabled = true;
-btn.innerText = "GUARDANDO...";
-  
+  btn.disabled = true;
+  btn.innerText = "GUARDANDO...";
+
   const datos = {
     hoja: "Notificaciones",
     ID_Notificacion: "NOT-" + Date.now(),
     FechaReporte: document.getElementById("fecha").value,
     Horareporte: document.getElementById("hora").value,
     ReportadoPor: usuario.codigo,
+    NombreReportadoPor: usuario.nombre,
     Turno: document.getElementById("turno").value,
     Origenreporte: document.getElementById("origen").value,
     ClaseTrabajo: "CT01",
@@ -313,12 +313,12 @@ btn.innerText = "GUARDANDO...";
     AvisoSap: document.getElementById("avisoSAP").value
   };
 
-  if(!datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla){
-  alert("Debe completar origen, línea, equipo y descripción.");
-  btn.disabled = false;
-  btn.innerText = "GUARDAR NOVEDAD";
-  return;
-}
+  if(!datos.Turno || !datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla){
+    alert("Debe completar turno, origen, línea, equipo y descripción.");
+    btn.disabled = false;
+    btn.innerText = "GUARDAR NOVEDAD";
+    return;
+  }
 
   try{
     const params = new URLSearchParams(datos);
@@ -330,13 +330,15 @@ btn.innerText = "GUARDANDO...";
       window.location.href = "menu.html";
     }else{
       alert("Error: " + resultado.mensaje);
+      btn.disabled = false;
+      btn.innerText = "GUARDAR NOVEDAD";
     }
 
   }catch(error){
-  alert("Error guardando novedad: " + error);
-  btn.disabled = false;
-  btn.innerText = "GUARDAR NOVEDAD";
-}
+    alert("Error guardando novedad: " + error);
+    btn.disabled = false;
+    btn.innerText = "GUARDAR NOVEDAD";
+  }
 }
 
 cargarInicial();
