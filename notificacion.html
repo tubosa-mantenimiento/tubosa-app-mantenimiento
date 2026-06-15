@@ -134,16 +134,6 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
       </div>
     </div>
 
-    <label>Modo falla</label>
-    <select id="modoFalla">
-      <option value="">Cargando modos de falla...</option>
-    </select>
-
-    <label>Causa probable</label>
-    <select id="causaProbable">
-      <option value="">Cargando causas...</option>
-    </select>
-
     <label>Consecuencia producción</label>
     <select id="consecuenciaProduccion">
       <option value="">Cargando consecuencias...</option>
@@ -213,8 +203,6 @@ async function cargarCatalogo(nombreHoja, idSelect){
 }
 
 async function cargarCatalogos(){
-  await cargarCatalogo("Catalogo_ModoFalla", "modoFalla");
-  await cargarCatalogo("Catalogo_Causa", "causaProbable");
   await cargarCatalogo("Catalogo_Consecuencia", "consecuenciaProduccion");
 }
 
@@ -291,8 +279,6 @@ async function guardarNovedad(){
   btn.disabled = true;
   btn.innerText = "GUARDANDO...";
 
-  const modoFallaTexto = textoSelect("modoFalla");
-  const causaProbableTexto = textoSelect("causaProbable");
   const consecuenciaTexto = textoSelect("consecuenciaProduccion");
 
   const datos = {
@@ -315,8 +301,8 @@ async function guardarNovedad(){
     TiempoParadaInicial: document.getElementById("tiempoParada").value,
     quedapendiente: document.getElementById("quedaPendiente").value,
     Prioridad: document.getElementById("prioridad").value,
-    ModoFalla: modoFallaTexto,
-    CausaProbable: causaProbableTexto,
+    ModoFalla: "",
+    CausaProbable: "",
     ConsecuenciaProduccion: consecuenciaTexto,
     Estado: "Reportado",
     OrdenSAP: document.getElementById("ordenSAP").value,
@@ -330,8 +316,8 @@ async function guardarNovedad(){
     return;
   }
 
-  if(!document.getElementById("modoFalla").value || !document.getElementById("causaProbable").value || !document.getElementById("consecuenciaProduccion").value){
-    alert("Debe seleccionar modo de falla, causa probable y consecuencia.");
+  if(!document.getElementById("consecuenciaProduccion").value){
+    alert("Debe seleccionar la consecuencia de producción.");
     btn.disabled = false;
     btn.innerText = "GUARDAR NOVEDAD";
     return;
