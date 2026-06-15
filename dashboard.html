@@ -20,10 +20,9 @@ h2{font-size:24px;margin-bottom:14px;}
 .kpi{background:white;color:#001f5b;border-radius:20px;padding:20px;text-align:center;}
 .kpi-num{font-size:38px;font-weight:900;}
 .kpi-label{font-size:15px;font-weight:bold;margin-top:6px;}
-.ranking-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:10px;}
+.ranking-item,.bar-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
 .ranking-title{font-size:16px;font-weight:900;}
 .ranking-value{font-size:14px;margin-top:4px;opacity:.85;}
-.bar-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
 .bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;}
 .bar-bg{width:100%;height:16px;background:#dbe4f5;border-radius:20px;overflow:hidden;}
 .bar-fill{height:100%;background:#001f5b;border-radius:20px;}
@@ -49,63 +48,47 @@ h2{font-size:24px;margin-bottom:14px;}
   </div>
 
   <div class="grid">
-    <div class="kpi">
-      <div class="kpi-num" id="kpiNovedadesHoy">0</div>
-      <div class="kpi-label">Novedades hoy</div>
-    </div>
-
-    <div class="kpi">
-      <div class="kpi-num" id="kpiAbiertas">0</div>
-      <div class="kpi-label">Novedades abiertas</div>
-    </div>
-
-    <div class="kpi">
-      <div class="kpi-num" id="kpiCriticas">0</div>
-      <div class="kpi-label">Novedades críticas</div>
-    </div>
-
-    <div class="kpi">
-      <div class="kpi-num" id="kpiPIABHoy">0</div>
-      <div class="kpi-label">Rutas PIAB hoy</div>
-    </div>
-
-    <div class="kpi">
-      <div class="kpi-num" id="kpiServiciosHoy">0</div>
-      <div class="kpi-label">Servicios hoy</div>
-    </div>
-
-    <div class="kpi">
-      <div class="kpi-num" id="kpiCalentamientoHoy">0</div>
-      <div class="kpi-label">Calentamientos hoy</div>
-    </div>
+    <div class="kpi"><div class="kpi-num" id="kpiNovedadesHoy">0</div><div class="kpi-label">Novedades hoy</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiAbiertas">0</div><div class="kpi-label">Novedades abiertas</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiCriticas">0</div><div class="kpi-label">Novedades críticas</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiPIABHoy">0</div><div class="kpi-label">Rutas PIAB hoy</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiServiciosHoy">0</div><div class="kpi-label">Servicios hoy</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiCalentamientoHoy">0</div><div class="kpi-label">Calentamientos hoy</div></div>
   </div>
 
   <div class="card" style="margin-top:18px;">
     <h2>Top líneas con más fallas</h2>
-    <div id="topLineas">
-      <div class="vacio">Cargando...</div>
-    </div>
+    <div id="topLineas"><div class="vacio">Cargando...</div></div>
   </div>
 
   <div class="card">
     <h2>Top equipos con más fallas</h2>
-    <div id="topEquipos">
-      <div class="vacio">Cargando...</div>
-    </div>
+    <div id="topEquipos"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Novedades por estado</h2>
+    <div id="estadoNovedades"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Novedades por origen</h2>
+    <div id="origenNovedades"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Pendientes vs no pendientes</h2>
+    <div id="pendientesNovedades"><div class="vacio">Cargando...</div></div>
   </div>
 
   <div class="card">
     <h2>Vacío PIAB por línea</h2>
-    <div id="vacioPIAB">
-      <div class="vacio">Sin datos PIAB todavía.</div>
-    </div>
+    <div id="vacioPIAB"><div class="vacio">Sin datos PIAB todavía.</div></div>
   </div>
 
   <div class="card">
     <h2>Novedades por prioridad</h2>
-    <div id="prioridades">
-      <div class="vacio">Cargando...</div>
-    </div>
+    <div id="prioridades"><div class="vacio">Cargando...</div></div>
   </div>
 
   <div class="footer">
@@ -172,16 +155,21 @@ function esAbierta(estado){
   ].includes(e);
 }
 
+function limpiarTexto(valor){
+  let texto = String(valor || "").trim();
+
+  if(!texto){
+    texto = "Sin dato";
+  }
+
+  return texto;
+}
+
 function contarPorCampo(datos, campo){
   const conteo = {};
 
   datos.forEach(item => {
-    let valor = String(item[campo] || "").trim();
-
-    if(!valor){
-      valor = "Sin dato";
-    }
-
+    const valor = limpiarTexto(item[campo]);
     conteo[valor] = (conteo[valor] || 0) + 1;
   });
 
@@ -252,14 +240,11 @@ function obtenerUltimoVacioPIAB(piab){
   const registrosValidos = piab
     .filter(r => String(r.BombaInstalada || "").trim() === "Sí")
     .filter(r => r.VacioPIAB !== "" && r.VacioPIAB !== undefined && r.VacioPIAB !== null)
-    .map(r => {
-      return {
-        linea: r.PuntoInspeccion || r.Linea || "Sin dato",
-        vacio: Number(r.VacioPIAB),
-        fecha: fechaISO(r.Fecha) || new Date(0),
-        hora: r.Hora || ""
-      };
-    })
+    .map(r => ({
+      linea: r.PuntoInspeccion || r.Linea || "Sin dato",
+      vacio: Number(r.VacioPIAB),
+      fecha: fechaISO(r.Fecha) || new Date(0)
+    }))
     .filter(r => !isNaN(r.vacio));
 
   const ultimoPorLinea = {};
@@ -267,18 +252,12 @@ function obtenerUltimoVacioPIAB(piab){
   registrosValidos.forEach(r => {
     const key = r.linea;
 
-    if(!ultimoPorLinea[key]){
-      ultimoPorLinea[key] = r;
-      return;
-    }
-
-    if(r.fecha > ultimoPorLinea[key].fecha){
+    if(!ultimoPorLinea[key] || r.fecha > ultimoPorLinea[key].fecha){
       ultimoPorLinea[key] = r;
     }
   });
 
-  return Object.values(ultimoPorLinea)
-    .sort((a,b) => a.vacio - b.vacio);
+  return Object.values(ultimoPorLinea).sort((a,b) => a.vacio - b.vacio);
 }
 
 function renderVacioPIAB(datos){
@@ -322,7 +301,6 @@ async function cargarDashboard(){
     ]);
 
     const novedadesHoy = notificaciones.filter(n => esHoy(n.FechaReporte)).length;
-
     const abiertas = notificaciones.filter(n => esAbierta(n.Estado)).length;
 
     const criticas = notificaciones.filter(n =>
@@ -331,9 +309,7 @@ async function cargarDashboard(){
     ).length;
 
     const piabHoy = piab.filter(r => esHoy(r.Fecha)).length;
-
     const serviciosHoy = servicios.filter(r => esHoy(r.Fecha)).length;
-
     const calentamientosHoy = calentamientos.filter(r => esHoy(r.Fecha)).length;
 
     document.getElementById("kpiNovedadesHoy").innerText = novedadesHoy;
@@ -343,15 +319,13 @@ async function cargarDashboard(){
     document.getElementById("kpiServiciosHoy").innerText = serviciosHoy;
     document.getElementById("kpiCalentamientoHoy").innerText = calentamientosHoy;
 
-    const topLineas = ordenarConteo(contarPorCampo(notificaciones, "Linea"), 10);
-    const topEquipos = ordenarConteo(contarPorCampo(notificaciones, "Equipo"), 5);
-    const prioridades = ordenarConteo(contarPorCampo(notificaciones, "Prioridad"), 5);
-    const ultimoVacioPIAB = obtenerUltimoVacioPIAB(piab);
-
-    renderBarras("topLineas", topLineas, "fallas");
-    renderRanking("topEquipos", topEquipos, "fallas");
-    renderVacioPIAB(ultimoVacioPIAB);
-    renderRanking("prioridades", prioridades, "novedades");
+    renderBarras("topLineas", ordenarConteo(contarPorCampo(notificaciones, "Linea"), 10), "fallas");
+    renderRanking("topEquipos", ordenarConteo(contarPorCampo(notificaciones, "Equipo"), 5), "fallas");
+    renderBarras("estadoNovedades", ordenarConteo(contarPorCampo(notificaciones, "Estado"), 10), "novedades");
+    renderBarras("origenNovedades", ordenarConteo(contarPorCampo(notificaciones, "Origenreporte"), 10), "novedades");
+    renderBarras("pendientesNovedades", ordenarConteo(contarPorCampo(notificaciones, "quedapendiente"), 5), "novedades");
+    renderVacioPIAB(obtenerUltimoVacioPIAB(piab));
+    renderRanking("prioridades", ordenarConteo(contarPorCampo(notificaciones, "Prioridad"), 5), "novedades");
 
     document.getElementById("estadoCarga").innerText = "Información actualizada correctamente.";
 
