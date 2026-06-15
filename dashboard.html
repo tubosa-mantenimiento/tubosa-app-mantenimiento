@@ -14,12 +14,16 @@ body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
 .logo{font-size:46px;font-weight:900;}
 .card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
 h1{font-size:30px;margin-bottom:8px;}
+h2{font-size:24px;margin-bottom:14px;}
 .subtitle{font-size:17px;opacity:.85;margin-bottom:18px;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .kpi{background:white;color:#001f5b;border-radius:20px;padding:20px;text-align:center;}
 .kpi-num{font-size:38px;font-weight:900;}
 .kpi-label{font-size:15px;font-weight:bold;margin-top:6px;}
-.vacio{text-align:center;opacity:.85;margin-top:30px;font-size:17px;}
+.ranking-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:10px;}
+.ranking-title{font-size:16px;font-weight:900;}
+.ranking-value{font-size:14px;margin-top:4px;opacity:.85;}
+.vacio{text-align:center;opacity:.85;margin-top:12px;font-size:16px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
 </style>
 </head>
@@ -69,6 +73,27 @@ h1{font-size:30px;margin-bottom:8px;}
     <div class="kpi">
       <div class="kpi-num" id="kpiCalentamientoHoy">0</div>
       <div class="kpi-label">Calentamientos hoy</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px;">
+    <h2>Top líneas con más fallas</h2>
+    <div id="topLineas">
+      <div class="vacio">Cargando...</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Top equipos con más fallas</h2>
+    <div id="topEquipos">
+      <div class="vacio">Cargando...</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Novedades por prioridad</h2>
+    <div id="prioridades">
+      <div class="vacio">Cargando...</div>
     </div>
   </div>
 
@@ -136,6 +161,51 @@ function esAbierta(estado){
   ].includes(e);
 }
 
+function contarPorCampo(datos, campo){
+  const conteo = {};
+
+  datos.forEach(item => {
+    let valor = String(item[campo] || "").trim();
+
+    if(!valor){
+      valor = "Sin dato";
+    }
+
+    conteo[valor] = (conteo[valor] || 0) + 1;
+  });
+
+  return conteo;
+}
+
+function ordenarConteo(conteo, limite){
+  return Object.entries(conteo)
+    .map(([nombre, cantidad]) => ({nombre, cantidad}))
+    .sort((a,b) => b.cantidad - a.cantidad)
+    .slice(0, limite);
+}
+
+function renderRanking(idContenedor, datos, etiqueta){
+  const contenedor = document.getElementById(idContenedor);
+  contenedor.innerHTML = "";
+
+  if(datos.length === 0){
+    contenedor.innerHTML = '<div class="vacio">Sin información disponible.</div>';
+    return;
+  }
+
+  datos.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.className = "ranking-item";
+
+    div.innerHTML = `
+      <div class="ranking-title">${index + 1}. ${item.nombre}</div>
+      <div class="ranking-value">${item.cantidad} ${etiqueta}</div>
+    `;
+
+    contenedor.appendChild(div);
+  });
+}
+
 async function cargarDashboard(){
   try{
     const [notificaciones, piab, servicios, calentamientos] = await Promise.all([
@@ -166,6 +236,14 @@ async function cargarDashboard(){
     document.getElementById("kpiPIABHoy").innerText = piabHoy;
     document.getElementById("kpiServiciosHoy").innerText = serviciosHoy;
     document.getElementById("kpiCalentamientoHoy").innerText = calentamientosHoy;
+
+    const topLineas = ordenarConteo(contarPorCampo(notificaciones, "Linea"), 5);
+    const topEquipos = ordenarConteo(contarPorCampo(notificaciones, "Equipo"), 5);
+    const prioridades = ordenarConteo(contarPorCampo(notificaciones, "Prioridad"), 5);
+
+    renderRanking("topLineas", topLineas, "novedades");
+    renderRanking("topEquipos", topEquipos, "novedades");
+    renderRanking("prioridades", prioridades, "novedades");
 
     document.getElementById("estadoCarga").innerText = "Información actualizada correctamente.";
 
