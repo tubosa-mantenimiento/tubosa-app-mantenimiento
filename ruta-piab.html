@@ -41,7 +41,7 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
 
   <div class="card">
     <h1>Bombas PIAB</h1>
-    <div class="subtitle">Inspección de vacío para las 21 líneas de extrusión</div>
+    <div class="subtitle">Inspección de vacío por líneas activas de extrusión</div>
 
     <div class="grid">
       <div>
@@ -61,7 +61,7 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
     <input id="turno" class="readonly" readonly>
 
     <div class="aviso">
-      Diligencie cada línea. Si la línea no tiene bomba PIAB instalada, seleccione “No”.
+      Líneas fuera de servicio ocultas: L1, L2, L3, L6, L8, L12 y L17.
     </div>
   </div>
 
@@ -88,9 +88,8 @@ if(!usuario){
 let equiposBD = [];
 
 const lineasProduccion = [
-  "L1","L2","L3","L4","L5","L6","L7",
-  "L8","L9","L10","L11","L12","L13","L14",
-  "L15","L16","L17","L18","L19","L20","L21"
+  "L4","L5","L7","L9","L10","L11",
+  "L13","L14","L15","L16","L18","L19","L20","L21"
 ];
 
 function determinarTurno(){
@@ -272,7 +271,7 @@ async function guardarPIAB(){
       }
     }
 
-    alert("Ruta PIAB guardada correctamente para las 21 líneas.");
+    alert("Ruta PIAB guardada correctamente.");
     window.location.href = "rutas.html";
 
   }catch(error){
