@@ -123,9 +123,9 @@ async function cargarPendientes(){
         String(obtenerCampo(u, "ID_Usuario")).trim() === String(reportadoPor).trim()
       );
 
-      const nombreReporta = usuarioReporta
-        ? obtenerCampo(usuarioReporta, "Nombre")
-        : reportadoPor;
+      const nombreReporta =
+        obtenerCampo(n, "NombreReportadoPor") ||
+        (usuarioReporta ? obtenerCampo(usuarioReporta, "Nombre") : reportadoPor);
 
       const linea = obtenerCampo(n, "Linea");
       const equipo = obtenerCampo(n, "Equipo");
@@ -175,7 +175,8 @@ async function aprobarNovedad(id){
       accion: "aprobar_novedad",
       ID_Notificacion: id,
       OrdenSAP: ordenSAP,
-      Supervisor: usuario.codigo
+      Supervisor: usuario.codigo,
+      NombreSupervisor: usuario.nombre
     };
 
     const params = new URLSearchParams(datos);
