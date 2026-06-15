@@ -23,6 +23,8 @@ button.activo{background:#dbe4f5;}
 .tipo{font-size:20px;font-weight:900;margin-bottom:8px;}
 .detalle{font-size:16px;margin-top:5px;opacity:.95;}
 .fecha{font-size:14px;opacity:.8;margin-top:8px;}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.badge{background:white;color:#001f5b;border-radius:12px;padding:10px;font-size:14px;font-weight:900;}
 .pdf{display:inline-block;margin-top:12px;background:white;color:#001f5b;text-decoration:none;padding:12px 16px;border-radius:12px;font-weight:900;}
 .vacio{text-align:center;opacity:.85;margin-top:30px;font-size:17px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
@@ -142,6 +144,8 @@ async function cargarEjecuciones(){
           detalle:n.DescripcionFalla || "",
           fecha:n.FechaReporte || "",
           hora:n.Horareporte || "",
+          estado:n.Estado || "Reportado",
+          ordenSAP:n.OrdenSAP || "Sin orden SAP",
           pdf:""
         });
       });
@@ -155,6 +159,8 @@ async function cargarEjecuciones(){
           detalle:"Turno: " + (s.Turno || ""),
           fecha:s.Fecha || "",
           hora:s.Hora || "",
+          estado:s.Estado || "Registrado",
+          ordenSAP:s.OrdenSAP || "No aplica",
           pdf:""
         });
       });
@@ -168,6 +174,8 @@ async function cargarEjecuciones(){
           detalle:"Check List FMT03",
           fecha:c.Fecha || "",
           hora:c.Hora || "",
+          estado:c.Estado || "Registrado",
+          ordenSAP:c.OrdenSAP || "No aplica",
           pdf:c.PDF_URL || ""
         });
       });
@@ -205,6 +213,12 @@ function renderizar(){
       <div class="tipo">${e.tipo}</div>
       <div class="detalle"><strong>${e.titulo}</strong></div>
       <div class="detalle">${e.detalle}</div>
+
+      <div class="meta">
+        <div class="badge">Estado: ${e.estado}</div>
+        <div class="badge">Orden SAP: ${e.ordenSAP}</div>
+      </div>
+
       <div class="fecha">${e.fecha} ${e.hora}</div>
       ${e.pdf ? `<a class="pdf" href="${e.pdf}" target="_blank">VER PDF</a>` : ""}
     `;
