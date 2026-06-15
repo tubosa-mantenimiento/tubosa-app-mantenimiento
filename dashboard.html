@@ -26,7 +26,7 @@ h2{font-size:24px;margin-bottom:14px;}
 .ranking-item,.bar-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
 .ranking-title{font-size:16px;font-weight:900;}
 .ranking-value{font-size:14px;margin-top:4px;opacity:.85;}
-.bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;}
+.bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;gap:10px;}
 .bar-bg{width:100%;height:16px;background:#dbe4f5;border-radius:20px;overflow:hidden;}
 .bar-fill{height:100%;background:#001f5b;border-radius:20px;}
 .chart-card{background:white;color:#001f5b;border-radius:18px;padding:14px;margin-bottom:14px;}
@@ -34,6 +34,7 @@ h2{font-size:24px;margin-bottom:14px;}
 .chart-sub{font-size:13px;opacity:.75;margin-bottom:10px;}
 .chart-values{display:flex;justify-content:space-between;font-size:13px;font-weight:bold;margin-top:6px;gap:6px;}
 svg{width:100%;height:160px;background:#f1f5ff;border-radius:14px;}
+.semaforo{font-size:20px;margin-left:6px;}
 .vacio{text-align:center;opacity:.85;margin-top:12px;font-size:16px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
 </style>
@@ -127,6 +128,7 @@ if(!usuario){
 }
 
 let filtroActual = "hoy";
+
 let BD = {
   notificaciones: [],
   piab: [],
@@ -136,6 +138,10 @@ let BD = {
 
 function fechaISO(fechaTexto){
   if(!fechaTexto) return null;
+
+  if(fechaTexto instanceof Date){
+    return fechaTexto;
+  }
 
   const texto = String(fechaTexto).trim();
 
@@ -156,16 +162,32 @@ function horaA24(horaTexto){
   if(!horaTexto) return "00:00";
 
   let texto = String(horaTexto).trim().toLowerCase();
-  texto = texto.replaceAll(" ", "");
 
-  let esPM = texto.includes("p.m") || texto.includes("pm");
-  let esAM = texto.includes("a.m") || texto.includes("am");
+  texto = texto
+    .replaceAll(" ", "")
+    .replaceAll("a. m.", "am")
+    .replaceAll("p. m.", "pm")
+    .replaceAll("a.m.", "am")
+    .replaceAll("p.m.", "pm")
+    .replaceAll("a.m", "am")
+    .replaceAll("p.m", "pm");
 
-  texto = texto.replace("a.m.","").replace("p.m.","").replace("am","").replace("pm","");
+  const esPM = texto.includes("pm");
+  const esAM = texto.includes("am");
 
-  const partes = texto.split(":");
-  let h = Number(partes[0] || 0);
-  let m = Number(partes[1] || 0);
+  texto = texto.replace("am", "").replace("pm", "");
+
+  const match = texto.match(/(\d{1,2})(?::(\d{1,2}))?/);
+
+  if(!match){
+    return "00:00";
+  }
+
+  let h = Number(match[1]);
+  let m = Number(match[2] || 0);
+
+  if(isNaN(h)) h = 0;
+  if(isNaN(m)) m = 0;
 
   if(esPM && h < 12) h += 12;
   if(esAM && h === 12) h = 0;
@@ -431,17 +453,48 @@ function renderServicios(servicios){
   `;
 }
 
+function formatoVacio(valor, unidad){
+  const n = numero(valor);
+  if(n === null) return "-";
+
+  const abs = Math.abs(n);
+  const signo = n < 0 ? "-" : "-";
+  return `${signo}${abs} ${unidad || ""}`.trim();
+}
+
+function semaforoVacio(valor, unidad){
+  const n = Math.abs(numero(valor) || 0);
+  const u = String(unidad || "").toLowerCase();
+
+  if(u.includes("inhg")){
+    if(n >= 15) return "🟢";
+    if(n >= 12) return "🟡";
+    return "🔴";
+  }
+
+  if(u.includes("bar")){
+    if(n >= 0.65) return "🟢";
+    if(n >= 0.50) return "🟡";
+    return "🔴";
+  }
+
+  if(n >= 15) return "🟢";
+  if(n >= 12) return "🟡";
+  return "🔴";
+}
+
 function obtenerUltimoVacioPIAB(piab){
   const registrosValidos = piab
     .filter(r => estaEnFiltro(r.Fecha))
-    .filter(r => String(r.BombaInstalada || "").trim() === "Sí")
+    .filter(r => String(r.BombaInstalada || "").trim().toLowerCase() === "sí" || String(r.BombaInstalada || "").trim().toLowerCase() === "si")
     .filter(r => r.VacioPIAB !== "" && r.VacioPIAB !== undefined && r.VacioPIAB !== null)
     .map(r => ({
       linea: r.PuntoInspeccion || r.Linea || "Sin dato",
-      vacio: Number(String(r.VacioPIAB).replace(",", ".")),
+      vacio: numero(r.VacioPIAB),
+      unidad: r.UnidadVacio || "",
       fechaObj: fechaHoraObj(r.Fecha, r.Hora)
     }))
-    .filter(r => !isNaN(r.vacio));
+    .filter(r => r.vacio !== null);
 
   const ultimoPorLinea = {};
 
@@ -453,7 +506,8 @@ function obtenerUltimoVacioPIAB(piab){
     }
   });
 
-  return Object.values(ultimoPorLinea).sort((a,b) => a.vacio - b.vacio);
+  return Object.values(ultimoPorLinea)
+    .sort((a,b) => Math.abs(a.vacio) - Math.abs(b.vacio));
 }
 
 function renderVacioPIAB(datos){
@@ -469,6 +523,8 @@ function renderVacioPIAB(datos){
 
   datos.forEach(item => {
     const porcentaje = maxAbs > 0 ? (Math.abs(item.vacio) / maxAbs) * 100 : 0;
+    const valorTexto = formatoVacio(item.vacio, item.unidad);
+    const sem = semaforoVacio(item.vacio, item.unidad);
 
     const div = document.createElement("div");
     div.className = "bar-item";
@@ -476,7 +532,7 @@ function renderVacioPIAB(datos){
     div.innerHTML = `
       <div class="bar-head">
         <span>${item.linea}</span>
-        <span>${item.vacio}</span>
+        <span>${valorTexto} <span class="semaforo">${sem}</span></span>
       </div>
       <div class="bar-bg">
         <div class="bar-fill" style="width:${porcentaje}%;"></div>
