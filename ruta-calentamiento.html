@@ -62,9 +62,16 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
 <label>Turno</label>
 <input id="Turno" class="readonly" readonly>
 
+<label>Tipo de Extrusión</label>
+<select id="TipoExtrusion" onchange="cargarLineasPorTipo()">
+<option value="">Seleccione...</option>
+<option value="Extrusión Lisa">Extrusión Lisa</option>
+<option value="Extrusión Corrugado">Extrusión Corrugado</option>
+</select>
+
 <label>Línea</label>
 <select id="Linea">
-<option value="">Cargando líneas...</option>
+<option value="">Seleccione primero el tipo de extrusión...</option>
 </select>
 </div>
 
@@ -112,6 +119,15 @@ if(!usuario){
   window.location.href = "index.html";
 }
 
+const LINEAS_POR_TIPO = {
+  "Extrusión Lisa": [
+    "L4","L5","L7","L8","L9","L10","L11","L13","L14","L15","L16","L18","L21"
+  ],
+  "Extrusión Corrugado": [
+    "L17","L19","L20"
+  ]
+};
+
 function cargarInicial(){
   const ahora = new Date();
 
@@ -121,35 +137,25 @@ function cargarInicial(){
   document.getElementById("Turno").value = usuario.turno;
 }
 
-async function cargarLineas(){
+function cargarLineasPorTipo(){
+  const tipo = document.getElementById("TipoExtrusion").value;
   const select = document.getElementById("Linea");
 
-  try{
-    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Equipos");
-    const data = await respuesta.json();
+  select.innerHTML = '<option value="">Seleccione...</option>';
 
-    const equipos = data.datos || [];
-
-    const lineas = [...new Set(
-  equipos
-    .filter(e => String(e.Area).trim().toLowerCase() === "extrusión")
-    .map(e => e.Linea)
-    .filter(l => l && l !== "")
-)].sort();
-
-    select.innerHTML = '<option value="">Seleccione...</option>';
-
-    lineas.forEach(linea => {
-      const option = document.createElement("option");
-      option.value = linea;
-      option.textContent = linea;
-      select.appendChild(option);
-    });
-
-  }catch(error){
-    alert("Error cargando líneas: " + error);
-    select.innerHTML = '<option value="">Error cargando líneas</option>';
+  if(!tipo){
+    select.innerHTML = '<option value="">Seleccione primero el tipo de extrusión...</option>';
+    return;
   }
+
+  const lineas = LINEAS_POR_TIPO[tipo] || [];
+
+  lineas.forEach(linea => {
+    const option = document.createElement("option");
+    option.value = linea;
+    option.textContent = linea;
+    select.appendChild(option);
+  });
 }
 
 function crearZona(grupo, contenedorId, cantidad){
@@ -229,7 +235,15 @@ async function guardarCalentamiento(){
   btn.disabled = true;
   btn.innerText = "GUARDANDO...";
 
+  const tipoExtrusion = document.getElementById("TipoExtrusion").value;
   const linea = document.getElementById("Linea").value;
+
+  if(!tipoExtrusion){
+    alert("Debe seleccionar el tipo de extrusión.");
+    btn.disabled = false;
+    btn.innerText = "GUARDAR Y GENERAR PDF";
+    return;
+  }
 
   if(!linea){
     alert("Debe seleccionar la línea.");
@@ -245,6 +259,7 @@ async function guardarCalentamiento(){
     Hora: document.getElementById("Hora").value,
     Tecnico: usuario.codigo,
     Turno: document.getElementById("Turno").value,
+    TipoExtrusion: tipoExtrusion,
     Linea: linea,
     Observaciones: document.getElementById("Observaciones").value,
     PDF_URL: ""
@@ -320,7 +335,6 @@ function compartirPDF(){
 }
 
 cargarInicial();
-cargarLineas();
 
 crearZona("Barril", "barril", 8);
 crearZona("Adaptador", "adaptador", 2);
