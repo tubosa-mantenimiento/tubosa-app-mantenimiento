@@ -18,7 +18,7 @@ h2{font-size:22px;margin:12px 0;}
 .subtitle{font-size:17px;opacity:.85;margin-bottom:20px;}
 label{display:block;font-weight:bold;font-size:17px;margin-top:16px;margin-bottom:5px;}
 .ref{font-size:14px;opacity:.85;margin-bottom:7px;}
-input,textarea{width:100%;padding:16px;border:none;border-radius:15px;font-size:17px;color:#001f5b;}
+input,select,textarea{width:100%;padding:16px;border:none;border-radius:15px;font-size:17px;color:#001f5b;}
 textarea{min-height:100px;resize:vertical;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .readonly{background:#dbe4f5;}
@@ -56,7 +56,12 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
 <input id="tecnico" class="readonly" readonly>
 
 <label>Turno</label>
-<input id="turno" class="readonly" readonly>
+<select id="turno">
+  <option value="">Seleccione...</option>
+  <option value="A">Turno A</option>
+  <option value="B">Turno B</option>
+  <option value="C">Turno C</option>
+</select>
 </div>
 
 <div class="card">
@@ -136,7 +141,9 @@ function cargarInicial(){
   document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
   document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
   document.getElementById("tecnico").value = usuario.nombre;
-  document.getElementById("turno").value = usuario.turno;
+
+  const turnoUsuario = usuario.turno || "";
+  document.getElementById("turno").value = turnoUsuario;
 }
 
 async function guardarRuta(){
@@ -145,13 +152,22 @@ async function guardarRuta(){
   btn.disabled = true;
   btn.innerText = "GUARDANDO...";
 
+  const turno = document.getElementById("turno").value;
+
+  if(!turno){
+    alert("Debe seleccionar el turno.");
+    btn.disabled = false;
+    btn.innerText = "GUARDAR RUTA";
+    return;
+  }
+
   const datos = {
     hoja: "Rutas_Servicios",
     ID_Ruta: "RS-" + Date.now(),
     Fecha: document.getElementById("fecha").value,
     Hora: document.getElementById("hora").value,
     Tecnico: usuario.codigo,
-    Turno: document.getElementById("turno").value,
+    Turno: turno,
 
     Amperaje_Trafo2000_Antigua: document.getElementById("trafo2000Antigua").value,
     Amperaje_Trafo1000_1600: document.getElementById("trafo1000_1600").value,
