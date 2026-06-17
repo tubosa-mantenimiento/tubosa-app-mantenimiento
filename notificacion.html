@@ -98,6 +98,9 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
       </div>
     </div>
 
+    <label>Supervisor responsable</label>
+    <input id="nombreSupervisor" class="readonly" readonly placeholder="Se asigna automáticamente por área">
+
     <label>Descripción de la falla</label>
     <textarea id="descripcion" placeholder="Describa claramente la novedad..."></textarea>
 
@@ -111,7 +114,7 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
       </div>
       <div>
         <label>Tiempo parada (min)</label>
-<input id="tiempoParada" type="number" min="0" step="1" placeholder="Ej: 30">
+        <input id="tiempoParada" type="number" min="0" step="1" placeholder="Ej: 30">
       </div>
     </div>
 
@@ -176,6 +179,44 @@ function textoSelect(id){
   const select = document.getElementById(id);
   const opt = select.options[select.selectedIndex];
   return opt ? opt.textContent : "";
+}
+
+function normalizarTexto(texto){
+  return String(texto || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function obtenerSupervisorPorArea(area){
+  const a = normalizarTexto(area);
+
+  if(a.includes("extrusion") || a.includes("servicios industriales")){
+    return {
+      codigo: "SUP-JH",
+      nombre: "Jorge Holguín"
+    };
+  }
+
+  if(a.includes("mezclas") || a.includes("molinos") || a.includes("pulverizado")){
+    return {
+      codigo: "SUP-AV",
+      nombre: "Andrés Vidal"
+    };
+  }
+
+  return {
+    codigo: "",
+    nombre: "Sin supervisor asignado"
+  };
+}
+
+function actualizarSupervisor(){
+  const area = document.getElementById("area").value;
+  const supervisor = obtenerSupervisorPorArea(area);
+  document.getElementById("nombreSupervisor").value = supervisor.nombre;
+  return supervisor;
 }
 
 async function cargarCatalogo(nombreHoja, idSelect){
@@ -252,6 +293,7 @@ function cargarEquiposPorLinea(){
   selectEquipo.innerHTML = '<option value="">Seleccione...</option>';
   document.getElementById("area").value = "";
   document.getElementById("idEquipo").value = "";
+  document.getElementById("nombreSupervisor").value = "";
 
   const filtrados = equiposBD.filter(e => e.Linea === linea);
 
@@ -271,6 +313,8 @@ function llenarEquipo(){
 
   document.getElementById("idEquipo").value = opt.dataset.id || "";
   document.getElementById("area").value = opt.dataset.area || "";
+
+  actualizarSupervisor();
 }
 
 async function guardarNovedad(){
@@ -280,6 +324,7 @@ async function guardarNovedad(){
   btn.innerText = "GUARDANDO...";
 
   const consecuenciaTexto = textoSelect("consecuenciaProduccion");
+  const supervisorAsignado = actualizarSupervisor();
 
   const datos = {
     hoja: "Notificaciones",
@@ -306,11 +351,21 @@ async function guardarNovedad(){
     ConsecuenciaProduccion: consecuenciaTexto,
     Estado: "Reportado",
     OrdenSAP: document.getElementById("ordenSAP").value,
-    AvisoSap: document.getElementById("avisoSAP").value
+    AvisoSap: document.getElementById("avisoSAP").value,
+    Supervisor: supervisorAsignado.codigo,
+    NombreSupervisor: supervisorAsignado.nombre,
+    FechaRevisionSupervisor: ""
   };
 
   if(!datos.Turno || !datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla){
     alert("Debe completar turno, origen, línea, equipo y descripción.");
+    btn.disabled = false;
+    btn.innerText = "GUARDAR NOVEDAD";
+    return;
+  }
+
+  if(!datos.Supervisor){
+    alert("El área seleccionada no tiene supervisor asignado. Revise el área del equipo.");
     btn.disabled = false;
     btn.innerText = "GUARDAR NOVEDAD";
     return;
@@ -329,7 +384,7 @@ async function guardarNovedad(){
     const resultado = await respuesta.json();
 
     if(resultado.ok){
-      alert("Novedad guardada correctamente.");
+      alert("Novedad guardada correctamente. Supervisor asignado: " + supervisorAsignado.nombre);
       window.location.href = "menu.html";
     }else{
       alert("Error: " + resultado.mensaje);
