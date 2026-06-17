@@ -20,7 +20,8 @@ h1{font-size:30px;margin-bottom:8px;}
 .detalle{font-size:16px;margin-top:6px;opacity:.95;}
 .badge{background:white;color:#001f5b;border-radius:14px;padding:12px;margin-top:12px;font-weight:900;}
 label{display:block;font-weight:bold;font-size:16px;margin-top:14px;margin-bottom:6px;}
-textarea{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;min-height:90px;}
+textarea,input{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
+textarea{min-height:90px;}
 button{width:100%;padding:16px;border:none;border-radius:15px;background:white;color:#001f5b;font-size:18px;font-weight:900;margin-top:14px;}
 .vacio{text-align:center;opacity:.85;margin-top:30px;font-size:17px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
@@ -117,6 +118,7 @@ async function cargarPendientes(){
       const trabajoPendiente = obtenerCampo(n, "TrabajoPendiente");
       const prioridad = obtenerCampo(n, "Prioridad");
       const ordenSAP = obtenerCampo(n, "OrdenSAP") || "Sin orden SAP";
+      const tiempoInicial = obtenerCampo(n, "TiempoParadaInicial") || "0";
 
       const div = document.createElement("div");
       div.className = "item";
@@ -129,11 +131,15 @@ async function cargarPendientes(){
         <div class="detalle"><strong>Reportado por:</strong> ${reportadoPor || ""}</div>
         <div class="detalle"><strong>Prioridad:</strong> ${prioridad || ""}</div>
         <div class="detalle"><strong>Orden SAP:</strong> ${ordenSAP}</div>
+        <div class="detalle"><strong>Tiempo inicial reportado:</strong> ${tiempoInicial} min</div>
         <div class="detalle"><strong>Falla:</strong> ${descripcion || ""}</div>
 
         <div class="badge">
           Trabajo pendiente:<br>${trabajoPendiente || "Sin descripción"}
         </div>
+
+        <label>Tiempo utilizado para terminar (min)</label>
+        <input id="tiempo_${id}" type="number" min="1" step="1" placeholder="Ej: 45">
 
         <label>Observación de cierre</label>
         <textarea id="obs_${id}" placeholder="Describa qué se realizó para cerrar el pendiente..."></textarea>
@@ -152,7 +158,13 @@ async function cargarPendientes(){
 async function cerrarPendiente(id){
 
   const obs = document.getElementById("obs_" + id).value.trim();
+  const tiempo = document.getElementById("tiempo_" + id).value.trim();
   const btn = document.getElementById("btn_" + id);
+
+  if(!tiempo || Number(tiempo) <= 0){
+    alert("Debe ingresar el tiempo utilizado para terminar en minutos.");
+    return;
+  }
 
   if(!obs){
     alert("Debe escribir una observación de cierre.");
@@ -172,6 +184,7 @@ async function cerrarPendiente(id){
       accion: "cerrar_pendiente",
       ID_Notificacion: id,
       ObservacionCierre: obs,
+      TiempoCierrePendiente: tiempo,
       TecnicoCierre: usuario.codigo,
       NombreTecnicoCierre: usuario.nombre
     };
@@ -181,7 +194,7 @@ async function cerrarPendiente(id){
     const resultado = await respuesta.json();
 
     if(resultado.ok){
-      alert("Pendiente cerrado correctamente.");
+      alert("Pendiente cerrado correctamente. Tiempo total: " + resultado.tiempoTotalIntervencion + " min");
       cargarPendientes();
     }else{
       alert("Error: " + resultado.mensaje);
