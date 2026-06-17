@@ -20,6 +20,7 @@ input,select,textarea{width:100%;padding:16px;border:none;border-radius:15px;fon
 textarea{min-height:110px;resize:vertical;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .readonly{background:#dbe4f5;}
+.pendiente-box{display:none;background:#123f86;border:1px solid rgba(255,255,255,.18);border-radius:20px;padding:16px;margin-top:18px;}
 button{width:100%;padding:19px;border:none;border-radius:16px;background:white;color:#001f5b;font-size:21px;font-weight:900;margin-top:26px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
 </style>
@@ -121,7 +122,7 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
     <div class="grid">
       <div>
         <label>Queda pendiente</label>
-        <select id="quedaPendiente">
+        <select id="quedaPendiente" onchange="controlarPendiente()">
           <option>No</option>
           <option>Sí</option>
         </select>
@@ -135,6 +136,16 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
           <option>Crítica</option>
         </select>
       </div>
+    </div>
+
+    <div id="bloquePendiente" class="pendiente-box">
+      <label>Técnico que recibe</label>
+      <select id="tecnicoRecibe">
+        <option value="">Cargando técnicos...</option>
+      </select>
+
+      <label>Trabajo pendiente por realizar</label>
+      <textarea id="trabajoPendiente" placeholder="Describa qué debe continuar el técnico del siguiente turno..."></textarea>
     </div>
 
     <label>Consecuencia producción</label>
@@ -174,6 +185,7 @@ if(!usuario){
 }
 
 let equiposBD = [];
+let usuariosBD = [];
 
 function textoSelect(id){
   const select = document.getElementById(id);
@@ -219,6 +231,36 @@ function actualizarSupervisor(){
   return supervisor;
 }
 
+function controlarPendiente(){
+  const quedaPendiente = document.getElementById("quedaPendiente").value;
+  const bloque = document.getElementById("bloquePendiente");
+
+  if(quedaPendiente === "Sí"){
+    bloque.style.display = "block";
+  }else{
+    bloque.style.display = "none";
+    document.getElementById("tecnicoRecibe").value = "";
+    document.getElementById("trabajoPendiente").value = "";
+  }
+}
+
+function obtenerTecnicoRecibe(){
+  const select = document.getElementById("tecnicoRecibe");
+  const opt = select.options[select.selectedIndex];
+
+  if(!opt || !select.value){
+    return {
+      codigo: "",
+      nombre: ""
+    };
+  }
+
+  return {
+    codigo: select.value,
+    nombre: opt.textContent
+  };
+}
+
 async function cargarCatalogo(nombreHoja, idSelect){
 
   const select = document.getElementById(idSelect);
@@ -253,6 +295,36 @@ function cargarInicial(){
   document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
   document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
   document.getElementById("tecnico").value = usuario.nombre;
+}
+
+async function cargarUsuarios(){
+  const select = document.getElementById("tecnicoRecibe");
+  select.innerHTML = '<option value="">Cargando técnicos...</option>';
+
+  try{
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Usuarios");
+    const data = await respuesta.json();
+
+    usuariosBD = data.datos || [];
+
+    const tecnicos = usuariosBD.filter(u =>
+      normalizarTexto(u.Rol) === "tecnico" &&
+      normalizarTexto(u.Activo) === "si"
+    );
+
+    select.innerHTML = '<option value="">Seleccione técnico...</option>';
+
+    tecnicos.forEach(t => {
+      const option = document.createElement("option");
+      option.value = t.Codigo;
+      option.textContent = t.Nombre;
+      select.appendChild(option);
+    });
+
+  }catch(error){
+    alert("Error cargando técnicos: " + error);
+    select.innerHTML = '<option value="">Error cargando técnicos</option>';
+  }
 }
 
 async function cargarEquipos(){
@@ -325,6 +397,9 @@ async function guardarNovedad(){
 
   const consecuenciaTexto = textoSelect("consecuenciaProduccion");
   const supervisorAsignado = actualizarSupervisor();
+  const tecnicoRecibe = obtenerTecnicoRecibe();
+  const quedaPendiente = document.getElementById("quedaPendiente").value;
+  const trabajoPendiente = document.getElementById("trabajoPendiente").value;
 
   const datos = {
     hoja: "Notificaciones",
@@ -344,17 +419,23 @@ async function guardarNovedad(){
     TrabajoRealizado: "",
     EquipoParado: document.getElementById("equipoParado").value,
     TiempoParadaInicial: document.getElementById("tiempoParada").value,
-    quedapendiente: document.getElementById("quedaPendiente").value,
+    quedapendiente: quedaPendiente,
     Prioridad: document.getElementById("prioridad").value,
     ModoFalla: "",
     CausaProbable: "",
     ConsecuenciaProduccion: consecuenciaTexto,
-    Estado: "Reportado",
+    Estado: quedaPendiente === "Sí" ? "Pendiente por continuar" : "Reportado",
     OrdenSAP: document.getElementById("ordenSAP").value,
     AvisoSap: document.getElementById("avisoSAP").value,
     Supervisor: supervisorAsignado.codigo,
     NombreSupervisor: supervisorAsignado.nombre,
-    FechaRevisionSupervisor: ""
+    FechaRevisionSupervisor: "",
+    TecnicoRecibe: quedaPendiente === "Sí" ? tecnicoRecibe.codigo : "",
+    NombreTecnicoRecibe: quedaPendiente === "Sí" ? tecnicoRecibe.nombre : "",
+    TrabajoPendiente: quedaPendiente === "Sí" ? trabajoPendiente : "",
+    ActividadTerminada: quedaPendiente === "Sí" ? "No" : "Sí",
+    FechaCierre: "",
+    ObservacionCierre: ""
   };
 
   if(!datos.Turno || !datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla){
@@ -366,6 +447,13 @@ async function guardarNovedad(){
 
   if(!datos.Supervisor){
     alert("El área seleccionada no tiene supervisor asignado. Revise el área del equipo.");
+    btn.disabled = false;
+    btn.innerText = "GUARDAR NOVEDAD";
+    return;
+  }
+
+  if(quedaPendiente === "Sí" && (!tecnicoRecibe.codigo || !trabajoPendiente.trim())){
+    alert("Debe seleccionar el técnico que recibe y describir el trabajo pendiente.");
     btn.disabled = false;
     btn.innerText = "GUARDAR NOVEDAD";
     return;
@@ -401,7 +489,9 @@ async function guardarNovedad(){
 
 cargarInicial();
 cargarEquipos();
+cargarUsuarios();
 cargarCatalogos();
+controlarPendiente();
 </script>
 
 </body>
