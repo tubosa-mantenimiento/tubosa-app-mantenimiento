@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Pendientes - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
+.container{max-width:560px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
+.logo{font-size:46px;font-weight:900;}
+.card,.item{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
+h1{font-size:30px;margin-bottom:8px;}
+.subtitle{font-size:17px;opacity:.85;margin-bottom:20px;}
+.info{font-size:16px;opacity:.9;}
+.titulo{font-size:22px;font-weight:900;margin-bottom:8px;}
+.detalle{font-size:16px;margin-top:6px;opacity:.95;}
+.badge{background:white;color:#001f5b;border-radius:14px;padding:12px;margin-top:12px;font-weight:900;}
+label{display:block;font-weight:bold;font-size:16px;margin-top:14px;margin-bottom:6px;}
+textarea{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;min-height:90px;}
+button{width:100%;padding:16px;border:none;border-radius:15px;background:white;color:#001f5b;font-size:18px;font-weight:900;margin-top:14px;}
+.vacio{text-align:center;opacity:.85;margin-top:30px;font-size:17px;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<a class="back" href="menu.html">‹</a>
+<div class="logo">TUBOSA</div>
+<div style="width:42px;"></div>
+</div>
+
+<div class="card">
+<h1>Mis Pendientes</h1>
+<div class="subtitle">Actividades recibidas de otro turno</div>
+<div class="info" id="tecnico"></div>
+</div>
+
+<div id="lista">
+<div class="vacio">Cargando pendientes...</div>
+</div>
+
+<div class="footer">
+TUBOSA - Sistema de Mantenimiento<br>
+Versión 1.0
+</div>
+
+</div>
+
+<script>
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
+if(!usuario){
+  window.location.href = "index.html";
+}
+
+document.getElementById("tecnico").innerText = usuario.nombre + " - " + usuario.codigo;
+
+function obtenerCampo(obj, nombre){
+  const clave = Object.keys(obj).find(k => k.trim() === nombre);
+  return clave ? obj[clave] : "";
+}
+
+function formatearFecha(fecha){
+  if(!fecha) return "";
+  const texto = String(fecha);
+
+  if(texto.includes("T")){
+    const d = new Date(texto);
+    if(!isNaN(d)) return d.toLocaleDateString("es-CO");
+  }
+
+  return texto;
+}
+
+async function cargarPendientes(){
+
+  const lista = document.getElementById("lista");
+
+  try{
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Notificaciones");
+    const data = await respuesta.json();
+
+    const novedades = data.datos || [];
+
+    const pendientes = novedades.filter(n =>
+      String(obtenerCampo(n, "TecnicoRecibe")).trim() === String(usuario.codigo).trim() &&
+      String(obtenerCampo(n, "ActividadTerminada")).trim().toLowerCase() !== "sí" &&
+      String(obtenerCampo(n, "ActividadTerminada")).trim().toLowerCase() !== "si"
+    );
+
+    lista.innerHTML = "";
+
+    if(pendientes.length === 0){
+      lista.innerHTML = '<div class="vacio">No tienes pendientes asignados.</div>';
+      return;
+    }
+
+    pendientes.reverse().forEach(n => {
+      const id = obtenerCampo(n, "ID_Notificacion");
+      const linea = obtenerCampo(n, "Linea");
+      const equipo = obtenerCampo(n, "Equipo");
+      const area = obtenerCampo(n, "Area");
+      const fecha = obtenerCampo(n, "FechaReporte");
+      const hora = obtenerCampo(n, "Horareporte");
+      const reportadoPor = obtenerCampo(n, "NombreReportadoPor");
+      const descripcion = obtenerCampo(n, "DescripcionFalla");
+      const trabajoPendiente = obtenerCampo(n, "TrabajoPendiente");
+      const prioridad = obtenerCampo(n, "Prioridad");
+      const ordenSAP = obtenerCampo(n, "OrdenSAP") || "Sin orden SAP";
+
+      const div = document.createElement("div");
+      div.className = "item";
+
+      div.innerHTML = `
+        <div class="titulo">📌 ${linea || ""} - ${equipo || "Equipo no definido"}</div>
+        <div class="detalle"><strong>ID:</strong> ${id}</div>
+        <div class="detalle"><strong>Fecha reporte:</strong> ${formatearFecha(fecha)} ${hora || ""}</div>
+        <div class="detalle"><strong>Área:</strong> ${area || "Sin área"}</div>
+        <div class="detalle"><strong>Reportado por:</strong> ${reportadoPor || ""}</div>
+        <div class="detalle"><strong>Prioridad:</strong> ${prioridad || ""}</div>
+        <div class="detalle"><strong>Orden SAP:</strong> ${ordenSAP}</div>
+        <div class="detalle"><strong>Falla:</strong> ${descripcion || ""}</div>
+
+        <div class="badge">
+          Trabajo pendiente:<br>${trabajoPendiente || "Sin descripción"}
+        </div>
+
+        <label>Observación de cierre</label>
+        <textarea id="obs_${id}" placeholder="Describa qué se realizó para cerrar el pendiente..."></textarea>
+
+        <button onclick="cerrarPendiente('${id}')">FINALIZAR PENDIENTE</button>
+      `;
+
+      lista.appendChild(div);
+    });
+
+  }catch(error){
+    lista.innerHTML = '<div class="vacio">Error cargando pendientes: ' + error + '</div>';
+  }
+}
+
+async function cerrarPendiente(id){
+
+  const obs = document.getElementById("obs_" + id).value.trim();
+
+  if(!obs){
+    alert("Debe escribir una observación de cierre.");
+    return;
+  }
+
+  alert("Siguiente paso: activar cierre en Apps Script para actualizar esta novedad.");
+}
+
+cargarPendientes();
+</script>
+
+</body>
+</html>
