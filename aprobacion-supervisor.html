@@ -18,6 +18,7 @@ h1{font-size:30px;margin-bottom:8px;}
 .item{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:18px;margin-bottom:16px;}
 .titulo{font-size:20px;font-weight:900;margin-bottom:8px;}
 .detalle{font-size:15px;margin-top:5px;opacity:.95;}
+.supervisor-box{background:white;color:#001f5b;border-radius:14px;padding:12px;margin-top:12px;font-weight:900;}
 label{display:block;font-weight:bold;font-size:15px;margin-top:14px;margin-bottom:6px;}
 input{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
 button{width:100%;padding:16px;border:none;border-radius:15px;background:white;color:#001f5b;font-size:18px;font-weight:900;margin-top:14px;}
@@ -68,6 +69,8 @@ if(!rolesPermitidos.includes(String(usuario.rol).trim().toUpperCase())){
   window.location.href = "menu.html";
 }
 
+let novedadesPendientesBD = [];
+
 function obtenerCampo(obj, nombre){
   const clave = Object.keys(obj).find(k => k.trim() === nombre);
   return clave ? obj[clave] : "";
@@ -106,6 +109,8 @@ async function cargarPendientes(){
       !String(obtenerCampo(n, "OrdenSAP") || "").trim()
     );
 
+    novedadesPendientesBD = pendientes;
+
     lista.innerHTML = "";
 
     if(pendientes.length === 0){
@@ -129,10 +134,12 @@ async function cargarPendientes(){
 
       const linea = obtenerCampo(n, "Linea");
       const equipo = obtenerCampo(n, "Equipo");
+      const area = obtenerCampo(n, "Area");
       const fecha = obtenerCampo(n, "FechaReporte");
       const hora = obtenerCampo(n, "Horareporte");
       const descripcion = obtenerCampo(n, "DescripcionFalla");
       const avisoSap = obtenerCampo(n, "AvisoSap") || obtenerCampo(n, "AvisoSAP");
+      const supervisorAsignado = obtenerCampo(n, "NombreSupervisor") || "Sin supervisor asignado";
 
       const div = document.createElement("div");
       div.className = "item";
@@ -141,10 +148,15 @@ async function cargarPendientes(){
         <div class="titulo">${linea || ""} - ${equipo || "Equipo no definido"}</div>
         <div class="detalle"><strong>ID:</strong> ${idNotificacion || ""}</div>
         <div class="detalle"><strong>Fecha:</strong> ${formatearFecha(fecha)} ${hora || ""}</div>
+        <div class="detalle"><strong>Área:</strong> ${area || "Sin área"}</div>
         <div class="detalle"><strong>Reportado por:</strong> ${nombreReporta || ""}</div>
         <div class="detalle"><strong>Clase de trabajo:</strong> Correctivo (CT01)</div>
         <div class="detalle"><strong>Descripción:</strong> ${descripcion || ""}</div>
         <div class="detalle"><strong>Aviso SAP:</strong> ${avisoSap || "Sin aviso"}</div>
+
+        <div class="supervisor-box">
+          👤 Supervisor responsable: ${supervisorAsignado}
+        </div>
 
         <label>Orden SAP obligatoria</label>
         <input id="orden_${idNotificacion}" placeholder="Ingrese Orden SAP">
@@ -170,13 +182,20 @@ async function aprobarNovedad(id){
     return;
   }
 
+  const novedad = novedadesPendientesBD.find(n =>
+    String(obtenerCampo(n, "ID_Notificacion")).trim() === String(id).trim()
+  );
+
+  const supervisorAsignado = novedad ? obtenerCampo(novedad, "Supervisor") : "";
+  const nombreSupervisorAsignado = novedad ? obtenerCampo(novedad, "NombreSupervisor") : "";
+
   try{
     const datos = {
       accion: "aprobar_novedad",
       ID_Notificacion: id,
       OrdenSAP: ordenSAP,
-      Supervisor: usuario.codigo,
-      NombreSupervisor: usuario.nombre
+      Supervisor: supervisorAsignado || usuario.codigo,
+      NombreSupervisor: nombreSupervisorAsignado || usuario.nombre
     };
 
     const params = new URLSearchParams(datos);
