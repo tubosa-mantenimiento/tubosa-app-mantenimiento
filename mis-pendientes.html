@@ -138,7 +138,7 @@ async function cargarPendientes(){
         <label>Observación de cierre</label>
         <textarea id="obs_${id}" placeholder="Describa qué se realizó para cerrar el pendiente..."></textarea>
 
-        <button onclick="cerrarPendiente('${id}')">FINALIZAR PENDIENTE</button>
+        <button id="btn_${id}" onclick="cerrarPendiente('${id}')">FINALIZAR PENDIENTE</button>
       `;
 
       lista.appendChild(div);
@@ -152,13 +152,48 @@ async function cargarPendientes(){
 async function cerrarPendiente(id){
 
   const obs = document.getElementById("obs_" + id).value.trim();
+  const btn = document.getElementById("btn_" + id);
 
   if(!obs){
     alert("Debe escribir una observación de cierre.");
     return;
   }
 
-  alert("Siguiente paso: activar cierre en Apps Script para actualizar esta novedad.");
+  const confirmar = confirm("¿Confirma que este pendiente ya fue finalizado?");
+  if(!confirmar){
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = "CERRANDO...";
+
+  try{
+    const datos = {
+      accion: "cerrar_pendiente",
+      ID_Notificacion: id,
+      ObservacionCierre: obs,
+      TecnicoCierre: usuario.codigo,
+      NombreTecnicoCierre: usuario.nombre
+    };
+
+    const params = new URLSearchParams(datos);
+    const respuesta = await fetch(URL_API + "?" + params.toString());
+    const resultado = await respuesta.json();
+
+    if(resultado.ok){
+      alert("Pendiente cerrado correctamente.");
+      cargarPendientes();
+    }else{
+      alert("Error: " + resultado.mensaje);
+      btn.disabled = false;
+      btn.innerText = "FINALIZAR PENDIENTE";
+    }
+
+  }catch(error){
+    alert("Error cerrando pendiente: " + error);
+    btn.disabled = false;
+    btn.innerText = "FINALIZAR PENDIENTE";
+  }
 }
 
 cargarPendientes();
