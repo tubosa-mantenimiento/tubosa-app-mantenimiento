@@ -204,7 +204,7 @@ function normalizarTexto(texto){
 function obtenerSupervisorPorArea(area){
   const a = normalizarTexto(area);
 
-  if(a.includes("extrusion") || a.includes("servicios industriales")){
+  if(a.includes("extrusion") || a.includes("servicios industriales") || a.includes("corrugado")){
     return {
       codigo: "SUP-JH",
       nombre: "Jorge Holguín"
