@@ -44,11 +44,11 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
     <div class="grid">
       <div>
         <label>Fecha</label>
-        <input id="fecha" class="readonly" readonly>
+<input id="fecha" type="date">
       </div>
       <div>
         <label>Hora</label>
-        <input id="hora" class="readonly" readonly>
+<input id="hora" type="time">
       </div>
     </div>
 
@@ -290,11 +290,17 @@ async function cargarCatalogos(){
 }
 
 function cargarInicial(){
+
   const ahora = new Date();
 
-  document.getElementById("fecha").value = ahora.toLocaleDateString("es-CO");
-  document.getElementById("hora").value = ahora.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit"});
-  document.getElementById("tecnico").value = usuario.nombre;
+  document.getElementById("fecha").value =
+    ahora.toISOString().split("T")[0];
+
+  document.getElementById("hora").value =
+    ahora.toTimeString().slice(0,5);
+
+  document.getElementById("tecnico").value =
+    usuario.nombre;
 }
 
 async function cargarUsuarios(){
