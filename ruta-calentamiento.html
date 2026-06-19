@@ -209,6 +209,17 @@ function crearZona(grupo, contenedorId, cantidad){
           <input type="time" id="${prefijo}_100_Fin">
         </div>
       </div>
+
+      <div class="grid">
+        <div>
+          <label>140°C Inicio</label>
+          <input type="time" id="${prefijo}_140_Inicio">
+        </div>
+        <div>
+          <label>140°C Fin</label>
+          <input type="time" id="${prefijo}_140_Fin">
+        </div>
+      </div>
     `;
 
     contenedor.appendChild(div);
@@ -221,11 +232,16 @@ function agregarDatosZona(datos, grupo, cantidad){
 
     datos[prefijo + "_50_Inicio"] = document.getElementById(prefijo + "_50_Inicio").value;
     datos[prefijo + "_50_Fin"] = document.getElementById(prefijo + "_50_Fin").value;
+
     datos[prefijo + "_AMP_R"] = document.getElementById(prefijo + "_AMP_R").value;
     datos[prefijo + "_AMP_S"] = document.getElementById(prefijo + "_AMP_S").value;
     datos[prefijo + "_AMP_T"] = document.getElementById(prefijo + "_AMP_T").value;
+
     datos[prefijo + "_100_Inicio"] = document.getElementById(prefijo + "_100_Inicio").value;
     datos[prefijo + "_100_Fin"] = document.getElementById(prefijo + "_100_Fin").value;
+
+    datos[prefijo + "_140_Inicio"] = document.getElementById(prefijo + "_140_Inicio").value;
+    datos[prefijo + "_140_Fin"] = document.getElementById(prefijo + "_140_Fin").value;
   }
 }
 
