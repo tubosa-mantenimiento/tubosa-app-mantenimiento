@@ -96,28 +96,8 @@ svg{width:100%;height:210px;background:#f1f5ff;border-radius:16px;}
   </div>
 
   <div class="card">
-    <h2>Novedades por estado</h2>
-    <div id="estadoNovedades"><div class="vacio">Cargando...</div></div>
-  </div>
-
-  <div class="card">
-    <h2>Novedades por origen</h2>
-    <div id="origenNovedades"><div class="vacio">Cargando...</div></div>
-  </div>
-
-  <div class="card">
-    <h2>Pendientes vs no pendientes</h2>
-    <div id="pendientesNovedades"><div class="vacio">Cargando...</div></div>
-  </div>
-
-  <div class="card">
     <h2>Vacío PIAB por línea</h2>
     <div id="vacioPIAB"><div class="vacio">Sin datos PIAB todavía.</div></div>
-  </div>
-
-  <div class="card">
-    <h2>Novedades por prioridad</h2>
-    <div id="prioridades"><div class="vacio">Cargando...</div></div>
   </div>
 
   <div class="footer">
@@ -738,11 +718,7 @@ function renderDashboard(){
   renderServicios(BD.servicios);
   renderBarras("topLineas", ordenarConteo(contarPorCampo(notificacionesFiltro, "Linea"), 10), "fallas");
   renderRanking("topEquipos", ordenarConteo(contarPorCampo(notificacionesFiltro, "Equipo"), 5), "fallas");
-  renderBarras("estadoNovedades", ordenarConteo(contarPorCampo(notificacionesFiltro, "Estado"), 10), "novedades");
-  renderBarras("origenNovedades", ordenarConteo(contarPorCampo(notificacionesFiltro, "Origenreporte"), 10), "novedades");
-  renderBarras("pendientesNovedades", ordenarConteo(contarPorCampo(notificacionesFiltro, "quedapendiente"), 5), "novedades");
   renderVacioPIAB(obtenerUltimoVacioPIAB(BD.piab));
-  renderRanking("prioridades", ordenarConteo(contarPorCampo(notificacionesFiltro, "Prioridad"), 5), "novedades");
 
   document.getElementById("estadoCarga").innerText = "Información actualizada correctamente.";
 }
