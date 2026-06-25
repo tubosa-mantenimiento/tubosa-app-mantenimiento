@@ -65,7 +65,7 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
     <input id="turno" class="readonly" readonly>
 
     <div class="aviso">
-      Ahora se registra el inventario de bomba PIAB instalada, aunque la línea no esté trabajando.
+      Se registra si la línea está trabajando y si tiene bomba PIAB instalada. El vacío solo aplica cuando la línea trabaja y tiene bomba instalada.
     </div>
   </div>
 
@@ -101,7 +101,7 @@ const puntosPIAB = [
   { linea:"Línea 14", punto:"PIAB Línea 14" },
   { linea:"Línea 15", punto:"PIAB Línea 15" },
   { linea:"Línea 16", punto:"PIAB Línea 16" },
-  { linea:"Línea 17", punto:"PIAB Línea 16" },
+  { linea:"Línea 17", punto:"PIAB Línea 17" },
   { linea:"Línea 18", punto:"PIAB Línea 18" },
   { linea:"Línea 19", punto:"PIAB Línea 19" },
   { linea:"Línea 20", punto:"PIAB Línea 20" },
@@ -154,11 +154,11 @@ function construirFormularioLineas(){
         <div class="line-title">${item.punto}</div>
         <div class="line-subtitle">Inspección bomba PIAB / vacío de material</div>
 
-        <label>Estado de la línea</label>
+        <label>Línea trabajando</label>
         <select id="estadoLinea_${id}" onchange="controlarCamposPIAB('${id}')">
           <option value="">Seleccione...</option>
-          <option value="En trabajo">En trabajo</option>
-          <option value="Fuera de servicio">Fuera de servicio</option>
+          <option>Sí</option>
+          <option>No</option>
         </select>
 
         <label>Bomba PIAB instalada</label>
@@ -171,11 +171,11 @@ function construirFormularioLineas(){
         <div class="grid">
           <div>
             <label>Vacío PIAB</label>
-            <input id="vacioPIAB_${id}" type="number" step="0.01" placeholder="Ej: -0.65">
+            <input id="vacioPIAB_${id}" type="number" step="0.01" placeholder="Ej: -0.65" disabled class="disabled">
           </div>
           <div>
             <label>Unidad</label>
-            <select id="unidadVacio_${id}">
+            <select id="unidadVacio_${id}" disabled class="disabled">
               <option value="">Seleccione...</option>
               <option>bar</option>
               <option>inHg</option>
@@ -186,7 +186,7 @@ function construirFormularioLineas(){
         </div>
 
         <div class="info-linea" id="info_${id}">
-          Seleccione el estado de la línea y si la bomba PIAB está instalada.
+          Seleccione si la línea está trabajando y si tiene bomba PIAB instalada.
         </div>
 
         <label>Observaciones</label>
@@ -195,13 +195,12 @@ function construirFormularioLineas(){
     `;
 
     contenedor.insertAdjacentHTML("beforeend", html);
-    controlarCamposPIAB(id);
   });
 }
 
 function controlarCamposPIAB(id){
-  const estadoLinea = document.getElementById("estadoLinea_" + id).value;
-  const instalada = document.getElementById("bombaInstalada_" + id).value;
+  const lineaTrabajando = document.getElementById("estadoLinea_" + id).value;
+  const bombaInstalada = document.getElementById("bombaInstalada_" + id).value;
   const vacio = document.getElementById("vacioPIAB_" + id);
   const unidad = document.getElementById("unidadVacio_" + id);
   const info = document.getElementById("info_" + id);
@@ -210,13 +209,13 @@ function controlarCamposPIAB(id){
   card.classList.remove("normal");
   card.classList.remove("fuera");
 
-  if(estadoLinea === "En trabajo" && instalada === "Sí"){
+  if(lineaTrabajando === "Sí" && bombaInstalada === "Sí"){
     vacio.disabled = false;
     unidad.disabled = false;
     vacio.classList.remove("disabled");
     unidad.classList.remove("disabled");
     card.classList.add("normal");
-    info.innerText = "Línea en trabajo. Registre el valor de vacío PIAB.";
+    info.innerText = "Línea trabajando y bomba instalada. Registre el valor de vacío PIAB.";
     return;
   }
 
@@ -227,30 +226,30 @@ function controlarCamposPIAB(id){
   vacio.classList.add("disabled");
   unidad.classList.add("disabled");
 
-  if(estadoLinea === "Fuera de servicio"){
+  if(lineaTrabajando === "No"){
     card.classList.add("fuera");
-    info.innerText = "Línea fuera de servicio. Solo se registra inventario de bomba PIAB instalada.";
+    info.innerText = "Línea no está trabajando. Se registra inventario de bomba PIAB, no requiere vacío.";
     return;
   }
 
-  if(instalada === "No"){
+  if(bombaInstalada === "No"){
     info.innerText = "No hay bomba PIAB instalada. Se guarda como inventario, no requiere vacío.";
     return;
   }
 
-  info.innerText = "Seleccione el estado de la línea y si la bomba PIAB está instalada.";
+  info.innerText = "Seleccione si la línea está trabajando y si tiene bomba PIAB instalada.";
 }
 
 function validarFormulario(){
   for(const item of puntosPIAB){
     const id = limpiarID(item.punto);
-    const estadoLinea = document.getElementById("estadoLinea_" + id).value;
+    const lineaTrabajando = document.getElementById("estadoLinea_" + id).value;
     const bombaInstalada = document.getElementById("bombaInstalada_" + id).value;
     const vacio = document.getElementById("vacioPIAB_" + id).value;
     const unidad = document.getElementById("unidadVacio_" + id).value;
 
-    if(!estadoLinea){
-      alert("Debe seleccionar el estado de la línea en " + item.punto + ".");
+    if(!lineaTrabajando){
+      alert("Debe seleccionar si la línea está trabajando en " + item.punto + ".");
       return false;
     }
 
@@ -259,8 +258,8 @@ function validarFormulario(){
       return false;
     }
 
-    if(estadoLinea === "En trabajo" && bombaInstalada === "Sí" && (!vacio || !unidad)){
-      alert(item.punto + " está en trabajo y tiene PIAB instalada. Debe registrar vacío y unidad.");
+    if(lineaTrabajando === "Sí" && bombaInstalada === "Sí" && (!vacio || !unidad)){
+      alert(item.punto + " está trabajando y tiene bomba PIAB instalada. Debe registrar vacío y unidad.");
       return false;
     }
   }
@@ -289,17 +288,15 @@ async function guardarPIAB(){
         Fecha: document.getElementById("fecha").value,
         Hora: document.getElementById("hora").value,
         Tecnico: usuario.codigo,
-        NombreTecnico: usuario.nombre,
         Turno: document.getElementById("turno").value,
         Linea: item.linea,
         PuntoInspeccion: item.punto,
         Extrusora: "",
-        EstadoLinea: document.getElementById("estadoLinea_" + id).value,
         BombaInstalada: document.getElementById("bombaInstalada_" + id).value,
         VacioPIAB: document.getElementById("vacioPIAB_" + id).value,
         UnidadVacio: document.getElementById("unidadVacio_" + id).value,
         Observaciones: document.getElementById("observaciones_" + id).value,
-        Estado: "Registrado"
+        EstadoLinea: document.getElementById("estadoLinea_" + id).value
       };
 
       const params = new URLSearchParams(datos);
