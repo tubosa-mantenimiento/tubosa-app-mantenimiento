@@ -29,11 +29,20 @@ h2{font-size:24px;margin-bottom:14px;}
 .bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;gap:10px;}
 .bar-bg{width:100%;height:16px;background:#dbe4f5;border-radius:20px;overflow:hidden;}
 .bar-fill{height:100%;background:#001f5b;border-radius:20px;}
-.chart-card{background:white;color:#001f5b;border-radius:18px;padding:14px;margin-bottom:14px;}
-.chart-title{font-size:18px;font-weight:900;margin-bottom:4px;}
-.chart-sub{font-size:13px;opacity:.75;margin-bottom:10px;}
-.chart-values{display:flex;justify-content:space-between;font-size:13px;font-weight:bold;margin-top:6px;gap:6px;}
-svg{width:100%;height:160px;background:#f1f5ff;border-radius:14px;}
+.chart-card{background:white;color:#001f5b;border-radius:22px;padding:18px;margin-bottom:18px;}
+.chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.chart-title{font-size:21px;font-weight:900;line-height:1.1;}
+.chart-sub{font-size:14px;opacity:.75;margin-top:5px;}
+.estado-pill{font-size:13px;font-weight:900;padding:8px 12px;border-radius:12px;white-space:nowrap;}
+.estado-normal{background:#e8f8ee;color:#087a23;border:1px solid #5dcc78;}
+.estado-advertencia{background:#fff5d6;color:#b87900;border:1px solid #f0bf3a;}
+.estado-critico{background:#ffe1e1;color:#b00000;border:1px solid #e53935;}
+.chart-info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+.info-box{background:#f1f5ff;border-radius:14px;padding:10px;text-align:center;}
+.info-label{font-size:11px;opacity:.75;font-weight:bold;}
+.info-value{font-size:17px;font-weight:900;margin-top:3px;}
+.chart-values{display:flex;justify-content:space-between;font-size:13px;font-weight:bold;margin-top:10px;gap:6px;flex-wrap:wrap;}
+svg{width:100%;height:210px;background:#f1f5ff;border-radius:16px;}
 .semaforo{font-size:20px;margin-left:6px;}
 .vacio{text-align:center;opacity:.85;margin-top:12px;font-size:16px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
@@ -134,6 +143,49 @@ let BD = {
   piab: [],
   servicios: [],
   calentamientos: []
+};
+
+const RANGOS_SERVICIOS = {
+  Presion_Aire_SAM: {
+    meta: 100,
+    min: 95,
+    max: 105,
+    criticoMin: 90,
+    criticoMax: 110,
+    unidad: "PSI"
+  },
+  Caudal_Aire: {
+    meta: 700,
+    min: 600,
+    max: 800,
+    criticoMin: 500,
+    criticoMax: 850,
+    unidad: "CFM"
+  },
+  Temperatura_Chiller: {
+    meta: 64,
+    min: 62,
+    max: 66,
+    criticoMin: 58,
+    criticoMax: 70,
+    unidad: "°F"
+  },
+  Carga_Compresores: {
+    meta: 75,
+    min: 60,
+    max: 85,
+    criticoMin: 40,
+    criticoMax: 95,
+    unidad: "%"
+  },
+  Presion_Bombas: {
+    meta: 60,
+    min: 50,
+    max: 70,
+    criticoMin: 40,
+    criticoMax: 80,
+    unidad: "PSI"
+  }
 };
 
 function fechaISO(fechaTexto){
@@ -363,69 +415,182 @@ function prepararSerieServicios(servicios, campo){
     .slice(-12);
 }
 
-function crearSVGSerie(datos, unidad){
+function estadoValor(valor, rango){
+  if(valor === null || valor === undefined || valor === "-"){
+    return {
+      texto: "SIN DATO",
+      clase: "estado-advertencia",
+      color: "#f0a000",
+      icono: "⚠"
+    };
+  }
+
+  if(
+    (rango.criticoMin !== undefined && valor < rango.criticoMin) ||
+    (rango.criticoMax !== undefined && valor > rango.criticoMax)
+  ){
+    return {
+      texto: "CRÍTICO",
+      clase: "estado-critico",
+      color: "#e00000",
+      icono: "🔴"
+    };
+  }
+
+  if(valor < rango.min || valor > rango.max){
+    return {
+      texto: "ADVERTENCIA",
+      clase: "estado-advertencia",
+      color: "#f0a000",
+      icono: "🟡"
+    };
+  }
+
+  return {
+    texto: "NORMAL",
+    clase: "estado-normal",
+    color: "#0a8a24",
+    icono: "🟢"
+  };
+}
+
+function promedio(datos){
+  if(!datos.length) return "-";
+  const suma = datos.reduce((acc,d) => acc + d.valor, 0);
+  return Number((suma / datos.length).toFixed(1));
+}
+
+function crearSVGSerie(datos, unidad, rango){
   if(datos.length === 0){
     return '<div class="vacio">Sin datos registrados para este filtro.</div>';
   }
 
-  const ancho = 360;
-  const alto = 170;
-
-  if(datos.length === 1){
-    const valor = datos[0].valor;
-    const etiqueta = datos[0].etiqueta;
-
-    return `
-      <svg viewBox="0 0 ${ancho} ${alto}">
-        <text x="180" y="45" text-anchor="middle" font-size="18" font-weight="900" fill="#001f5b">${valor} ${unidad}</text>
-        <circle cx="180" cy="85" r="7" fill="#001f5b"></circle>
-        <text x="180" y="132" text-anchor="middle" font-size="12" font-weight="700" fill="#001f5b">${etiqueta}</text>
-      </svg>
-    `;
-  }
+  const ancho = 380;
+  const alto = 220;
+  const margenIzq = 42;
+  const margenDer = 28;
+  const margenTop = 24;
+  const margenBottom = 44;
+  const chartW = ancho - margenIzq - margenDer;
+  const chartH = alto - margenTop - margenBottom;
 
   const valores = datos.map(d => d.valor);
-  const min = Math.min(...valores);
-  const max = Math.max(...valores);
-  const rango = max - min || 1;
 
-  const puntosObj = datos.map((d,i) => {
-    const x = 28 + (i * (304 / (datos.length - 1)));
-    const y = 115 - ((d.valor - min) / rango) * 80;
-    return {x,y,valor:d.valor,etiqueta:d.etiqueta};
-  });
+  let minGraf = Math.min(...valores, rango.min, rango.meta);
+  let maxGraf = Math.max(...valores, rango.max, rango.meta);
+
+  if(rango.criticoMin !== undefined) minGraf = Math.min(minGraf, rango.criticoMin);
+  if(rango.criticoMax !== undefined) maxGraf = Math.max(maxGraf, rango.criticoMax);
+
+  const padding = (maxGraf - minGraf) * 0.12 || 5;
+  minGraf -= padding;
+  maxGraf += padding;
+
+  const escalaY = valor => {
+    return margenTop + ((maxGraf - valor) / (maxGraf - minGraf)) * chartH;
+  };
+
+  const escalaX = i => {
+    if(datos.length === 1) return margenIzq + chartW / 2;
+    return margenIzq + (i * (chartW / (datos.length - 1)));
+  };
+
+  const yMin = escalaY(rango.min);
+  const yMax = escalaY(rango.max);
+  const yMeta = escalaY(rango.meta);
+  const yCritMin = rango.criticoMin !== undefined ? escalaY(rango.criticoMin) : null;
+  const yCritMax = rango.criticoMax !== undefined ? escalaY(rango.criticoMax) : null;
+
+  const puntosObj = datos.map((d,i) => ({
+    x: escalaX(i),
+    y: escalaY(d.valor),
+    valor: d.valor,
+    etiqueta: d.etiqueta,
+    estado: estadoValor(d.valor, rango)
+  }));
 
   const puntosLinea = puntosObj.map(p => `${p.x},${p.y}`).join(" ");
 
   const elementos = puntosObj.map((p,i) => {
-    const yTexto = Math.max(18, p.y - 12);
+    const yTexto = Math.max(15, p.y - 10);
     const mostrarEtiqueta = datos.length <= 6 || i === 0 || i === datos.length - 1;
 
     return `
-      <text x="${p.x}" y="${yTexto}" text-anchor="middle" font-size="12" font-weight="900" fill="#001f5b">${p.valor}</text>
-      <circle cx="${p.x}" cy="${p.y}" r="5" fill="#001f5b"></circle>
-      ${mostrarEtiqueta ? `<text x="${p.x}" y="150" text-anchor="middle" font-size="10" font-weight="700" fill="#001f5b">${p.etiqueta}</text>` : ""}
+      <text x="${p.x}" y="${yTexto}" text-anchor="middle" font-size="11" font-weight="900" fill="#001f5b">${p.valor}</text>
+      <circle cx="${p.x}" cy="${p.y}" r="6" fill="${p.estado.color}" stroke="#001f5b" stroke-width="2"></circle>
+      ${mostrarEtiqueta ? `<text x="${p.x}" y="198" text-anchor="middle" font-size="10" font-weight="700" fill="#001f5b">${p.etiqueta}</text>` : ""}
     `;
   }).join("");
 
+  const labelsEje = `
+    <text x="8" y="${escalaY(maxGraf) + 5}" font-size="10" fill="#001f5b">${Math.round(maxGraf)}</text>
+    <text x="8" y="${escalaY((maxGraf + minGraf) / 2) + 5}" font-size="10" fill="#001f5b">${Math.round((maxGraf + minGraf) / 2)}</text>
+    <text x="8" y="${escalaY(minGraf) + 5}" font-size="10" fill="#001f5b">${Math.round(minGraf)}</text>
+  `;
+
   return `
     <svg viewBox="0 0 ${ancho} ${alto}">
+      <rect x="${margenIzq}" y="${yMax}" width="${chartW}" height="${yMin - yMax}" fill="#dff5e7" opacity="0.85"></rect>
+
+      <line x1="${margenIzq}" y1="${yMeta}" x2="${margenIzq + chartW}" y2="${yMeta}" stroke="#0a8a24" stroke-width="2" stroke-dasharray="6,5"></line>
+      <text x="${margenIzq + chartW - 2}" y="${yMeta - 5}" text-anchor="end" font-size="11" font-weight="900" fill="#0a8a24">Meta ${rango.meta} ${unidad}</text>
+
+      <line x1="${margenIzq}" y1="${yMax}" x2="${margenIzq + chartW}" y2="${yMax}" stroke="#0a8a24" stroke-width="1.5" stroke-dasharray="5,5"></line>
+      <line x1="${margenIzq}" y1="${yMin}" x2="${margenIzq + chartW}" y2="${yMin}" stroke="#0a8a24" stroke-width="1.5" stroke-dasharray="5,5"></line>
+      <text x="${margenIzq + chartW - 2}" y="${yMin - 5}" text-anchor="end" font-size="11" font-weight="900" fill="#0a8a24">Rango ${rango.min}-${rango.max}</text>
+
+      ${yCritMin !== null ? `<line x1="${margenIzq}" y1="${yCritMin}" x2="${margenIzq + chartW}" y2="${yCritMin}" stroke="#e00000" stroke-width="2" stroke-dasharray="6,5"></line>` : ""}
+      ${yCritMax !== null ? `<line x1="${margenIzq}" y1="${yCritMax}" x2="${margenIzq + chartW}" y2="${yCritMax}" stroke="#e00000" stroke-width="2" stroke-dasharray="6,5"></line>` : ""}
+
+      ${labelsEje}
+
       <polyline points="${puntosLinea}" fill="none" stroke="#001f5b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+
       ${elementos}
     </svg>
   `;
 }
 
-function renderGraficoServicio(titulo, subtitulo, datos, unidad){
+function renderGraficoServicio(titulo, subtitulo, datos, unidad, rango){
   const ultimo = datos.length ? datos[datos.length - 1].valor : "-";
   const minimo = datos.length ? Math.min(...datos.map(d => d.valor)) : "-";
   const maximo = datos.length ? Math.max(...datos.map(d => d.valor)) : "-";
+  const prom = promedio(datos);
+
+  const anterior = datos.length >= 2 ? datos[datos.length - 2].valor : null;
+  const dif = anterior !== null && ultimo !== "-" ? Number((ultimo - anterior).toFixed(1)) : 0;
+  const flecha = dif > 0 ? "⬆" : dif < 0 ? "⬇" : "➡";
+  const tendencia = datos.length >= 2 ? `${flecha} ${dif > 0 ? "+" : ""}${dif} ${unidad}` : "Sin tendencia";
+
+  const estado = estadoValor(ultimo, rango);
 
   return `
     <div class="chart-card">
-      <div class="chart-title">${titulo}</div>
-      <div class="chart-sub">${subtitulo}</div>
-      ${crearSVGSerie(datos, unidad)}
+      <div class="chart-head">
+        <div>
+          <div class="chart-title">${titulo}</div>
+          <div class="chart-sub">${subtitulo}</div>
+        </div>
+        <div class="estado-pill ${estado.clase}">${estado.icono} ${estado.texto}</div>
+      </div>
+
+      ${crearSVGSerie(datos, unidad, rango)}
+
+      <div class="chart-info">
+        <div class="info-box">
+          <div class="info-label">Valor actual</div>
+          <div class="info-value">${ultimo} ${unidad}</div>
+        </div>
+        <div class="info-box">
+          <div class="info-label">Tendencia</div>
+          <div class="info-value">${tendencia}</div>
+        </div>
+        <div class="info-box">
+          <div class="info-label">Promedio</div>
+          <div class="info-value">${prom} ${unidad}</div>
+        </div>
+      </div>
+
       <div class="chart-values">
         <span>Min: ${minimo} ${unidad}</span>
         <span>Último: ${ultimo} ${unidad}</span>
@@ -445,11 +610,11 @@ function renderServicios(servicios){
   const presionBombas = prepararSerieServicios(servicios, "Presion_Bombas");
 
   contenedor.innerHTML = `
-    ${renderGraficoServicio("Presión aire comprimido SAM", "Tendencia según filtro seleccionado", presion, "PSI")}
-    ${renderGraficoServicio("Caudal aire comprimido", "CFM total salida sistema de compresores", caudal, "CFM")}
-    ${renderGraficoServicio("Temperatura chiller", "Lectura en pantalla del chiller", tempChiller, "°F")}
-    ${renderGraficoServicio("% carga compresores chiller", "Ocupación de capacidad del chiller", cargaChiller, "%")}
-    ${renderGraficoServicio("Presión bombas agua fría", "Presión de agua hacia planta", presionBombas, "PSI")}
+    ${renderGraficoServicio("Presión aire comprimido SAM", "Tendencia según filtro seleccionado", presion, "PSI", RANGOS_SERVICIOS.Presion_Aire_SAM)}
+    ${renderGraficoServicio("Caudal aire comprimido", "CFM total salida sistema de compresores", caudal, "CFM", RANGOS_SERVICIOS.Caudal_Aire)}
+    ${renderGraficoServicio("Temperatura chiller", "Lectura en pantalla del chiller", tempChiller, "°F", RANGOS_SERVICIOS.Temperatura_Chiller)}
+    ${renderGraficoServicio("% carga compresores chiller", "Ocupación de capacidad del chiller", cargaChiller, "%", RANGOS_SERVICIOS.Carga_Compresores)}
+    ${renderGraficoServicio("Presión bombas agua fría", "Presión de agua hacia planta", presionBombas, "PSI", RANGOS_SERVICIOS.Presion_Bombas)}
   `;
 }
 
