@@ -12,60 +12,144 @@ body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
 .back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
 .logo{font-size:46px;font-weight:900;}
-.card,.menu-card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:26px;margin-bottom:18px;}
-h1{font-size:32px;margin-bottom:8px;}
-.subtitle{font-size:17px;opacity:.85;line-height:1.35;}
-.menu-card{display:flex;align-items:center;justify-content:space-between;color:white;text-decoration:none;}
-.menu-left{display:flex;align-items:center;gap:18px;}
-.icon{font-size:38px;width:44px;text-align:center;}
-.title{font-size:25px;font-weight:900;}
-.desc{font-size:16px;opacity:.85;margin-top:7px;line-height:1.35;}
-.arrow{font-size:42px;font-weight:900;}
-.footer{text-align:center;opacity:.7;font-size:13px;margin-top:26px;}
+
+.card{
+background:#0b3475;
+border:1px solid rgba(255,255,255,.18);
+border-radius:24px;
+padding:24px;
+margin-bottom:20px;
+}
+
+.menu-card{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:#0b3475;
+border:1px solid rgba(255,255,255,.18);
+border-radius:24px;
+padding:26px;
+margin-bottom:18px;
+color:white;
+text-decoration:none;
+}
+
+.menu-left{
+display:flex;
+align-items:center;
+gap:18px;
+}
+
+.icon{
+font-size:40px;
+}
+
+.title{
+font-size:28px;
+font-weight:900;
+}
+
+.desc{
+margin-top:8px;
+font-size:16px;
+opacity:.85;
+}
+
+.arrow{
+font-size:42px;
+font-weight:bold;
+}
+
+.footer{
+text-align:center;
+opacity:.7;
+font-size:13px;
+margin-top:28px;
+}
 </style>
+
 </head>
 
 <body>
 
 <div class="container">
 
-  <div class="header">
-    <a class="back" href="menu.html">‹</a>
-    <div class="logo">TUBOSA</div>
-    <div style="width:42px;"></div>
-  </div>
+<div class="header">
+<a class="back" href="menu.html">‹</a>
+<div class="logo">TUBOSA</div>
+<div style="width:42px"></div>
+</div>
 
-  <div class="card">
-    <h1>Preventivos</h1>
-    <div class="subtitle">Gestión de asignación y control de mantenimientos preventivos</div>
-  </div>
+<div class="card">
+<h1 style="font-size:34px;">Preventivos</h1>
+<p style="margin-top:8px;font-size:17px;opacity:.85;">
+Gestión de asignación y seguimiento de mantenimientos preventivos
+</p>
+</div>
 
-  <a class="menu-card" href="preventivos-pendientes.html">
-    <div class="menu-left">
-      <div class="icon">🗓</div>
-      <div>
-        <div class="title">Asignar Preventivos</div>
-        <div class="desc">Pendientes por asignar, buscador y contadores por área</div>
-      </div>
-    </div>
-    <div class="arrow">›</div>
-  </a>
+<a class="menu-card" href="preventivos-pendientes.html">
 
-  <a class="menu-card" href="preventivos-historial.html">
-    <div class="menu-left">
-      <div class="icon">📚</div>
-      <div>
-        <div class="title">Historial</div>
-        <div class="desc">Centro de control, estados, técnicos y seguimiento ejecutivo</div>
-      </div>
-    </div>
-    <div class="arrow">›</div>
-  </a>
+<div class="menu-left">
 
-  <div class="footer">
-    TUBOSA - Sistema de Mantenimiento<br>
-    Versión 1.0
-  </div>
+<div class="icon">
+🗓
+</div>
+
+<div>
+
+<div class="title">
+Asignar Preventivos
+</div>
+
+<div class="desc">
+Preventivos pendientes, carga por área y asignación de técnicos.
+</div>
+
+</div>
+
+</div>
+
+<div class="arrow">
+›
+</div>
+
+</a>
+
+<a class="menu-card" href="preventivos-historial.html">
+
+<div class="menu-left">
+
+<div class="icon">
+📚
+</div>
+
+<div>
+
+<div class="title">
+Historial
+</div>
+
+<div class="desc">
+Seguimiento ejecutivo, estados, técnicos e indicadores.
+</div>
+
+</div>
+
+</div>
+
+<div class="arrow">
+›
+</div>
+
+</a>
+
+<div class="footer">
+
+TUBOSA - Sistema de Mantenimiento<br>
+
+Versión 1.0
+
+</div>
 
 </div>
 
