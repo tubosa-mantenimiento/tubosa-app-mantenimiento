@@ -15,11 +15,12 @@ body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
 .card,.item{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
 h1{font-size:30px;margin-bottom:8px;}
 .subtitle{font-size:17px;opacity:.85;margin-bottom:14px;}
-.info,.detalle{font-size:16px;margin-top:6px;opacity:.95;}
-.titulo{font-size:22px;font-weight:900;margin-bottom:10px;}
-.badge{background:white;color:#001f5b;border-radius:14px;padding:12px;margin-top:12px;font-weight:900;}
-label{display:block;font-weight:bold;font-size:16px;margin-top:14px;margin-bottom:6px;}
-select,input{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
+.info,.detalle{font-size:16px;margin-top:8px;opacity:.95;line-height:1.35;}
+.titulo{font-size:24px;font-weight:900;margin-bottom:12px;}
+.badge{background:white;color:#001f5b;border-radius:16px;padding:16px;margin-top:16px;font-weight:900;line-height:1.35;white-space:normal;word-break:break-word;}
+.actividad-texto{font-size:20px;margin-top:6px;}
+label{display:block;font-weight:bold;font-size:16px;margin-top:16px;margin-bottom:6px;}
+select{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
 button{width:100%;padding:16px;border:none;border-radius:15px;background:white;color:#001f5b;font-size:18px;font-weight:900;margin-top:14px;}
 button:disabled{opacity:.6;}
 .vacio{text-align:center;opacity:.85;margin-top:30px;font-size:17px;}
@@ -70,19 +71,28 @@ if(!["SUPERVISOR", "PLANEADOR", "COORDINADOR", "ADMIN"].includes(rolUsuario)){
   window.location.href = "menu.html";
 }
 
-document.getElementById("usuario").innerText =
-  usuario.nombre + " - " + usuario.rol;
+document.getElementById("usuario").innerText = usuario.nombre + " - " + usuario.rol;
 
 let tecnicos = [];
+let equipos = [];
 
 function obtenerCampo(obj, nombre){
-  const clave = Object.keys(obj).find(k => k.trim() === nombre);
+  const clave = Object.keys(obj).find(k => k.trim().toLowerCase() === nombre.trim().toLowerCase());
   return clave ? obj[clave] : "";
+}
+
+function limpiarTexto(v){
+  return String(v || "").trim().toUpperCase();
 }
 
 function formatearFecha(fecha){
   if(!fecha) return "";
-  const texto = String(fecha);
+
+  const texto = String(fecha).trim();
+
+  if(/^\d{8}$/.test(texto)){
+    return texto.substring(6,8) + "/" + texto.substring(4,6) + "/" + texto.substring(0,4);
+  }
 
   if(texto.includes("T")){
     const d = new Date(texto);
@@ -105,11 +115,64 @@ async function cargarTecnicos(){
   tecnicos = data.datos || [];
 }
 
+async function cargarEquipos(){
+  try{
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Equipos");
+    const data = await respuesta.json();
+    equipos = data.datos || [];
+  }catch(error){
+    equipos = [];
+  }
+}
+
+function buscarInfoEquipo(equipoSAP, ubicacionTecnica){
+  const equipoBuscado = limpiarTexto(equipoSAP);
+  const ubicacionBuscada = limpiarTexto(ubicacionTecnica);
+
+  const encontrado = equipos.find(eq => {
+    const posiblesEquipo = [
+      obtenerCampo(eq, "Equipo"),
+      obtenerCampo(eq, "ID_Equipo"),
+      obtenerCampo(eq, "Codigo"),
+      obtenerCampo(eq, "Código"),
+      obtenerCampo(eq, "CodigoEquipo"),
+      obtenerCampo(eq, "CódigoEquipo")
+    ].map(limpiarTexto);
+
+    const posiblesUbicacion = [
+      obtenerCampo(eq, "Ubicac.técnica"),
+      obtenerCampo(eq, "UbicacionTecnica"),
+      obtenerCampo(eq, "UbicaciónTecnica"),
+      obtenerCampo(eq, "Ubicación técnica"),
+      obtenerCampo(eq, "Ubicacion"),
+      obtenerCampo(eq, "Ubicación")
+    ].map(limpiarTexto);
+
+    return (
+      posiblesEquipo.includes(equipoBuscado) ||
+      posiblesUbicacion.includes(ubicacionBuscada)
+    );
+  });
+
+  if(!encontrado){
+    return {
+      area: "",
+      linea: ""
+    };
+  }
+
+  return {
+    area: obtenerCampo(encontrado, "Area") || obtenerCampo(encontrado, "Área"),
+    linea: obtenerCampo(encontrado, "Linea") || obtenerCampo(encontrado, "Línea")
+  };
+}
+
 async function cargarPreventivos(){
   const lista = document.getElementById("lista");
 
   try{
     await cargarTecnicos();
+    await cargarEquipos();
 
     const respuesta = await fetch(URL_API + "?accion=listar&hoja=Preventivos");
     const data = await respuesta.json();
@@ -139,41 +202,36 @@ async function cargarPreventivos(){
       const fechaInicio = obtenerCampo(p, "Fe.inic.extrema");
       const fechaFin = obtenerCampo(p, "Fe.fin extrema");
       const orden = obtenerCampo(p, "Orden");
-      const claseOrden = obtenerCampo(p, "Clase de orden");
       const textoBreve = obtenerCampo(p, "Texto breve");
       const ubicacion = obtenerCampo(p, "Ubicac.técnica");
-      const aviso = obtenerCampo(p, "Aviso");
-      const status = obtenerCampo(p, "Status sistema");
       const equipo = obtenerCampo(p, "Equipo");
       const denominacionEquipo = obtenerCampo(p, "DenominaciónEquipo");
       const denominacionTecnica = obtenerCampo(p, "DenominaciónTecnica");
-      const area = obtenerCampo(p, "Area");
-      const linea = obtenerCampo(p, "Linea");
       const actividad = obtenerCampo(p, "Actividad") || textoBreve;
-      const prioridad = obtenerCampo(p, "Prioridad");
+
+      const infoEquipo = buscarInfoEquipo(equipo, ubicacion);
+      const area = infoEquipo.area || obtenerCampo(p, "Area") || "Sin área";
+      const linea = infoEquipo.linea || obtenerCampo(p, "Linea") || "Sin línea";
 
       const div = document.createElement("div");
       div.className = "item";
 
       div.innerHTML = `
-        <div class="titulo">🗓 Preventivo ${id || orden || ""}</div>
+        <div class="titulo">🗓 Preventivo</div>
 
+        <div class="detalle"><strong>Orden SAP:</strong> ${orden || "Sin orden"}</div>
         <div class="detalle"><strong>Fecha inicio:</strong> ${formatearFecha(fechaInicio)}</div>
         <div class="detalle"><strong>Fecha fin:</strong> ${formatearFecha(fechaFin)}</div>
-        <div class="detalle"><strong>Orden SAP:</strong> ${orden || "Sin orden"}</div>
-        <div class="detalle"><strong>Clase de orden:</strong> ${claseOrden || ""}</div>
-        <div class="detalle"><strong>Aviso:</strong> ${aviso || ""}</div>
-        <div class="detalle"><strong>Status SAP:</strong> ${status || ""}</div>
         <div class="detalle"><strong>Ubicación técnica:</strong> ${ubicacion || ""}</div>
-        <div class="detalle"><strong>Área:</strong> ${area || "Sin área"}</div>
-        <div class="detalle"><strong>Línea:</strong> ${linea || "Sin línea"}</div>
         <div class="detalle"><strong>Equipo:</strong> ${equipo || "Sin equipo"}</div>
+        <div class="detalle"><strong>Área:</strong> ${area}</div>
+        <div class="detalle"><strong>Línea:</strong> ${linea}</div>
         <div class="detalle"><strong>Denominación equipo:</strong> ${denominacionEquipo || ""}</div>
         <div class="detalle"><strong>Denominación técnica:</strong> ${denominacionTecnica || ""}</div>
-        <div class="detalle"><strong>Prioridad:</strong> ${prioridad || ""}</div>
 
         <div class="badge">
-          Actividad:<br>${actividad || "Sin actividad definida"}
+          Actividad:
+          <div class="actividad-texto">${actividad || "Sin actividad definida"}</div>
         </div>
 
         <label>Técnico asignado</label>
