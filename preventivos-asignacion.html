@@ -17,8 +17,18 @@ h1{font-size:30px;margin-bottom:8px;}
 .subtitle{font-size:17px;opacity:.85;margin-bottom:14px;}
 .info,.detalle{font-size:16px;margin-top:8px;opacity:.95;line-height:1.35;}
 .titulo{font-size:24px;font-weight:900;margin-bottom:12px;}
-.badge{background:white;color:#001f5b;border-radius:16px;padding:16px;margin-top:16px;font-weight:900;line-height:1.35;white-space:normal;word-break:break-word;}
-.actividad-texto{font-size:20px;margin-top:6px;}
+.badge{
+  background:white;
+  color:#001f5b;
+  border-radius:16px;
+  padding:16px;
+  margin-top:16px;
+  font-weight:900;
+  line-height:1.35;
+  white-space:normal;
+  word-break:break-word;
+}
+.actividad-texto{font-size:19px;margin-top:8px;font-weight:700;}
 label{display:block;font-weight:bold;font-size:16px;margin-top:16px;margin-bottom:6px;}
 select{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
 button{width:100%;padding:16px;border:none;border-radius:15px;background:white;color:#001f5b;font-size:18px;font-weight:900;margin-top:14px;}
@@ -83,6 +93,14 @@ function obtenerCampo(obj, nombre){
 
 function limpiarTexto(v){
   return String(v || "").trim().toUpperCase();
+}
+
+function textoSeguro(v){
+  return String(v || "")
+    .replace(/\\/g, "\\\\")
+    .replace(/'/g, "\\'")
+    .replace(/"/g, "&quot;")
+    .replace(/\n/g, " ");
 }
 
 function formatearFecha(fecha){
@@ -207,6 +225,7 @@ async function cargarPreventivos(){
       const equipo = obtenerCampo(p, "Equipo");
       const denominacionEquipo = obtenerCampo(p, "DenominaciónEquipo");
       const denominacionTecnica = obtenerCampo(p, "DenominaciónTecnica");
+
       const actividad = obtenerCampo(p, "Actividad") || textoBreve;
 
       const infoEquipo = buscarInfoEquipo(equipo, ubicacion);
@@ -240,7 +259,11 @@ async function cargarPreventivos(){
           ${opcionesTecnicos()}
         </select>
 
-        <button id="btn_${id}" onclick="asignarPreventivo('${id}')">ASIGNAR PREVENTIVO</button>
+        <button 
+          id="btn_${id}" 
+          onclick="asignarPreventivo('${id}', '${textoSeguro(area)}', '${textoSeguro(linea)}', '${textoSeguro(actividad)}')">
+          ASIGNAR PREVENTIVO
+        </button>
       `;
 
       lista.appendChild(div);
@@ -266,7 +289,7 @@ function opcionesTecnicos(){
   }).join("");
 }
 
-async function asignarPreventivo(id){
+async function asignarPreventivo(id, area, linea, actividad){
   const select = document.getElementById("tecnico_" + id);
   const btn = document.getElementById("btn_" + id);
 
@@ -294,7 +317,10 @@ async function asignarPreventivo(id){
       TecnicoAsignado: codigoTecnico,
       NombreTecnicoAsignado: nombreTecnico,
       SupervisorAsignado: usuario.codigo,
-      UsuarioAsignador: usuario.nombre
+      UsuarioAsignador: usuario.nombre,
+      Area: area,
+      Linea: linea,
+      Actividad: actividad
     };
 
     const params = new URLSearchParams(datos);
