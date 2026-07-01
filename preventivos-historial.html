@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historial Preventivos - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
+.container{max-width:620px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
+.logo{font-size:46px;font-weight:900;}
+.card,.item{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
+h1{font-size:30px;margin-bottom:8px;}
+.subtitle{font-size:17px;opacity:.85;margin-bottom:14px;}
+.info{font-size:16px;opacity:.9;}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.kpi{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px;cursor:pointer;}
+.kpi.activo{background:white;color:#001f5b;}
+.kpi-title{font-size:14px;opacity:.85;}
+.kpi-num{font-size:34px;font-weight:900;margin-top:4px;}
+.search{width:100%;padding:16px;border:none;border-radius:16px;font-size:16px;color:#001f5b;margin-top:16px;}
+.item{padding:18px;}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.estado{border-radius:14px;padding:8px 12px;font-size:13px;font-weight:900;white-space:nowrap;}
+.asignado{background:#fff2b8;color:#5a4500;}
+.ejecucion{background:#b9ddff;color:#00335f;}
+.ejecutado{background:#c7ffd4;color:#00551d;}
+.reprogramado{background:#ffd9b8;color:#6b3300;}
+.cancelado{background:#ffb8b8;color:#640000;}
+.otro{background:white;color:#001f5b;}
+.orden{font-size:20px;font-weight:900;}
+.detalle{font-size:15px;margin-top:7px;opacity:.95;line-height:1.35;}
+.actividad{margin-top:10px;background:white;color:#001f5b;border-radius:14px;padding:12px;font-size:15px;font-weight:800;line-height:1.35;word-break:break-word;}
+.vacio{text-align:center;opacity:.85;margin-top:24px;font-size:17px;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <a class="back" href="preventivos-asignacion.html">‹</a>
+    <div class="logo">TUBOSA</div>
+    <div style="width:42px;"></div>
+  </div>
+
+  <div class="card">
+    <h1>Historial Preventivos</h1>
+    <div class="subtitle">Centro de control de asignaciones y ejecución</div>
+    <div class="info" id="usuario"></div>
+
+    <div class="kpis">
+      <div class="kpi activo" id="kpi_hoy" onclick="cambiarFiltro('hoy')">
+        <div class="kpi-title">Hoy</div>
+        <div class="kpi-num" id="numHoy">0</div>
+      </div>
+
+      <div class="kpi" id="kpi_semana" onclick="cambiarFiltro('semana')">
+        <div class="kpi-title">Semana</div>
+        <div class="kpi-num" id="numSemana">0</div>
+      </div>
+
+      <div class="kpi" id="kpi_mes" onclick="cambiarFiltro('mes')">
+        <div class="kpi-title">Mes</div>
+        <div class="kpi-num" id="numMes">0</div>
+      </div>
+
+      <div class="kpi" id="kpi_pendientes" onclick="cambiarFiltro('pendientes')">
+        <div class="kpi-title">Pendientes ejecución</div>
+        <div class="kpi-num" id="numPendientes">0</div>
+      </div>
+    </div>
+
+    <input 
+      class="search" 
+      id="buscador" 
+      placeholder="🔎 Buscar por orden, técnico, estado o actividad..."
+      oninput="renderHistorial()"
+    >
+  </div>
+
+  <div id="lista">
+    <div class="vacio">Cargando historial...</div>
+  </div>
+
+  <div class="footer">
+    TUBOSA - Sistema de Mantenimiento<br>
+    Versión 1.0
+  </div>
+
+</div>
+
+<script>
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
+if(!usuario){
+  window.location.href = "index.html";
+}
+
+const rolUsuario = String(usuario.rol || "").trim().toUpperCase();
+
+if(!["SUPERVISOR", "PLANEADOR", "COORDINADOR", "ADMIN"].includes(rolUsuario)){
+  alert("No tienes permiso para acceder a esta pantalla.");
+  window.location.href = "menu.html";
+}
+
+document.getElementById("usuario").innerText = usuario.nombre + " - " + usuario.rol;
+
+let preventivos = [];
+let filtroActivo = "hoy";
+
+function obtenerCampo(obj, nombre){
+  const clave = Object.keys(obj).find(k => k.trim().toLowerCase() === nombre.trim().toLowerCase());
+  return clave ? obj[clave] : "";
+}
+
+function normalizar(v){
+  return String(v || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function parsearFecha(fecha){
+  if(!fecha) return null;
+
+  const texto = String(fecha).trim();
+
+  if(texto.includes("T")){
+    const d = new Date(texto);
+    if(!isNaN(d)) return d;
+  }
+
+  const partes = texto.split(/[\/\-]/);
+
+  if(partes.length >= 3){
+    let d, m, y;
+
+    if(partes[0].length === 4){
+      y = Number(partes[0]);
+      m = Number(partes[1]) - 1;
+      d = Number(partes[2]);
+    }else{
+      d = Number(partes[0]);
+      m = Number(partes[1]) - 1;
+      y = Number(partes[2]);
+    }
+
+    const fechaParseada = new Date(y, m, d);
+    if(!isNaN(fechaParseada)) return fechaParseada;
+  }
+
+  const d = new Date(texto);
+  if(!isNaN(d)) return d;
+
+  return null;
+}
+
+function formatearFechaHora(fecha){
+  const d = parsearFecha(fecha);
+
+  if(d && !isNaN(d)){
+    return d.toLocaleDateString("es-CO") + " " + d.toLocaleTimeString("es-CO", {hour:"2-digit", minute:"2-digit"});
+  }
+
+  return fecha || "";
+}
+
+function inicioHoy(){
+  const h = new Date();
+  return new Date(h.getFullYear(), h.getMonth(), h.getDate());
+}
+
+function estaHoy(fecha){
+  const d = parsearFecha(fecha);
+  if(!d) return false;
+
+  const ini = inicioHoy();
+  const fin = new Date(ini);
+  fin.setDate(fin.getDate() + 1);
+
+  return d >= ini && d < fin;
+}
+
+function estaSemana(fecha){
+  const d = parsearFecha(fecha);
+  if(!d) return false;
+
+  const ini = inicioHoy();
+  const dia = ini.getDay();
+  const diferenciaLunes = dia === 0 ? 6 : dia - 1;
+  ini.setDate(ini.getDate() - diferenciaLunes);
+
+  const fin = new Date(ini);
+  fin.setDate(fin.getDate() + 7);
+
+  return d >= ini && d < fin;
+}
+
+function estaMes(fecha){
+  const d = parsearFecha(fecha);
+  if(!d) return false;
+
+  const h = new Date();
+  const ini = new Date(h.getFullYear(), h.getMonth(), 1);
+  const fin = new Date(h.getFullYear(), h.getMonth() + 1, 1);
+
+  return d >= ini && d < fin;
+}
+
+function estadoClase(estado){
+  const e = normalizar(estado);
+
+  if(e.includes("asignado")) return "asignado";
+  if(e.includes("ejecucion")) return "ejecucion";
+  if(e.includes("ejecutado")) return "ejecutado";
+  if(e.includes("reprogramado")) return "reprogramado";
+  if(e.includes("cancelado")) return "cancelado";
+
+  return "otro";
+}
+
+function esPendienteEjecucion(p){
+  const estado = normalizar(obtenerCampo(p, "Estado"));
+  return estado === "asignado" || estado === "en ejecucion";
+}
+
+function fechaBase(p){
+  return obtenerCampo(p, "FechaAsignacion") || obtenerCampo(p, "FechaHoraInicioReal") || obtenerCampo(p, "FechaEjecucion");
+}
+
+async function cargarHistorial(){
+  try{
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Preventivos");
+    const data = await respuesta.json();
+
+    preventivos = (data.datos || []).filter(p => {
+      const estado = normalizar(obtenerCampo(p, "Estado"));
+      return estado && estado !== "programado" && estado !== "pendiente de asignacion";
+    });
+
+    actualizarKPIs();
+    renderHistorial();
+
+  }catch(error){
+    document.getElementById("lista").innerHTML =
+      '<div class="vacio">Error cargando historial: ' + error + '</div>';
+  }
+}
+
+function actualizarKPIs(){
+  document.getElementById("numHoy").innerText =
+    preventivos.filter(p => estaHoy(fechaBase(p))).length;
+
+  document.getElementById("numSemana").innerText =
+    preventivos.filter(p => estaSemana(fechaBase(p))).length;
+
+  document.getElementById("numMes").innerText =
+    preventivos.filter(p => estaMes(fechaBase(p))).length;
+
+  document.getElementById("numPendientes").innerText =
+    preventivos.filter(esPendienteEjecucion).length;
+}
+
+function cambiarFiltro(filtro){
+  filtroActivo = filtro;
+
+  document.querySelectorAll(".kpi").forEach(k => k.classList.remove("activo"));
+  document.getElementById("kpi_" + filtro).classList.add("activo");
+
+  renderHistorial();
+}
+
+function filtrarPorPeriodo(p){
+  const fecha = fechaBase(p);
+
+  if(filtroActivo === "hoy") return estaHoy(fecha);
+  if(filtroActivo === "semana") return estaSemana(fecha);
+  if(filtroActivo === "mes") return estaMes(fecha);
+  if(filtroActivo === "pendientes") return esPendienteEjecucion(p);
+
+  return true;
+}
+
+function renderHistorial(){
+  const lista = document.getElementById("lista");
+  const busqueda = normalizar(document.getElementById("buscador").value);
+
+  let datos = preventivos.filter(filtrarPorPeriodo);
+
+  if(busqueda){
+    datos = datos.filter(p => {
+      const texto = normalizar([
+        obtenerCampo(p, "Orden"),
+        obtenerCampo(p, "Actividad"),
+        obtenerCampo(p, "Texto breve"),
+        obtenerCampo(p, "Estado"),
+        obtenerCampo(p, "TecnicoAsignado"),
+        obtenerCampo(p, "NombreTecnicoAsignado"),
+        obtenerCampo(p, "TecnicoEjecutor"),
+        obtenerCampo(p, "NombreTecnicoEjecutor")
+      ].join(" "));
+
+      return texto.includes(busqueda);
+    });
+  }
+
+  datos.sort((a,b) => {
+    const fa = parsearFecha(fechaBase(a)) || new Date(0);
+    const fb = parsearFecha(fechaBase(b)) || new Date(0);
+    return fb - fa;
+  });
+
+  lista.innerHTML = "";
+
+  if(datos.length === 0){
+    lista.innerHTML = '<div class="vacio">No hay registros para este filtro.</div>';
+    return;
+  }
+
+  datos.forEach(p => {
+    const orden = obtenerCampo(p, "Orden");
+    const estado = obtenerCampo(p, "Estado");
+    const actividad = obtenerCampo(p, "Actividad") || obtenerCampo(p, "Texto breve");
+    const tecnico =
+      obtenerCampo(p, "NombreTecnicoAsignado") ||
+      obtenerCampo(p, "NombreTecnicoEjecutor") ||
+      obtenerCampo(p, "TecnicoAsignado") ||
+      "Sin técnico";
+
+    const fecha = fechaBase(p);
+    const tiempo = obtenerCampo(p, "TiempoEjecucionMin");
+
+    const div = document.createElement("div");
+    div.className = "item";
+
+    div.innerHTML = `
+      <div class="top">
+        <div>
+          <div class="orden">Orden SAP ${orden || "Sin orden"}</div>
+          <div class="detalle"><strong>Técnico:</strong> ${tecnico}</div>
+          <div class="detalle"><strong>Fecha:</strong> ${formatearFechaHora(fecha)}</div>
+          ${tiempo ? `<div class="detalle"><strong>Tiempo ejecución:</strong> ${tiempo} min</div>` : ""}
+        </div>
+        <div class="estado ${estadoClase(estado)}">${estado || "Sin estado"}</div>
+      </div>
+
+      <div class="actividad">${actividad || "Sin actividad registrada"}</div>
+    `;
+
+    lista.appendChild(div);
+  });
+}
+
+cargarHistorial();
+</script>
+
+</body>
+</html>
