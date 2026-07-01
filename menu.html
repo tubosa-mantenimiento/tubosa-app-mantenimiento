@@ -11,11 +11,18 @@ body{min-height:100vh;background:#001f5b;color:white;padding:22px;}
 .container{max-width:620px;margin:auto;}
 .logo{text-align:center;font-size:50px;font-weight:900;margin:18px 0 26px;}
 .card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:24px;margin-bottom:20px;}
-.user-card h1{font-size:30px;margin-bottom:18px;}
-..user-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.user-item{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px;}
-.user-label{font-size:14px;opacity:.75;margin-bottom:5px;}
-.user-value{font-size:18px;font-weight:900;line-height:1.2;}
+
+.perfil-card{padding:24px;}
+.perfil-header{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+.avatar{width:58px;height:58px;border-radius:50%;background:white;color:#001f5b;display:flex;align-items:center;justify-content:center;font-size:30px;}
+.perfil-header h1{font-size:28px;margin-bottom:4px;}
+.perfil-nombre{font-size:20px;font-weight:900;}
+.perfil-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+.perfil-item{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:13px;}
+.perfil-item span{font-size:24px;width:30px;text-align:center;}
+.perfil-label{font-size:13px;opacity:.75;}
+.perfil-value{font-size:17px;font-weight:900;margin-top:2px;}
+
 .menu-card{display:flex;align-items:center;justify-content:space-between;background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:22px;margin-bottom:16px;color:white;text-decoration:none;}
 .menu-left{display:flex;align-items:center;gap:18px;}
 .icon{font-size:34px;width:42px;text-align:center;}
@@ -24,7 +31,6 @@ body{min-height:100vh;background:#001f5b;color:white;padding:22px;}
 .arrow{font-size:34px;font-weight:900;}
 .logout{margin-top:24px;background:white;color:#001f5b;justify-content:center;font-size:20px;font-weight:900;}
 .footer{text-align:center;opacity:.7;font-size:14px;margin-top:26px;}
-
 </style>
 </head>
 
@@ -34,28 +40,38 @@ body{min-height:100vh;background:#001f5b;color:white;padding:22px;}
 
   <div class="logo">TUBOSA</div>
 
-  <div class="card user-card">
-    <h1>¡Bienvenido!</h1>
+  <div class="card perfil-card">
+    <div class="perfil-header">
+      <div class="avatar">👤</div>
+      <div>
+        <h1>¡Bienvenido!</h1>
+        <div class="perfil-nombre" id="nombre"></div>
+      </div>
+    </div>
 
-    <div class="user-grid">
-      <div class="user-item">
-        <div class="user-label">Nombre</div>
-        <div class="user-value" id="nombre"></div>
+    <div class="perfil-grid">
+      <div class="perfil-item">
+        <span>💼</span>
+        <div>
+          <div class="perfil-label">Cargo / Turno</div>
+          <div class="perfil-value" id="turno"></div>
+        </div>
       </div>
 
-      <div class="user-item">
-        <div class="user-label">Turno / Cargo</div>
-        <div class="user-value" id="turno"></div>
+      <div class="perfil-item">
+        <span>🏭</span>
+        <div>
+          <div class="perfil-label">Área</div>
+          <div class="perfil-value" id="area"></div>
+        </div>
       </div>
 
-      <div class="user-item">
-        <div class="user-label">Área</div>
-        <div class="user-value" id="area"></div>
-      </div>
-
-      <div class="user-item">
-        <div class="user-label">Rol</div>
-        <div class="user-value" id="rol"></div>
+      <div class="perfil-item">
+        <span>🛡</span>
+        <div>
+          <div class="perfil-label">Rol</div>
+          <div class="perfil-value" id="rol"></div>
+        </div>
       </div>
     </div>
   </div>
