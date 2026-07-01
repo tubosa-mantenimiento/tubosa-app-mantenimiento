@@ -503,12 +503,9 @@ function crearSVGSerie(datos, unidad, rango){
       <rect x="${margenIzq}" y="${yMax}" width="${chartW}" height="${yMin - yMax}" fill="#dff5e7" opacity="0.85"></rect>
 
       <line x1="${margenIzq}" y1="${yMeta}" x2="${margenIzq + chartW}" y2="${yMeta}" stroke="#0a8a24" stroke-width="2" stroke-dasharray="6,5"></line>
-      <text x="${margenIzq + chartW - 2}" y="${yMeta - 5}" text-anchor="end" font-size="11" font-weight="900" fill="#0a8a24">Meta ${rango.meta} ${unidad}</text>
-
       <line x1="${margenIzq}" y1="${yMax}" x2="${margenIzq + chartW}" y2="${yMax}" stroke="#0a8a24" stroke-width="1.5" stroke-dasharray="5,5"></line>
       <line x1="${margenIzq}" y1="${yMin}" x2="${margenIzq + chartW}" y2="${yMin}" stroke="#0a8a24" stroke-width="1.5" stroke-dasharray="5,5"></line>
-      <text x="${margenIzq + chartW - 2}" y="${yMin - 5}" text-anchor="end" font-size="11" font-weight="900" fill="#0a8a24">Rango ${rango.min}-${rango.max}</text>
-
+     
       ${yCritMin !== null ? `<line x1="${margenIzq}" y1="${yCritMin}" x2="${margenIzq + chartW}" y2="${yCritMin}" stroke="#e00000" stroke-width="2" stroke-dasharray="6,5"></line>` : ""}
       ${yCritMax !== null ? `<line x1="${margenIzq}" y1="${yCritMax}" x2="${margenIzq + chartW}" y2="${yCritMax}" stroke="#e00000" stroke-width="2" stroke-dasharray="6,5"></line>` : ""}
 
