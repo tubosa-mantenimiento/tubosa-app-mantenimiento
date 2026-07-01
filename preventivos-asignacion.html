@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Asignación Preventivos - TUBOSA</title>
+<title>Preventivos - TUBOSA</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
@@ -12,56 +12,16 @@ body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
 .back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
 .logo{font-size:46px;font-weight:900;}
-.card,.item{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
-h1{font-size:30px;margin-bottom:8px;}
-h2{font-size:24px;margin-bottom:10px;}
-.subtitle{font-size:17px;opacity:.85;margin-bottom:14px;}
-.info,.detalle{font-size:16px;margin-top:8px;opacity:.95;line-height:1.35;}
-.titulo{font-size:24px;font-weight:900;margin-bottom:12px;}
-.badge{background:white;color:#001f5b;border-radius:16px;padding:16px;margin-top:16px;font-weight:900;line-height:1.35;white-space:normal;word-break:break-word;}
-.actividad-texto{font-size:19px;margin-top:8px;font-weight:700;}
-label{display:block;font-weight:bold;font-size:16px;margin-top:16px;margin-bottom:6px;}
-select{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
-button{width:100%;padding:16px;border:none;border-radius:15px;background:white;color:#001f5b;font-size:18px;font-weight:900;margin-top:14px;}
-button:disabled{opacity:.6;}
-.vacio{text-align:center;opacity:.85;margin-top:22px;font-size:17px;}
-.footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
-
-.filtros{display:flex;gap:8px;margin-top:14px;}
-.filtros button{font-size:14px;padding:11px;margin-top:0;border-radius:12px;}
-.filtros button.activo{background:#dce7ff;color:#001f5b;}
-
-.historial-item{
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:16px;
-  padding:14px;
-  margin-top:12px;
-}
-.historial-top{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  align-items:flex-start;
-}
-.historial-orden{font-size:17px;font-weight:900;}
-.historial-estado{
-  background:white;
-  color:#001f5b;
-  border-radius:12px;
-  padding:6px 10px;
-  font-size:13px;
-  font-weight:900;
-  white-space:nowrap;
-}
-.historial-detalle{font-size:14px;margin-top:6px;opacity:.95;line-height:1.35;}
-.historial-actividad{
-  margin-top:8px;
-  font-size:14px;
-  opacity:.95;
-  line-height:1.35;
-  word-break:break-word;
-}
+.card,.menu-card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:26px;margin-bottom:18px;}
+h1{font-size:32px;margin-bottom:8px;}
+.subtitle{font-size:17px;opacity:.85;line-height:1.35;}
+.menu-card{display:flex;align-items:center;justify-content:space-between;color:white;text-decoration:none;}
+.menu-left{display:flex;align-items:center;gap:18px;}
+.icon{font-size:38px;width:44px;text-align:center;}
+.title{font-size:25px;font-weight:900;}
+.desc{font-size:16px;opacity:.85;margin-top:7px;line-height:1.35;}
+.arrow{font-size:42px;font-weight:900;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:26px;}
 </style>
 </head>
 
@@ -76,33 +36,31 @@ button:disabled{opacity:.6;}
   </div>
 
   <div class="card">
-    <h1>Asignación Preventivos</h1>
-    <div class="subtitle">Asignar mantenimientos preventivos cargados desde SAP</div>
-    <div class="info" id="usuario"></div>
+    <h1>Preventivos</h1>
+    <div class="subtitle">Gestión de asignación y control de mantenimientos preventivos</div>
   </div>
 
-  <div class="card">
-    <h2>🗓 Preventivos pendientes</h2>
-    <div class="subtitle">Preventivos disponibles para asignación</div>
-    <div id="lista">
-      <div class="vacio">Cargando preventivos...</div>
+  <a class="menu-card" href="preventivos-pendientes.html">
+    <div class="menu-left">
+      <div class="icon">🗓</div>
+      <div>
+        <div class="title">Asignar Preventivos</div>
+        <div class="desc">Pendientes por asignar, buscador y contadores por área</div>
+      </div>
     </div>
-  </div>
+    <div class="arrow">›</div>
+  </a>
 
-  <div class="card">
-    <h2>📚 Historial de asignación</h2>
-    <div class="subtitle">Consulta rápida de preventivos ya asignados</div>
-
-    <div class="filtros">
-      <button id="filtro_hoy" onclick="cambiarFiltroHistorial('hoy')">Hoy</button>
-      <button id="filtro_semana" onclick="cambiarFiltroHistorial('semana')">Semana</button>
-      <button id="filtro_mes" onclick="cambiarFiltroHistorial('mes')">Mes</button>
+  <a class="menu-card" href="preventivos-historial.html">
+    <div class="menu-left">
+      <div class="icon">📚</div>
+      <div>
+        <div class="title">Historial</div>
+        <div class="desc">Centro de control, estados, técnicos y seguimiento ejecutivo</div>
+      </div>
     </div>
-
-    <div id="historial">
-      <div class="vacio">Cargando historial...</div>
-    </div>
-  </div>
+    <div class="arrow">›</div>
+  </a>
 
   <div class="footer">
     TUBOSA - Sistema de Mantenimiento<br>
@@ -110,441 +68,6 @@ button:disabled{opacity:.6;}
   </div>
 
 </div>
-
-<script>
-const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
-
-const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
-
-if(!usuario){
-  window.location.href = "index.html";
-}
-
-const rolUsuario = String(usuario.rol || "").trim().toUpperCase();
-
-if(!["SUPERVISOR", "PLANEADOR", "COORDINADOR", "ADMIN"].includes(rolUsuario)){
-  alert("No tienes permiso para acceder a esta pantalla.");
-  window.location.href = "menu.html";
-}
-
-document.getElementById("usuario").innerText = usuario.nombre + " - " + usuario.rol;
-
-let tecnicos = [];
-let equipos = [];
-let preventivosGlobal = [];
-let filtroHistorial = "hoy";
-
-function obtenerCampo(obj, nombre){
-  const clave = Object.keys(obj).find(k => k.trim().toLowerCase() === nombre.trim().toLowerCase());
-  return clave ? obj[clave] : "";
-}
-
-function limpiarTexto(v){
-  return String(v || "").trim().toUpperCase();
-}
-
-function formatearFecha(fecha){
-  if(!fecha) return "";
-
-  const texto = String(fecha).trim();
-
-  if(/^\d{8}$/.test(texto)){
-    return texto.substring(6,8) + "/" + texto.substring(4,6) + "/" + texto.substring(0,4);
-  }
-
-  if(texto.includes("T")){
-    const d = new Date(texto);
-    if(!isNaN(d)) return d.toLocaleDateString("es-CO");
-  }
-
-  return texto;
-}
-
-function formatearFechaHora(fecha){
-  if(!fecha) return "";
-
-  const d = parsearFecha(fecha);
-  if(d && !isNaN(d)){
-    return d.toLocaleDateString("es-CO") + " " + d.toLocaleTimeString("es-CO", {hour:"2-digit", minute:"2-digit"});
-  }
-
-  return String(fecha);
-}
-
-function parsearFecha(fecha){
-  if(!fecha) return null;
-
-  if(fecha instanceof Date) return fecha;
-
-  const texto = String(fecha).trim();
-
-  if(texto.includes("T")){
-    const d = new Date(texto);
-    if(!isNaN(d)) return d;
-  }
-
-  const partes = texto.split(/[\/\-]/);
-  if(partes.length >= 3){
-    let d, m, y;
-
-    if(partes[0].length === 4){
-      y = Number(partes[0]);
-      m = Number(partes[1]) - 1;
-      d = Number(partes[2]);
-    }else{
-      d = Number(partes[0]);
-      m = Number(partes[1]) - 1;
-      y = Number(partes[2]);
-    }
-
-    const fechaParseada = new Date(y, m, d);
-    if(!isNaN(fechaParseada)) return fechaParseada;
-  }
-
-  const d = new Date(texto);
-  if(!isNaN(d)) return d;
-
-  return null;
-}
-
-function estaEnFiltro(fecha){
-  const d = parsearFecha(fecha);
-  if(!d) return false;
-
-  const hoy = new Date();
-  const inicioHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
-
-  if(filtroHistorial === "hoy"){
-    const inicio = inicioHoy;
-    const fin = new Date(inicio);
-    fin.setDate(fin.getDate() + 1);
-    return d >= inicio && d < fin;
-  }
-
-  if(filtroHistorial === "semana"){
-    const inicio = new Date(inicioHoy);
-    const dia = inicio.getDay();
-    const diferenciaLunes = dia === 0 ? 6 : dia - 1;
-    inicio.setDate(inicio.getDate() - diferenciaLunes);
-
-    const fin = new Date(inicio);
-    fin.setDate(fin.getDate() + 7);
-    return d >= inicio && d < fin;
-  }
-
-  if(filtroHistorial === "mes"){
-    const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
-    const fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 1);
-    return d >= inicio && d < fin;
-  }
-
-  return true;
-}
-
-function cambiarFiltroHistorial(filtro){
-  filtroHistorial = filtro;
-
-  document.querySelectorAll(".filtros button").forEach(btn => btn.classList.remove("activo"));
-  document.getElementById("filtro_" + filtro).classList.add("activo");
-
-  renderHistorial();
-}
-
-async function cargarTecnicos(){
-  const respuesta = await fetch(URL_API + "?accion=listar_tecnicos_activos");
-  const data = await respuesta.json();
-
-  if(!data.ok){
-    alert("Error cargando técnicos: " + data.mensaje);
-    tecnicos = [];
-    return;
-  }
-
-  tecnicos = data.datos || [];
-}
-
-async function cargarEquipos(){
-  try{
-    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Equipos");
-    const data = await respuesta.json();
-    equipos = data.datos || [];
-  }catch(error){
-    equipos = [];
-  }
-}
-
-function buscarInfoEquipo(equipoSAP, ubicacionTecnica){
-  const equipoBuscado = limpiarTexto(equipoSAP);
-  const ubicacionBuscada = limpiarTexto(ubicacionTecnica);
-
-  let encontrado = null;
-
-  if(ubicacionBuscada){
-    encontrado = equipos.find(eq => {
-      const posiblesUbicacion = [
-        obtenerCampo(eq, "Ubicac.técnica"),
-        obtenerCampo(eq, "UbicacionTecnica"),
-        obtenerCampo(eq, "UbicaciónTecnica"),
-        obtenerCampo(eq, "Ubicación técnica"),
-        obtenerCampo(eq, "Ubicacion"),
-        obtenerCampo(eq, "Ubicación"),
-        obtenerCampo(eq, "Ubicacion_Tecnica"),
-        obtenerCampo(eq, "Ubicación_Tecnica")
-      ].map(limpiarTexto);
-
-      return posiblesUbicacion.includes(ubicacionBuscada);
-    });
-  }
-
-  if(!encontrado && equipoBuscado){
-    encontrado = equipos.find(eq => {
-      const posiblesEquipo = [
-        obtenerCampo(eq, "Equipo"),
-        obtenerCampo(eq, "ID_Equipo"),
-        obtenerCampo(eq, "Codigo"),
-        obtenerCampo(eq, "Código"),
-        obtenerCampo(eq, "CodigoEquipo"),
-        obtenerCampo(eq, "CódigoEquipo")
-      ].map(limpiarTexto);
-
-      return posiblesEquipo.includes(equipoBuscado);
-    });
-  }
-
-  if(!encontrado){
-    return { area:"", linea:"" };
-  }
-
-  return {
-    area: obtenerCampo(encontrado, "Area") || obtenerCampo(encontrado, "Área"),
-    linea: obtenerCampo(encontrado, "Linea") || obtenerCampo(encontrado, "Línea")
-  };
-}
-
-async function cargarPreventivos(){
-  const lista = document.getElementById("lista");
-
-  try{
-    await cargarTecnicos();
-    await cargarEquipos();
-
-    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Preventivos");
-    const data = await respuesta.json();
-
-    preventivosGlobal = data.datos || [];
-
-    renderAsignacion();
-    cambiarFiltroHistorial("hoy");
-
-  }catch(error){
-    lista.innerHTML = '<div class="vacio">Error cargando preventivos: ' + error + '</div>';
-    document.getElementById("historial").innerHTML = '<div class="vacio">Error cargando historial.</div>';
-  }
-}
-
-function renderAsignacion(){
-  const lista = document.getElementById("lista");
-
-  const pendientes = preventivosGlobal.filter(p => {
-    const estado = String(obtenerCampo(p, "Estado") || "").trim().toLowerCase();
-
-    return (
-      estado === "" ||
-      estado === "pendiente de asignación" ||
-      estado === "pendiente de asignacion" ||
-      estado === "programado"
-    );
-  });
-
-  lista.innerHTML = "";
-
-  if(pendientes.length === 0){
-    lista.innerHTML = '<div class="vacio">No hay preventivos pendientes de asignación.</div>';
-    return;
-  }
-
-  pendientes.forEach((p, index) => {
-    const id = obtenerCampo(p, "ID_Preventivo");
-    const fechaInicio = obtenerCampo(p, "Fe.inic.extrema");
-    const fechaFin = obtenerCampo(p, "Fe.fin extrema");
-    const orden = obtenerCampo(p, "Orden");
-    const textoBreve = obtenerCampo(p, "Texto breve");
-    const ubicacion = obtenerCampo(p, "Ubicac.técnica");
-    const equipo = obtenerCampo(p, "Equipo");
-    const denominacionEquipo = obtenerCampo(p, "DenominaciónEquipo");
-    const denominacionTecnica = obtenerCampo(p, "DenominaciónTecnica");
-    const actividad = obtenerCampo(p, "Actividad") || textoBreve;
-
-    const infoEquipo = buscarInfoEquipo(equipo, ubicacion);
-    const area = infoEquipo.area || obtenerCampo(p, "Area") || "Sin área";
-    const linea = infoEquipo.linea || obtenerCampo(p, "Linea") || "Sin línea";
-
-    const clave = "prev_" + index;
-
-    const div = document.createElement("div");
-    div.className = "item";
-
-    div.innerHTML = `
-      <div class="titulo">🗓 Preventivo</div>
-
-      <div class="detalle"><strong>Orden SAP:</strong> ${orden || "Sin orden"}</div>
-      <div class="detalle"><strong>Fecha inicio:</strong> ${formatearFecha(fechaInicio)}</div>
-      <div class="detalle"><strong>Fecha fin:</strong> ${formatearFecha(fechaFin)}</div>
-      <div class="detalle"><strong>Ubicación técnica:</strong> ${ubicacion || ""}</div>
-      <div class="detalle"><strong>Equipo:</strong> ${equipo || "Sin equipo"}</div>
-      <div class="detalle"><strong>Área:</strong> ${area}</div>
-      <div class="detalle"><strong>Línea:</strong> ${linea}</div>
-      <div class="detalle"><strong>Denominación equipo:</strong> ${denominacionEquipo || ""}</div>
-      <div class="detalle"><strong>Denominación técnica:</strong> ${denominacionTecnica || ""}</div>
-
-      <div class="badge">
-        Actividad:
-        <div class="actividad-texto">${actividad || "Sin actividad definida"}</div>
-      </div>
-
-      <label>Técnico asignado</label>
-      <select id="tecnico_${clave}">
-        <option value="">Seleccione técnico...</option>
-        ${opcionesTecnicos()}
-      </select>
-
-      <button id="btn_${clave}">ASIGNAR PREVENTIVO</button>
-    `;
-
-    lista.appendChild(div);
-
-    document.getElementById("btn_" + clave).onclick = function(){
-      asignarPreventivo(id, orden, clave, area, linea, actividad);
-    };
-  });
-}
-
-function renderHistorial(){
-  const historial = document.getElementById("historial");
-
-  const asignados = preventivosGlobal.filter(p => {
-    const estado = String(obtenerCampo(p, "Estado") || "").trim().toLowerCase();
-    const fechaAsignacion = obtenerCampo(p, "FechaAsignacion");
-
-    const tieneEstadoAsignado = !(
-      estado === "" ||
-      estado === "pendiente de asignación" ||
-      estado === "pendiente de asignacion" ||
-      estado === "programado"
-    );
-
-    return tieneEstadoAsignado && estaEnFiltro(fechaAsignacion);
-  });
-
-  historial.innerHTML = "";
-
-  if(asignados.length === 0){
-    historial.innerHTML = '<div class="vacio">No hay asignaciones en este periodo.</div>';
-    return;
-  }
-
-  asignados
-    .sort((a,b) => {
-      const fa = parsearFecha(obtenerCampo(a, "FechaAsignacion")) || new Date(0);
-      const fb = parsearFecha(obtenerCampo(b, "FechaAsignacion")) || new Date(0);
-      return fb - fa;
-    })
-    .forEach(p => {
-      const orden = obtenerCampo(p, "Orden");
-      const actividad = obtenerCampo(p, "Actividad") || obtenerCampo(p, "Texto breve");
-      const estado = obtenerCampo(p, "Estado");
-      const tecnico = obtenerCampo(p, "NombreTecnicoAsignado") || obtenerCampo(p, "TecnicoAsignado");
-      const fecha = obtenerCampo(p, "FechaAsignacion");
-
-      const div = document.createElement("div");
-      div.className = "historial-item";
-
-      div.innerHTML = `
-        <div class="historial-top">
-          <div class="historial-orden">Orden SAP: ${orden || "Sin orden"}</div>
-          <div class="historial-estado">${estado || ""}</div>
-        </div>
-        <div class="historial-detalle"><strong>Técnico:</strong> ${tecnico || "Sin técnico"}</div>
-        <div class="historial-detalle"><strong>Fecha:</strong> ${formatearFechaHora(fecha)}</div>
-        <div class="historial-actividad"><strong>Actividad:</strong> ${actividad || "Sin actividad"}</div>
-      `;
-
-      historial.appendChild(div);
-    });
-}
-
-function opcionesTecnicos(){
-  return tecnicos.map(t => {
-    const codigo = obtenerCampo(t, "Codigo");
-    const nombre = obtenerCampo(t, "Nombre");
-    const cargo = obtenerCampo(t, "Cargo");
-    const area = obtenerCampo(t, "Area");
-
-    return `
-      <option value="${codigo}" data-nombre="${nombre}">
-        ${nombre} - ${codigo} ${cargo ? "- " + cargo : ""} ${area ? "- " + area : ""}
-      </option>
-    `;
-  }).join("");
-}
-
-async function asignarPreventivo(id, orden, clave, area, linea, actividad){
-  const select = document.getElementById("tecnico_" + clave);
-  const btn = document.getElementById("btn_" + clave);
-
-  const codigoTecnico = select.value;
-  const nombreTecnico = select.options[select.selectedIndex].dataset.nombre || "";
-
-  if(!codigoTecnico){
-    alert("Debe seleccionar un técnico.");
-    return;
-  }
-
-  const confirmar = confirm("¿Confirma asignar este preventivo a " + nombreTecnico + "?");
-
-  if(!confirmar){
-    return;
-  }
-
-  btn.disabled = true;
-  btn.innerText = "ASIGNANDO...";
-
-  try{
-    const datos = {
-      accion: "asignar_preventivo",
-      ID_Preventivo: id,
-      Orden: orden,
-      TecnicoAsignado: codigoTecnico,
-      NombreTecnicoAsignado: nombreTecnico,
-      SupervisorAsignado: usuario.codigo,
-      UsuarioAsignador: usuario.nombre,
-      Area: area,
-      Linea: linea,
-      Actividad: actividad
-    };
-
-    const params = new URLSearchParams(datos);
-    const respuesta = await fetch(URL_API + "?" + params.toString());
-    const resultado = await respuesta.json();
-
-    if(resultado.ok){
-      alert("Preventivo asignado correctamente.");
-      cargarPreventivos();
-    }else{
-      alert("Error: " + resultado.mensaje);
-      btn.disabled = false;
-      btn.innerText = "ASIGNAR PREVENTIVO";
-    }
-
-  }catch(error){
-    alert("Error asignando preventivo: " + error);
-    btn.disabled = false;
-    btn.innerText = "ASIGNAR PREVENTIVO";
-  }
-}
-
-cargarPreventivos();
-</script>
 
 </body>
 </html>
