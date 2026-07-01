@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - TUBOSA</title>
+<title>Servicios Industriales - TUBOSA</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
@@ -19,16 +19,23 @@ h2{font-size:24px;margin-bottom:14px;}
 .filtros{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;}
 .filtros button{padding:14px;border:none;border-radius:14px;background:white;color:#001f5b;font-size:16px;font-weight:900;}
 .filtros button.activo{background:#dbe4f5;}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.kpi{background:white;color:#001f5b;border-radius:20px;padding:20px;text-align:center;}
-.kpi-num{font-size:38px;font-weight:900;}
-.kpi-label{font-size:15px;font-weight:bold;margin-top:6px;}
-.ranking-item,.bar-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
-.ranking-title{font-size:16px;font-weight:900;}
-.ranking-value{font-size:14px;margin-top:4px;opacity:.85;}
+
+.kpi-servicios{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:18px;}
+.kpi-servicio{background:white;color:#001f5b;border-radius:20px;padding:18px;display:flex;align-items:center;gap:16px;}
+.kpi-icon{width:54px;height:54px;border-radius:16px;background:#dbe4f5;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
+.kpi-title{font-size:17px;font-weight:900;}
+.kpi-num{font-size:36px;font-weight:900;line-height:1;margin-top:4px;}
+.kpi-label{font-size:14px;font-weight:bold;margin-top:4px;opacity:.85;}
+
+@media(min-width:700px){
+  .kpi-servicios{grid-template-columns:1fr 1fr 1fr;}
+}
+
+.bar-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
 .bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;gap:10px;}
 .bar-bg{width:100%;height:16px;background:#dbe4f5;border-radius:20px;overflow:hidden;}
 .bar-fill{height:100%;background:#001f5b;border-radius:20px;}
+
 .chart-card{background:white;color:#001f5b;border-radius:22px;padding:18px;margin-bottom:18px;}
 .chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;}
 .chart-title{font-size:21px;font-weight:900;line-height:1.1;}
@@ -42,6 +49,7 @@ h2{font-size:24px;margin-bottom:14px;}
 .info-label{font-size:11px;opacity:.75;font-weight:bold;}
 .info-value{font-size:17px;font-weight:900;margin-top:3px;}
 .chart-values{display:flex;justify-content:space-between;font-size:13px;font-weight:bold;margin-top:10px;gap:6px;flex-wrap:wrap;}
+.chart-legend{margin-top:14px;display:flex;justify-content:space-around;flex-wrap:wrap;gap:12px;font-size:14px;font-weight:bold;}
 svg{width:100%;height:210px;background:#f1f5ff;border-radius:16px;}
 .semaforo{font-size:20px;margin-left:6px;}
 .vacio{text-align:center;opacity:.85;margin-top:12px;font-size:16px;}
@@ -60,8 +68,8 @@ svg{width:100%;height:210px;background:#f1f5ff;border-radius:16px;}
   </div>
 
   <div class="card">
-    <h1>Dashboard</h1>
-    <div class="subtitle">Indicadores operativos de mantenimiento</div>
+    <h1>Servicios Industriales</h1>
+    <div class="subtitle">Monitoreo de aire comprimido, chiller, bombas, calentamientos y sistema PIAB</div>
     <div id="estadoCarga">Cargando información...</div>
 
     <div class="filtros">
@@ -71,29 +79,41 @@ svg{width:100%;height:210px;background:#f1f5ff;border-radius:16px;}
     </div>
   </div>
 
- <div class="grid grid-servicios">
-  <div class="kpi">
-    <div class="kpi-num" id="kpiPIABHoy">0</div>
-    <div class="kpi-label" id="lblPIAB">Rutas PIAB hoy</div>
+  <div class="kpi-servicios">
+    <div class="kpi-servicio">
+      <div class="kpi-icon">⚙️</div>
+      <div>
+        <div class="kpi-title">PIAB</div>
+        <div class="kpi-num" id="kpiPIABHoy">0</div>
+        <div class="kpi-label" id="lblPIAB">Inspecciones hoy</div>
+      </div>
+    </div>
+
+    <div class="kpi-servicio">
+      <div class="kpi-icon">🏭</div>
+      <div>
+        <div class="kpi-title">Servicios</div>
+        <div class="kpi-num" id="kpiServiciosHoy">0</div>
+        <div class="kpi-label" id="lblServicios">Rutas hoy</div>
+      </div>
+    </div>
+
+    <div class="kpi-servicio">
+      <div class="kpi-icon">🔥</div>
+      <div>
+        <div class="kpi-title">Calentamiento</div>
+        <div class="kpi-num" id="kpiCalentamientoHoy">0</div>
+        <div class="kpi-label" id="lblCalentamientos">Líneas hoy</div>
+      </div>
+    </div>
   </div>
 
-  <div class="kpi">
-    <div class="kpi-num" id="kpiServiciosHoy">0</div>
-    <div class="kpi-label" id="lblServicios">Servicios hoy</div>
-  </div>
-
-  <div class="kpi">
-    <div class="kpi-num" id="kpiCalentamientoHoy">0</div>
-    <div class="kpi-label" id="lblCalentamientos">Calentamientos hoy</div>
-  </div>
-</div>
-
-  <div class="card" style="margin-top:18px;">
-    <h2>Servicios Industriales</h2>
+  <div class="card">
+    <h2>Tendencias Servicios Industriales</h2>
     <div id="graficosServicios"><div class="vacio">Cargando tendencias...</div></div>
   </div>
 
- <div class="card">
+  <div class="card">
     <h2>Vacío PIAB por línea</h2>
     <div id="vacioPIAB"><div class="vacio">Sin datos PIAB todavía.</div></div>
   </div>
@@ -117,7 +137,6 @@ if(!usuario){
 let filtroActual = "hoy";
 
 let BD = {
-  notificaciones: [],
   piab: [],
   servicios: [],
   calentamientos: []
@@ -168,10 +187,7 @@ const RANGOS_SERVICIOS = {
 
 function fechaISO(fechaTexto){
   if(!fechaTexto) return null;
-
-  if(fechaTexto instanceof Date){
-    return fechaTexto;
-  }
+  if(fechaTexto instanceof Date) return fechaTexto;
 
   const texto = String(fechaTexto).trim();
 
@@ -209,9 +225,7 @@ function horaA24(horaTexto){
 
   const match = texto.match(/(\d{1,2})(?::(\d{1,2}))?/);
 
-  if(!match){
-    return "00:00";
-  }
+  if(!match) return "00:00";
 
   let h = Number(match[1]);
   let m = Number(match[2] || 0);
@@ -243,9 +257,7 @@ function formatoPunto(fechaTexto, horaTexto){
   const dia = String(f.getDate()).padStart(2,"0");
   const mes = String(f.getMonth() + 1).padStart(2,"0");
 
-  if(filtroActual === "hoy"){
-    return hora;
-  }
+  if(filtroActual === "hoy") return hora;
 
   return `${dia}/${mes} ${hora}`;
 }
@@ -285,97 +297,10 @@ async function cargarHoja(nombreHoja){
   return data.datos || [];
 }
 
-function esAbierta(estado){
-  const e = String(estado || "").trim().toLowerCase();
-
-  return ![
-    "terminado",
-    "cerrado",
-    "cancelado",
-    "finalizado"
-  ].includes(e);
-}
-
-function limpiarTexto(valor){
-  let texto = String(valor || "").trim();
-  return texto || "Sin dato";
-}
-
 function numero(valor){
   if(valor === undefined || valor === null || valor === "") return null;
   const n = Number(String(valor).replace(",", "."));
   return isNaN(n) ? null : n;
-}
-
-function contarPorCampo(datos, campo){
-  const conteo = {};
-
-  datos.forEach(item => {
-    const valor = limpiarTexto(item[campo]);
-    conteo[valor] = (conteo[valor] || 0) + 1;
-  });
-
-  return conteo;
-}
-
-function ordenarConteo(conteo, limite){
-  return Object.entries(conteo)
-    .map(([nombre, cantidad]) => ({nombre, cantidad}))
-    .sort((a,b) => b.cantidad - a.cantidad)
-    .slice(0, limite);
-}
-
-function renderRanking(idContenedor, datos, etiqueta){
-  const contenedor = document.getElementById(idContenedor);
-  contenedor.innerHTML = "";
-
-  if(datos.length === 0){
-    contenedor.innerHTML = '<div class="vacio">Sin información disponible.</div>';
-    return;
-  }
-
-  datos.forEach((item, index) => {
-    const div = document.createElement("div");
-    div.className = "ranking-item";
-
-    div.innerHTML = `
-      <div class="ranking-title">${index + 1}. ${item.nombre}</div>
-      <div class="ranking-value">${item.cantidad} ${etiqueta}</div>
-    `;
-
-    contenedor.appendChild(div);
-  });
-}
-
-function renderBarras(idContenedor, datos, etiqueta){
-  const contenedor = document.getElementById(idContenedor);
-  contenedor.innerHTML = "";
-
-  if(datos.length === 0){
-    contenedor.innerHTML = '<div class="vacio">Sin información disponible.</div>';
-    return;
-  }
-
-  const maximo = Math.max(...datos.map(d => Number(d.cantidad) || 0));
-
-  datos.forEach((item, index) => {
-    const porcentaje = maximo > 0 ? (item.cantidad / maximo) * 100 : 0;
-
-    const div = document.createElement("div");
-    div.className = "bar-item";
-
-    div.innerHTML = `
-      <div class="bar-head">
-        <span>${index + 1}. ${item.nombre}</span>
-        <span>${item.cantidad} ${etiqueta}</span>
-      </div>
-      <div class="bar-bg">
-        <div class="bar-fill" style="width:${porcentaje}%;"></div>
-      </div>
-    `;
-
-    contenedor.appendChild(div);
-  });
 }
 
 function prepararSerieServicios(servicios, campo){
@@ -464,14 +389,8 @@ function crearSVGSerie(datos, unidad, rango){
   minGraf -= padding;
   maxGraf += padding;
 
-  const escalaY = valor => {
-    return margenTop + ((maxGraf - valor) / (maxGraf - minGraf)) * chartH;
-  };
-
-  const escalaX = i => {
-    if(datos.length === 1) return margenIzq + chartW / 2;
-    return margenIzq + (i * (chartW / (datos.length - 1)));
-  };
+  const escalaY = valor => margenTop + ((maxGraf - valor) / (maxGraf - minGraf)) * chartH;
+  const escalaX = i => datos.length === 1 ? margenIzq + chartW / 2 : margenIzq + (i * (chartW / (datos.length - 1)));
 
   const yMin = escalaY(rango.min);
   const yMax = escalaY(rango.max);
@@ -513,7 +432,7 @@ function crearSVGSerie(datos, unidad, rango){
       <line x1="${margenIzq}" y1="${yMeta}" x2="${margenIzq + chartW}" y2="${yMeta}" stroke="#0a8a24" stroke-width="2" stroke-dasharray="6,5"></line>
       <line x1="${margenIzq}" y1="${yMax}" x2="${margenIzq + chartW}" y2="${yMax}" stroke="#0a8a24" stroke-width="1.5" stroke-dasharray="5,5"></line>
       <line x1="${margenIzq}" y1="${yMin}" x2="${margenIzq + chartW}" y2="${yMin}" stroke="#0a8a24" stroke-width="1.5" stroke-dasharray="5,5"></line>
-     
+
       ${yCritMin !== null ? `<line x1="${margenIzq}" y1="${yCritMin}" x2="${margenIzq + chartW}" y2="${yCritMin}" stroke="#e00000" stroke-width="2" stroke-dasharray="6,5"></line>` : ""}
       ${yCritMax !== null ? `<line x1="${margenIzq}" y1="${yCritMax}" x2="${margenIzq + chartW}" y2="${yCritMax}" stroke="#e00000" stroke-width="2" stroke-dasharray="6,5"></line>` : ""}
 
@@ -567,50 +486,16 @@ function renderGraficoServicio(titulo, subtitulo, datos, unidad, rango){
       </div>
 
       <div class="chart-values">
+        <span>Min: <strong>${minimo} ${unidad}</strong></span>
+        <span>Último: <strong>${ultimo} ${unidad}</strong></span>
+        <span>Max: <strong>${maximo} ${unidad}</strong></span>
+      </div>
 
-    <span>
-        Min:
-        <strong>${minimo} ${unidad}</strong>
-    </span>
-
-    <span>
-        Último:
-        <strong>${ultimo} ${unidad}</strong>
-    </span>
-
-    <span>
-        Max:
-        <strong>${maximo} ${unidad}</strong>
-    </span>
-
-</div>
-
-<div style="
-margin-top:14px;
-display:flex;
-justify-content:space-around;
-flex-wrap:wrap;
-gap:12px;
-font-size:14px;
-font-weight:bold;
-">
-
-    <span style="color:#0a8a24;">
-        🟢 Meta:
-        ${rango.meta} ${unidad}
-    </span>
-
-    <span style="color:#0a8a24;">
-        🟩 Normal:
-        ${rango.min} - ${rango.max} ${unidad}
-    </span>
-
-    <span style="color:#d00000;">
-        🔴 Crítico:
-        ${rango.criticoMin} - ${rango.criticoMax} ${unidad}
-    </span>
-
-</div>
+      <div class="chart-legend">
+        <span style="color:#0a8a24;">🟢 Meta: ${rango.meta} ${unidad}</span>
+        <span style="color:#0a8a24;">🟩 Normal: ${rango.min} - ${rango.max} ${unidad}</span>
+        <span style="color:#d00000;">🔴 Crítico: ${rango.criticoMin} - ${rango.criticoMax} ${unidad}</span>
+      </div>
     </div>
   `;
 }
@@ -726,25 +611,17 @@ function renderVacioPIAB(datos){
 function actualizarLabels(){
   const texto = filtroActual === "hoy" ? "hoy" : filtroActual === "semana" ? "semana" : "mes";
 
-  document.getElementById("lblNovedades").innerText = "Novedades " + texto;
-  document.getElementById("lblPIAB").innerText = "Rutas PIAB " + texto;
-  document.getElementById("lblServicios").innerText = "Servicios " + texto;
-  document.getElementById("lblCalentamientos").innerText = "Calentamientos " + texto;
+  document.getElementById("lblPIAB").innerText = "Inspecciones " + texto;
+  document.getElementById("lblServicios").innerText = "Rutas " + texto;
+  document.getElementById("lblCalentamientos").innerText = "Líneas " + texto;
 }
 
 function renderDashboard(){
-  const notificacionesFiltro = BD.notificaciones.filter(n => estaEnFiltro(n.FechaReporte));
   const piabFiltro = BD.piab.filter(r => estaEnFiltro(r.Fecha));
   const serviciosFiltro = BD.servicios.filter(r => estaEnFiltro(r.Fecha));
   const calentamientosFiltro = BD.calentamientos.filter(r => estaEnFiltro(r.Fecha));
 
   actualizarLabels();
-
-  document.getElementById("kpiNovedadesHoy").innerText = notificacionesFiltro.length;
-  document.getElementById("kpiAbiertas").innerText = notificacionesFiltro.filter(n => esAbierta(n.Estado)).length;
-  document.getElementById("kpiCriticas").innerText = notificacionesFiltro.filter(n =>
-    String(n.Prioridad || "").trim().toLowerCase() === "crítica" && esAbierta(n.Estado)
-  ).length;
 
   document.getElementById("kpiPIABHoy").innerText = piabFiltro.length;
   document.getElementById("kpiServiciosHoy").innerText = serviciosFiltro.length;
@@ -772,14 +649,12 @@ function cambiarFiltro(filtro){
 
 async function cargarDashboard(){
   try{
-    const [notificaciones, piab, servicios, calentamientos] = await Promise.all([
-      cargarHoja("Notificaciones"),
+    const [piab, servicios, calentamientos] = await Promise.all([
       cargarHoja("Rutas_PIAB"),
       cargarHoja("Rutas_Servicios"),
       cargarHoja("Rutas_Calentamiento")
     ]);
 
-    BD.notificaciones = notificaciones;
     BD.piab = piab;
     BD.servicios = servicios;
     BD.calentamientos = calentamientos;
