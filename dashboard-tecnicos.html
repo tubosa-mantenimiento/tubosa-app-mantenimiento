@@ -17,26 +17,83 @@ h1{font-size:30px;margin-bottom:8px;}
 h2{font-size:24px;margin-bottom:14px;}
 .subtitle{font-size:17px;opacity:.85;margin-bottom:14px;}
 .info{font-size:16px;opacity:.9;}
+
+.perfil-box{
+  display:flex;
+  gap:16px;
+  align-items:center;
+  margin-bottom:16px;
+}
+.avatar{
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:white;
+  color:#001f5b;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  flex-shrink:0;
+}
+.perfil-nombre{font-size:24px;font-weight:900;}
+.perfil-detalle{font-size:15px;opacity:.85;margin-top:4px;}
+
 .filtros{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;}
 .filtros button{padding:14px;border:none;border-radius:14px;background:white;color:#001f5b;font-size:16px;font-weight:900;}
 .filtros button.activo{background:#dbe4f5;}
 select{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;margin-top:12px;}
+
+.agenda{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-top:16px;
+}
+.agenda-item{
+  background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:18px;
+  padding:14px;
+  text-align:center;
+}
+.agenda-num{font-size:30px;font-weight:900;}
+.agenda-label{font-size:13px;opacity:.85;margin-top:4px;}
+
+.main-kpi{
+  background:white;
+  color:#001f5b;
+  border-radius:24px;
+  padding:22px;
+  margin-bottom:18px;
+}
+.main-title{font-size:18px;font-weight:900;}
+.main-num{font-size:46px;font-weight:900;margin-top:8px;}
+.progress-bg{width:100%;height:18px;background:#dbe4f5;border-radius:20px;overflow:hidden;margin-top:14px;}
+.progress-fill{height:100%;background:#001f5b;border-radius:20px;}
+
 .kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
 .kpi{background:white;color:#001f5b;border-radius:20px;padding:16px;}
 .kpi-num{font-size:34px;font-weight:900;line-height:1;}
 .kpi-label{font-size:13px;font-weight:bold;margin-top:6px;opacity:.85;}
-.kpi.full{grid-column:1/3;}
+
 .bar-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
 .bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;gap:10px;}
 .bar-bg{width:100%;height:16px;background:#dbe4f5;border-radius:20px;overflow:hidden;}
 .bar-fill{height:100%;background:#001f5b;border-radius:20px;}
+
 .tecnico-card{background:white;color:#001f5b;border-radius:18px;padding:16px;margin-bottom:12px;}
 .tecnico-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
 .tecnico-nombre{font-size:18px;font-weight:900;}
 .tecnico-detalle{font-size:13px;margin-top:6px;opacity:.85;}
 .estado-pill{background:#dbe4f5;color:#001f5b;border-radius:12px;padding:7px 10px;font-size:13px;font-weight:900;white-space:nowrap;}
+
 .vacio{text-align:center;opacity:.85;margin-top:12px;font-size:16px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+
+@media(max-width:430px){
+  .agenda{grid-template-columns:1fr;}
+}
 </style>
 </head>
 
@@ -45,14 +102,21 @@ select{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;col
 <div class="container">
 
   <div class="header">
-    <a class="back" href="dashboard.html">‹</a>
+    <a class="back" id="btnBack" href="menu.html">‹</a>
     <div class="logo">TUBOSA</div>
     <div style="width:42px;"></div>
   </div>
 
   <div class="card">
-    <h1>Dashboard Técnicos</h1>
-    <div class="subtitle">Indicadores de carga, ejecución y cumplimiento por técnico</div>
+    <div class="perfil-box">
+      <div class="avatar">👤</div>
+      <div>
+        <div class="perfil-nombre" id="nombreUsuario">Técnico</div>
+        <div class="perfil-detalle" id="detalleUsuario">Indicadores del período</div>
+      </div>
+    </div>
+
+    <div class="subtitle">Carga, ejecución y cumplimiento por técnico</div>
     <div class="info" id="estadoCarga">Cargando información...</div>
 
     <div class="filtros">
@@ -64,6 +128,29 @@ select{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;col
     <select id="selectorTecnico" onchange="renderDashboard()" style="display:none;">
       <option value="TODOS">Todos los técnicos</option>
     </select>
+
+    <div class="agenda">
+      <div class="agenda-item">
+        <div class="agenda-num" id="agendaPreventivos">0</div>
+        <div class="agenda-label">Preventivos activos</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-num" id="agendaPendientes">0</div>
+        <div class="agenda-label">Pendientes</div>
+      </div>
+      <div class="agenda-item">
+        <div class="agenda-num" id="agendaCorrectivos">0</div>
+        <div class="agenda-label">Correctivos cerrados</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-kpi">
+    <div class="main-title">Cumplimiento preventivo</div>
+    <div class="main-num" id="kpiCumplimientoPrincipal">0%</div>
+    <div class="progress-bg">
+      <div class="progress-fill" id="barraCumplimiento" style="width:0%;"></div>
+    </div>
   </div>
 
   <div class="kpis">
@@ -83,11 +170,6 @@ select{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;col
     </div>
 
     <div class="kpi">
-      <div class="kpi-num" id="kpiCumplimiento">0%</div>
-      <div class="kpi-label">% cumplimiento preventivo</div>
-    </div>
-
-    <div class="kpi">
       <div class="kpi-num" id="kpiCorrectivos">0</div>
       <div class="kpi-label">Correctivos cerrados</div>
     </div>
@@ -97,9 +179,9 @@ select{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;col
       <div class="kpi-label">Prom. correctivos min</div>
     </div>
 
-    <div class="kpi full">
+    <div class="kpi">
       <div class="kpi-num" id="kpiPromPreventivo">0</div>
-      <div class="kpi-label">Tiempo promedio preventivos min</div>
+      <div class="kpi-label">Prom. preventivos min</div>
     </div>
   </div>
 
@@ -137,6 +219,15 @@ let BD = {
 
 const rolUsuario = String(usuario.rol || "").trim().toUpperCase();
 const esAdmin = ["SUPERVISOR","PLANEADOR","COORDINADOR","ADMIN"].includes(rolUsuario);
+
+document.getElementById("nombreUsuario").innerText = usuario.nombre || "Usuario";
+document.getElementById("detalleUsuario").innerText = (usuario.turno || "") + " · " + (usuario.area || "") + " · " + (usuario.rol || "");
+
+if(esAdmin){
+  document.getElementById("btnBack").href = "dashboard.html";
+}else{
+  document.getElementById("btnBack").href = "menu.html";
+}
 
 function obtenerCampo(obj, nombre){
   const clave = Object.keys(obj).find(k => k.trim().toLowerCase() === nombre.trim().toLowerCase());
@@ -307,10 +398,15 @@ function renderDashboard(){
   const tiemposCorrectivos = correctivosCerrados.map(n => numero(obtenerCampo(n, "TiempoTotalIntervencion"))).filter(n => n > 0);
   const tiemposPreventivos = preventivosEjecutados.map(p => numero(obtenerCampo(p, "TiempoEjecucionMin"))).filter(n => n > 0);
 
+  document.getElementById("agendaPreventivos").innerText = preventivosAsignados.length;
+  document.getElementById("agendaPendientes").innerText = pendientesActivos.length;
+  document.getElementById("agendaCorrectivos").innerText = correctivosCerrados.length;
+
   document.getElementById("kpiPendientes").innerText = pendientesActivos.length;
   document.getElementById("kpiPrevAsignados").innerText = preventivosAsignados.length;
   document.getElementById("kpiPrevEjecutados").innerText = preventivosEjecutados.length;
-  document.getElementById("kpiCumplimiento").innerText = cumplimiento + "%";
+  document.getElementById("kpiCumplimientoPrincipal").innerText = cumplimiento + "%";
+  document.getElementById("barraCumplimiento").style.width = cumplimiento + "%";
   document.getElementById("kpiCorrectivos").innerText = correctivosCerrados.length;
   document.getElementById("kpiPromCorrectivo").innerText = promedio(tiemposCorrectivos);
   document.getElementById("kpiPromPreventivo").innerText = promedio(tiemposPreventivos);
