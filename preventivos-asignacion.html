@@ -147,30 +147,41 @@ function buscarInfoEquipo(equipoSAP, ubicacionTecnica){
   const equipoBuscado = limpiarTexto(equipoSAP);
   const ubicacionBuscada = limpiarTexto(ubicacionTecnica);
 
-  const encontrado = equipos.find(eq => {
-    const posiblesEquipo = [
-      obtenerCampo(eq, "Equipo"),
-      obtenerCampo(eq, "ID_Equipo"),
-      obtenerCampo(eq, "Codigo"),
-      obtenerCampo(eq, "Código"),
-      obtenerCampo(eq, "CodigoEquipo"),
-      obtenerCampo(eq, "CódigoEquipo")
-    ].map(limpiarTexto);
+  let encontrado = null;
 
-    const posiblesUbicacion = [
-      obtenerCampo(eq, "Ubicac.técnica"),
-      obtenerCampo(eq, "UbicacionTecnica"),
-      obtenerCampo(eq, "UbicaciónTecnica"),
-      obtenerCampo(eq, "Ubicación técnica"),
-      obtenerCampo(eq, "Ubicacion"),
-      obtenerCampo(eq, "Ubicación")
-    ].map(limpiarTexto);
+  // 1. Primero buscar por ubicación técnica
+  if(ubicacionBuscada){
+    encontrado = equipos.find(eq => {
+      const posiblesUbicacion = [
+        obtenerCampo(eq, "Ubicac.técnica"),
+        obtenerCampo(eq, "UbicacionTecnica"),
+        obtenerCampo(eq, "UbicaciónTecnica"),
+        obtenerCampo(eq, "Ubicación técnica"),
+        obtenerCampo(eq, "Ubicacion"),
+        obtenerCampo(eq, "Ubicación"),
+        obtenerCampo(eq, "Ubicacion_Tecnica"),
+        obtenerCampo(eq, "Ubicación_Tecnica")
+      ].map(limpiarTexto);
 
-    return (
-      posiblesEquipo.includes(equipoBuscado) ||
-      posiblesUbicacion.includes(ubicacionBuscada)
-    );
-  });
+      return posiblesUbicacion.includes(ubicacionBuscada);
+    });
+  }
+
+  // 2. Solo si no encontró por ubicación técnica, buscar por equipo
+  if(!encontrado && equipoBuscado){
+    encontrado = equipos.find(eq => {
+      const posiblesEquipo = [
+        obtenerCampo(eq, "Equipo"),
+        obtenerCampo(eq, "ID_Equipo"),
+        obtenerCampo(eq, "Codigo"),
+        obtenerCampo(eq, "Código"),
+        obtenerCampo(eq, "CodigoEquipo"),
+        obtenerCampo(eq, "CódigoEquipo")
+      ].map(limpiarTexto);
+
+      return posiblesEquipo.includes(equipoBuscado);
+    });
+  }
 
   if(!encontrado){
     return {
