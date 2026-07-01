@@ -14,27 +14,54 @@ body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
 .logo{font-size:46px;font-weight:900;}
 .card,.item{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
 h1{font-size:30px;margin-bottom:8px;}
+h2{font-size:24px;margin-bottom:10px;}
 .subtitle{font-size:17px;opacity:.85;margin-bottom:14px;}
 .info,.detalle{font-size:16px;margin-top:8px;opacity:.95;line-height:1.35;}
 .titulo{font-size:24px;font-weight:900;margin-bottom:12px;}
-.badge{
-  background:white;
-  color:#001f5b;
-  border-radius:16px;
-  padding:16px;
-  margin-top:16px;
-  font-weight:900;
-  line-height:1.35;
-  white-space:normal;
-  word-break:break-word;
-}
+.badge{background:white;color:#001f5b;border-radius:16px;padding:16px;margin-top:16px;font-weight:900;line-height:1.35;white-space:normal;word-break:break-word;}
 .actividad-texto{font-size:19px;margin-top:8px;font-weight:700;}
 label{display:block;font-weight:bold;font-size:16px;margin-top:16px;margin-bottom:6px;}
 select{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
 button{width:100%;padding:16px;border:none;border-radius:15px;background:white;color:#001f5b;font-size:18px;font-weight:900;margin-top:14px;}
 button:disabled{opacity:.6;}
-.vacio{text-align:center;opacity:.85;margin-top:30px;font-size:17px;}
+.vacio{text-align:center;opacity:.85;margin-top:22px;font-size:17px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+
+.filtros{display:flex;gap:8px;margin-top:14px;}
+.filtros button{font-size:14px;padding:11px;margin-top:0;border-radius:12px;}
+.filtros button.activo{background:#dce7ff;color:#001f5b;}
+
+.historial-item{
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.16);
+  border-radius:16px;
+  padding:14px;
+  margin-top:12px;
+}
+.historial-top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+.historial-orden{font-size:17px;font-weight:900;}
+.historial-estado{
+  background:white;
+  color:#001f5b;
+  border-radius:12px;
+  padding:6px 10px;
+  font-size:13px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.historial-detalle{font-size:14px;margin-top:6px;opacity:.95;line-height:1.35;}
+.historial-actividad{
+  margin-top:8px;
+  font-size:14px;
+  opacity:.95;
+  line-height:1.35;
+  word-break:break-word;
+}
 </style>
 </head>
 
@@ -54,8 +81,27 @@ button:disabled{opacity:.6;}
     <div class="info" id="usuario"></div>
   </div>
 
-  <div id="lista">
-    <div class="vacio">Cargando preventivos...</div>
+  <div class="card">
+    <h2>🗓 Preventivos pendientes</h2>
+    <div class="subtitle">Preventivos disponibles para asignación</div>
+    <div id="lista">
+      <div class="vacio">Cargando preventivos...</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>📚 Historial de asignación</h2>
+    <div class="subtitle">Consulta rápida de preventivos ya asignados</div>
+
+    <div class="filtros">
+      <button id="filtro_hoy" onclick="cambiarFiltroHistorial('hoy')">Hoy</button>
+      <button id="filtro_semana" onclick="cambiarFiltroHistorial('semana')">Semana</button>
+      <button id="filtro_mes" onclick="cambiarFiltroHistorial('mes')">Mes</button>
+    </div>
+
+    <div id="historial">
+      <div class="vacio">Cargando historial...</div>
+    </div>
   </div>
 
   <div class="footer">
@@ -85,6 +131,8 @@ document.getElementById("usuario").innerText = usuario.nombre + " - " + usuario.
 
 let tecnicos = [];
 let equipos = [];
+let preventivosGlobal = [];
+let filtroHistorial = "hoy";
 
 function obtenerCampo(obj, nombre){
   const clave = Object.keys(obj).find(k => k.trim().toLowerCase() === nombre.trim().toLowerCase());
@@ -93,14 +141,6 @@ function obtenerCampo(obj, nombre){
 
 function limpiarTexto(v){
   return String(v || "").trim().toUpperCase();
-}
-
-function textoSeguro(v){
-  return String(v || "")
-    .replace(/\\/g, "\\\\")
-    .replace(/'/g, "\\'")
-    .replace(/"/g, "&quot;")
-    .replace(/\n/g, " ");
 }
 
 function formatearFecha(fecha){
@@ -118,6 +158,96 @@ function formatearFecha(fecha){
   }
 
   return texto;
+}
+
+function formatearFechaHora(fecha){
+  if(!fecha) return "";
+
+  const d = parsearFecha(fecha);
+  if(d && !isNaN(d)){
+    return d.toLocaleDateString("es-CO") + " " + d.toLocaleTimeString("es-CO", {hour:"2-digit", minute:"2-digit"});
+  }
+
+  return String(fecha);
+}
+
+function parsearFecha(fecha){
+  if(!fecha) return null;
+
+  if(fecha instanceof Date) return fecha;
+
+  const texto = String(fecha).trim();
+
+  if(texto.includes("T")){
+    const d = new Date(texto);
+    if(!isNaN(d)) return d;
+  }
+
+  const partes = texto.split(/[\/\-]/);
+  if(partes.length >= 3){
+    let d, m, y;
+
+    if(partes[0].length === 4){
+      y = Number(partes[0]);
+      m = Number(partes[1]) - 1;
+      d = Number(partes[2]);
+    }else{
+      d = Number(partes[0]);
+      m = Number(partes[1]) - 1;
+      y = Number(partes[2]);
+    }
+
+    const fechaParseada = new Date(y, m, d);
+    if(!isNaN(fechaParseada)) return fechaParseada;
+  }
+
+  const d = new Date(texto);
+  if(!isNaN(d)) return d;
+
+  return null;
+}
+
+function estaEnFiltro(fecha){
+  const d = parsearFecha(fecha);
+  if(!d) return false;
+
+  const hoy = new Date();
+  const inicioHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+
+  if(filtroHistorial === "hoy"){
+    const inicio = inicioHoy;
+    const fin = new Date(inicio);
+    fin.setDate(fin.getDate() + 1);
+    return d >= inicio && d < fin;
+  }
+
+  if(filtroHistorial === "semana"){
+    const inicio = new Date(inicioHoy);
+    const dia = inicio.getDay();
+    const diferenciaLunes = dia === 0 ? 6 : dia - 1;
+    inicio.setDate(inicio.getDate() - diferenciaLunes);
+
+    const fin = new Date(inicio);
+    fin.setDate(fin.getDate() + 7);
+    return d >= inicio && d < fin;
+  }
+
+  if(filtroHistorial === "mes"){
+    const inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    const fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 1);
+    return d >= inicio && d < fin;
+  }
+
+  return true;
+}
+
+function cambiarFiltroHistorial(filtro){
+  filtroHistorial = filtro;
+
+  document.querySelectorAll(".filtros button").forEach(btn => btn.classList.remove("activo"));
+  document.getElementById("filtro_" + filtro).classList.add("activo");
+
+  renderHistorial();
 }
 
 async function cargarTecnicos(){
@@ -149,7 +279,6 @@ function buscarInfoEquipo(equipoSAP, ubicacionTecnica){
 
   let encontrado = null;
 
-  // 1. Primero buscar por ubicación técnica
   if(ubicacionBuscada){
     encontrado = equipos.find(eq => {
       const posiblesUbicacion = [
@@ -167,7 +296,6 @@ function buscarInfoEquipo(equipoSAP, ubicacionTecnica){
     });
   }
 
-  // 2. Solo si no encontró por ubicación técnica, buscar por equipo
   if(!encontrado && equipoBuscado){
     encontrado = equipos.find(eq => {
       const posiblesEquipo = [
@@ -184,10 +312,7 @@ function buscarInfoEquipo(equipoSAP, ubicacionTecnica){
   }
 
   if(!encontrado){
-    return {
-      area: "",
-      linea: ""
-    };
+    return { area:"", linea:"" };
   }
 
   return {
@@ -206,83 +331,146 @@ async function cargarPreventivos(){
     const respuesta = await fetch(URL_API + "?accion=listar&hoja=Preventivos");
     const data = await respuesta.json();
 
-    const preventivos = data.datos || [];
+    preventivosGlobal = data.datos || [];
 
-    const pendientes = preventivos.filter(p => {
-      const estado = String(obtenerCampo(p, "Estado") || "").trim().toLowerCase();
-
-      return (
-        estado === "" ||
-        estado === "pendiente de asignación" ||
-        estado === "pendiente de asignacion" ||
-        estado === "programado"
-      );
-    });
-
-    lista.innerHTML = "";
-
-    if(pendientes.length === 0){
-      lista.innerHTML = '<div class="vacio">No hay preventivos pendientes de asignación.</div>';
-      return;
-    }
-
-    pendientes.forEach(p => {
-      const id = obtenerCampo(p, "ID_Preventivo");
-      const fechaInicio = obtenerCampo(p, "Fe.inic.extrema");
-      const fechaFin = obtenerCampo(p, "Fe.fin extrema");
-      const orden = obtenerCampo(p, "Orden");
-      const textoBreve = obtenerCampo(p, "Texto breve");
-      const ubicacion = obtenerCampo(p, "Ubicac.técnica");
-      const equipo = obtenerCampo(p, "Equipo");
-      const denominacionEquipo = obtenerCampo(p, "DenominaciónEquipo");
-      const denominacionTecnica = obtenerCampo(p, "DenominaciónTecnica");
-
-      const actividad = obtenerCampo(p, "Actividad") || textoBreve;
-
-      const infoEquipo = buscarInfoEquipo(equipo, ubicacion);
-      const area = infoEquipo.area || obtenerCampo(p, "Area") || "Sin área";
-      const linea = infoEquipo.linea || obtenerCampo(p, "Linea") || "Sin línea";
-
-      const div = document.createElement("div");
-      div.className = "item";
-
-      div.innerHTML = `
-        <div class="titulo">🗓 Preventivo</div>
-
-        <div class="detalle"><strong>Orden SAP:</strong> ${orden || "Sin orden"}</div>
-        <div class="detalle"><strong>Fecha inicio:</strong> ${formatearFecha(fechaInicio)}</div>
-        <div class="detalle"><strong>Fecha fin:</strong> ${formatearFecha(fechaFin)}</div>
-        <div class="detalle"><strong>Ubicación técnica:</strong> ${ubicacion || ""}</div>
-        <div class="detalle"><strong>Equipo:</strong> ${equipo || "Sin equipo"}</div>
-        <div class="detalle"><strong>Área:</strong> ${area}</div>
-        <div class="detalle"><strong>Línea:</strong> ${linea}</div>
-        <div class="detalle"><strong>Denominación equipo:</strong> ${denominacionEquipo || ""}</div>
-        <div class="detalle"><strong>Denominación técnica:</strong> ${denominacionTecnica || ""}</div>
-
-        <div class="badge">
-          Actividad:
-          <div class="actividad-texto">${actividad || "Sin actividad definida"}</div>
-        </div>
-
-        <label>Técnico asignado</label>
-        <select id="tecnico_${id}">
-          <option value="">Seleccione técnico...</option>
-          ${opcionesTecnicos()}
-        </select>
-
-        <button 
-          id="btn_${id}" 
-          onclick="asignarPreventivo('${id}', '${textoSeguro(area)}', '${textoSeguro(linea)}', '${textoSeguro(actividad)}')">
-          ASIGNAR PREVENTIVO
-        </button>
-      `;
-
-      lista.appendChild(div);
-    });
+    renderAsignacion();
+    cambiarFiltroHistorial("hoy");
 
   }catch(error){
     lista.innerHTML = '<div class="vacio">Error cargando preventivos: ' + error + '</div>';
+    document.getElementById("historial").innerHTML = '<div class="vacio">Error cargando historial.</div>';
   }
+}
+
+function renderAsignacion(){
+  const lista = document.getElementById("lista");
+
+  const pendientes = preventivosGlobal.filter(p => {
+    const estado = String(obtenerCampo(p, "Estado") || "").trim().toLowerCase();
+
+    return (
+      estado === "" ||
+      estado === "pendiente de asignación" ||
+      estado === "pendiente de asignacion" ||
+      estado === "programado"
+    );
+  });
+
+  lista.innerHTML = "";
+
+  if(pendientes.length === 0){
+    lista.innerHTML = '<div class="vacio">No hay preventivos pendientes de asignación.</div>';
+    return;
+  }
+
+  pendientes.forEach((p, index) => {
+    const id = obtenerCampo(p, "ID_Preventivo");
+    const fechaInicio = obtenerCampo(p, "Fe.inic.extrema");
+    const fechaFin = obtenerCampo(p, "Fe.fin extrema");
+    const orden = obtenerCampo(p, "Orden");
+    const textoBreve = obtenerCampo(p, "Texto breve");
+    const ubicacion = obtenerCampo(p, "Ubicac.técnica");
+    const equipo = obtenerCampo(p, "Equipo");
+    const denominacionEquipo = obtenerCampo(p, "DenominaciónEquipo");
+    const denominacionTecnica = obtenerCampo(p, "DenominaciónTecnica");
+    const actividad = obtenerCampo(p, "Actividad") || textoBreve;
+
+    const infoEquipo = buscarInfoEquipo(equipo, ubicacion);
+    const area = infoEquipo.area || obtenerCampo(p, "Area") || "Sin área";
+    const linea = infoEquipo.linea || obtenerCampo(p, "Linea") || "Sin línea";
+
+    const clave = "prev_" + index;
+
+    const div = document.createElement("div");
+    div.className = "item";
+
+    div.innerHTML = `
+      <div class="titulo">🗓 Preventivo</div>
+
+      <div class="detalle"><strong>Orden SAP:</strong> ${orden || "Sin orden"}</div>
+      <div class="detalle"><strong>Fecha inicio:</strong> ${formatearFecha(fechaInicio)}</div>
+      <div class="detalle"><strong>Fecha fin:</strong> ${formatearFecha(fechaFin)}</div>
+      <div class="detalle"><strong>Ubicación técnica:</strong> ${ubicacion || ""}</div>
+      <div class="detalle"><strong>Equipo:</strong> ${equipo || "Sin equipo"}</div>
+      <div class="detalle"><strong>Área:</strong> ${area}</div>
+      <div class="detalle"><strong>Línea:</strong> ${linea}</div>
+      <div class="detalle"><strong>Denominación equipo:</strong> ${denominacionEquipo || ""}</div>
+      <div class="detalle"><strong>Denominación técnica:</strong> ${denominacionTecnica || ""}</div>
+
+      <div class="badge">
+        Actividad:
+        <div class="actividad-texto">${actividad || "Sin actividad definida"}</div>
+      </div>
+
+      <label>Técnico asignado</label>
+      <select id="tecnico_${clave}">
+        <option value="">Seleccione técnico...</option>
+        ${opcionesTecnicos()}
+      </select>
+
+      <button id="btn_${clave}">ASIGNAR PREVENTIVO</button>
+    `;
+
+    lista.appendChild(div);
+
+    document.getElementById("btn_" + clave).onclick = function(){
+      asignarPreventivo(id, orden, clave, area, linea, actividad);
+    };
+  });
+}
+
+function renderHistorial(){
+  const historial = document.getElementById("historial");
+
+  const asignados = preventivosGlobal.filter(p => {
+    const estado = String(obtenerCampo(p, "Estado") || "").trim().toLowerCase();
+    const fechaAsignacion = obtenerCampo(p, "FechaAsignacion");
+
+    const tieneEstadoAsignado = !(
+      estado === "" ||
+      estado === "pendiente de asignación" ||
+      estado === "pendiente de asignacion" ||
+      estado === "programado"
+    );
+
+    return tieneEstadoAsignado && estaEnFiltro(fechaAsignacion);
+  });
+
+  historial.innerHTML = "";
+
+  if(asignados.length === 0){
+    historial.innerHTML = '<div class="vacio">No hay asignaciones en este periodo.</div>';
+    return;
+  }
+
+  asignados
+    .sort((a,b) => {
+      const fa = parsearFecha(obtenerCampo(a, "FechaAsignacion")) || new Date(0);
+      const fb = parsearFecha(obtenerCampo(b, "FechaAsignacion")) || new Date(0);
+      return fb - fa;
+    })
+    .forEach(p => {
+      const orden = obtenerCampo(p, "Orden");
+      const actividad = obtenerCampo(p, "Actividad") || obtenerCampo(p, "Texto breve");
+      const estado = obtenerCampo(p, "Estado");
+      const tecnico = obtenerCampo(p, "NombreTecnicoAsignado") || obtenerCampo(p, "TecnicoAsignado");
+      const fecha = obtenerCampo(p, "FechaAsignacion");
+
+      const div = document.createElement("div");
+      div.className = "historial-item";
+
+      div.innerHTML = `
+        <div class="historial-top">
+          <div class="historial-orden">Orden SAP: ${orden || "Sin orden"}</div>
+          <div class="historial-estado">${estado || ""}</div>
+        </div>
+        <div class="historial-detalle"><strong>Técnico:</strong> ${tecnico || "Sin técnico"}</div>
+        <div class="historial-detalle"><strong>Fecha:</strong> ${formatearFechaHora(fecha)}</div>
+        <div class="historial-actividad"><strong>Actividad:</strong> ${actividad || "Sin actividad"}</div>
+      `;
+
+      historial.appendChild(div);
+    });
 }
 
 function opcionesTecnicos(){
@@ -300,9 +488,9 @@ function opcionesTecnicos(){
   }).join("");
 }
 
-async function asignarPreventivo(id, area, linea, actividad){
-  const select = document.getElementById("tecnico_" + id);
-  const btn = document.getElementById("btn_" + id);
+async function asignarPreventivo(id, orden, clave, area, linea, actividad){
+  const select = document.getElementById("tecnico_" + clave);
+  const btn = document.getElementById("btn_" + clave);
 
   const codigoTecnico = select.value;
   const nombreTecnico = select.options[select.selectedIndex].dataset.nombre || "";
@@ -325,6 +513,7 @@ async function asignarPreventivo(id, area, linea, actividad){
     const datos = {
       accion: "asignar_preventivo",
       ID_Preventivo: id,
+      Orden: orden,
       TecnicoAsignado: codigoTecnico,
       NombreTecnicoAsignado: nombreTecnico,
       SupervisorAsignado: usuario.codigo,
