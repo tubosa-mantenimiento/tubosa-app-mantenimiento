@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preventivos Pendientes - TUBOSA</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
+.container{max-width:620px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
+.logo{font-size:46px;font-weight:900;}
+.card,.item{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
+h1{font-size:30px;margin-bottom:8px;}
+.subtitle{font-size:17px;opacity:.85;margin-bottom:14px;}
+.info,.detalle{font-size:16px;margin-top:7px;opacity:.95;line-height:1.35;}
+.titulo{font-size:24px;font-weight:900;margin-bottom:12px;}
+.search{width:100%;padding:16px;border:none;border-radius:16px;font-size:16px;color:#001f5b;margin-top:14px;}
+.resumen{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.res-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:16px;}
+.res-title{font-size:14px;opacity:.85;}
+.res-num{font-size:34px;font-weight:900;margin-top:4px;}
+.areas{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+.area-chip{background:white;color:#001f5b;border-radius:14px;padding:8px 12px;font-size:13px;font-weight:900;}
+.item{padding:20px;}
+.badge{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-top:14px;font-weight:900;line-height:1.35;word-break:break-word;}
+.actividad-texto{font-size:18px;margin-top:8px;font-weight:700;}
+label{display:block;font-weight:bold;font-size:16px;margin-top:14px;margin-bottom:6px;}
+select{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
+button{width:100%;padding:15px;border:none;border-radius:15px;background:white;color:#001f5b;font-size:18px;font-weight:900;margin-top:14px;}
+button:disabled{opacity:.6;}
+.vacio{text-align:center;opacity:.85;margin-top:24px;font-size:17px;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <a class="back" href="preventivos-asignacion.html">‹</a>
+    <div class="logo">TUBOSA</div>
+    <div style="width:42px;"></div>
+  </div>
+
+  <div class="card">
+    <h1>Asignar Preventivos</h1>
+    <div class="subtitle">Preventivos pendientes de asignación cargados desde SAP</div>
+    <div class="info" id="usuario"></div>
+
+    <input 
+      class="search" 
+      id="buscador" 
+      placeholder="🔎 Buscar por orden, equipo, ubicación, actividad, área o línea..."
+      oninput="renderAsignacion()"
+    >
+
+    <div class="resumen">
+      <div class="res-card">
+        <div class="res-title">Pendientes por asignar</div>
+        <div class="res-num" id="totalPendientes">0</div>
+      </div>
+      <div class="res-card">
+        <div class="res-title">Áreas con pendientes</div>
+        <div class="res-num" id="totalAreas">0</div>
+      </div>
+    </div>
+
+    <div class="areas" id="resumenAreas"></div>
+  </div>
+
+  <div id="lista">
+    <div class="vacio">Cargando preventivos...</div>
+  </div>
+
+  <div class="footer">
+    TUBOSA - Sistema de Mantenimiento<br>
+    Versión 1.0
+  </div>
+
+</div>
+
+<script>
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
+if(!usuario){
+  window.location.href = "index.html";
+}
+
+const rolUsuario = String(usuario.rol || "").trim().toUpperCase();
+
+if(!["SUPERVISOR", "PLANEADOR", "COORDINADOR", "ADMIN"].includes(rolUsuario)){
+  alert("No tienes permiso para acceder a esta pantalla.");
+  window.location.href = "menu.html";
+}
+
+document.getElementById("usuario").innerText = usuario.nombre + " - " + usuario.rol;
+
+let tecnicos = [];
+let equipos = [];
+let preventivosGlobal = [];
+
+function obtenerCampo(obj, nombre){
+  const clave = Object.keys(obj).find(k => k.trim().toLowerCase() === nombre.trim().toLowerCase());
+  return clave ? obj[clave] : "";
+}
+
+function limpiarTexto(v){
+  return String(v || "").trim().toUpperCase();
+}
+
+function normalizarBusqueda(v){
+  return String(v || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function formatearFecha(fecha){
+  if(!fecha) return "";
+  const texto = String(fecha).trim();
+
+  if(/^\d{8}$/.test(texto)){
+    return texto.substring(6,8) + "/" + texto.substring(4,6) + "/" + texto.substring(0,4);
+  }
+
+  if(texto.includes("T")){
+    const d = new Date(texto);
+    if(!isNaN(d)) return d.toLocaleDateString("es-CO");
+  }
+
+  return texto;
+}
+
+async function cargarTecnicos(){
+  const respuesta = await fetch(URL_API + "?accion=listar_tecnicos_activos");
+  const data = await respuesta.json();
+
+  if(!data.ok){
+    alert("Error cargando técnicos: " + data.mensaje);
+    tecnicos = [];
+    return;
+  }
+
+  tecnicos = data.datos || [];
+}
+
+async function cargarEquipos(){
+  try{
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Equipos");
+    const data = await respuesta.json();
+    equipos = data.datos || [];
+  }catch(error){
+    equipos = [];
+  }
+}
+
+function buscarInfoEquipo(equipoSAP, ubicacionTecnica){
+  const equipoBuscado = limpiarTexto(equipoSAP);
+  const ubicacionBuscada = limpiarTexto(ubicacionTecnica);
+
+  let encontrado = null;
+
+  if(ubicacionBuscada){
+    encontrado = equipos.find(eq => {
+      const posiblesUbicacion = [
+        obtenerCampo(eq, "Ubicac.técnica"),
+        obtenerCampo(eq, "UbicacionTecnica"),
+        obtenerCampo(eq, "UbicaciónTecnica"),
+        obtenerCampo(eq, "Ubicación técnica"),
+        obtenerCampo(eq, "Ubicacion"),
+        obtenerCampo(eq, "Ubicación"),
+        obtenerCampo(eq, "Ubicacion_Tecnica"),
+        obtenerCampo(eq, "Ubicación_Tecnica")
+      ].map(limpiarTexto);
+
+      return posiblesUbicacion.includes(ubicacionBuscada);
+    });
+  }
+
+  if(!encontrado && equipoBuscado){
+    encontrado = equipos.find(eq => {
+      const posiblesEquipo = [
+        obtenerCampo(eq, "Equipo"),
+        obtenerCampo(eq, "ID_Equipo"),
+        obtenerCampo(eq, "Codigo"),
+        obtenerCampo(eq, "Código"),
+        obtenerCampo(eq, "CodigoEquipo"),
+        obtenerCampo(eq, "CódigoEquipo")
+      ].map(limpiarTexto);
+
+      return posiblesEquipo.includes(equipoBuscado);
+    });
+  }
+
+  if(!encontrado){
+    return { area:"", linea:"" };
+  }
+
+  return {
+    area: obtenerCampo(encontrado, "Area") || obtenerCampo(encontrado, "Área"),
+    linea: obtenerCampo(encontrado, "Linea") || obtenerCampo(encontrado, "Línea")
+  };
+}
+
+function prepararPreventivo(p, index){
+  const id = obtenerCampo(p, "ID_Preventivo");
+  const orden = obtenerCampo(p, "Orden");
+  const textoBreve = obtenerCampo(p, "Texto breve");
+  const ubicacion = obtenerCampo(p, "Ubicac.técnica");
+  const equipo = obtenerCampo(p, "Equipo");
+  const actividad = obtenerCampo(p, "Actividad") || textoBreve;
+
+  const infoEquipo = buscarInfoEquipo(equipo, ubicacion);
+  const area = infoEquipo.area || obtenerCampo(p, "Area") || "Sin área";
+  const linea = infoEquipo.linea || obtenerCampo(p, "Linea") || "Sin línea";
+
+  return {
+    raw:p,
+    index,
+    id,
+    clave:"prev_" + index,
+    orden,
+    fechaInicio: obtenerCampo(p, "Fe.inic.extrema"),
+    fechaFin: obtenerCampo(p, "Fe.fin extrema"),
+    ubicacion,
+    equipo,
+    denominacionEquipo: obtenerCampo(p, "DenominaciónEquipo"),
+    denominacionTecnica: obtenerCampo(p, "DenominaciónTecnica"),
+    actividad,
+    area,
+    linea
+  };
+}
+
+async function cargarPreventivos(){
+  const lista = document.getElementById("lista");
+
+  try{
+    await cargarTecnicos();
+    await cargarEquipos();
+
+    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Preventivos");
+    const data = await respuesta.json();
+
+    preventivosGlobal = data.datos || [];
+    renderAsignacion();
+
+  }catch(error){
+    lista.innerHTML = '<div class="vacio">Error cargando preventivos: ' + error + '</div>';
+  }
+}
+
+function obtenerPendientesPreparados(){
+  const pendientes = preventivosGlobal.filter(p => {
+    const estado = String(obtenerCampo(p, "Estado") || "").trim().toLowerCase();
+
+    return (
+      estado === "" ||
+      estado === "pendiente de asignación" ||
+      estado === "pendiente de asignacion" ||
+      estado === "programado"
+    );
+  }).map(prepararPreventivo);
+
+  const busqueda = normalizarBusqueda(document.getElementById("buscador").value);
+
+  if(!busqueda) return pendientes;
+
+  return pendientes.filter(p => {
+    const texto = normalizarBusqueda([
+      p.orden,
+      p.equipo,
+      p.ubicacion,
+      p.denominacionEquipo,
+      p.denominacionTecnica,
+      p.actividad,
+      p.area,
+      p.linea
+    ].join(" "));
+
+    return texto.includes(busqueda);
+  });
+}
+
+function renderAsignacion(){
+  const lista = document.getElementById("lista");
+  const pendientes = obtenerPendientesPreparados();
+
+  renderResumen(pendientes);
+
+  lista.innerHTML = "";
+
+  if(pendientes.length === 0){
+    lista.innerHTML = '<div class="vacio">No hay preventivos pendientes con este filtro.</div>';
+    return;
+  }
+
+  pendientes.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "item";
+
+    div.innerHTML = `
+      <div class="titulo">🗓 Orden SAP ${p.orden || "Sin orden"}</div>
+
+      <div class="detalle"><strong>${p.area}</strong> ${p.linea ? " - " + p.linea : ""}</div>
+      <div class="detalle"><strong>Fecha:</strong> ${formatearFecha(p.fechaInicio)} ${p.fechaFin ? " - " + formatearFecha(p.fechaFin) : ""}</div>
+      <div class="detalle"><strong>Ubicación técnica:</strong> ${p.ubicacion || ""}</div>
+      <div class="detalle"><strong>Equipo:</strong> ${p.equipo || "Sin equipo"}</div>
+      <div class="detalle"><strong>Denominación equipo:</strong> ${p.denominacionEquipo || ""}</div>
+      <div class="detalle"><strong>Denominación técnica:</strong> ${p.denominacionTecnica || ""}</div>
+
+      <div class="badge">
+        Actividad:
+        <div class="actividad-texto">${p.actividad || "Sin actividad definida"}</div>
+      </div>
+
+      <label>Técnico asignado</label>
+      <select id="tecnico_${p.clave}">
+        <option value="">Seleccione técnico...</option>
+        ${opcionesTecnicos()}
+      </select>
+
+      <button id="btn_${p.clave}">ASIGNAR PREVENTIVO</button>
+    `;
+
+    lista.appendChild(div);
+
+    document.getElementById("btn_" + p.clave).onclick = function(){
+      asignarPreventivo(p);
+    };
+  });
+}
+
+function renderResumen(pendientes){
+  document.getElementById("totalPendientes").innerText = pendientes.length;
+
+  const conteo = {};
+  pendientes.forEach(p => {
+    const area = p.area || "Sin área";
+    conteo[area] = (conteo[area] || 0) + 1;
+  });
+
+  const areas = Object.keys(conteo).sort();
+  document.getElementById("totalAreas").innerText = areas.length;
+
+  const resumenAreas = document.getElementById("resumenAreas");
+  resumenAreas.innerHTML = "";
+
+  areas.forEach(area => {
+    const chip = document.createElement("div");
+    chip.className = "area-chip";
+    chip.innerText = area + ": " + conteo[area];
+    resumenAreas.appendChild(chip);
+  });
+}
+
+function opcionesTecnicos(){
+  return tecnicos.map(t => {
+    const codigo = obtenerCampo(t, "Codigo");
+    const nombre = obtenerCampo(t, "Nombre");
+    const cargo = obtenerCampo(t, "Cargo");
+    const area = obtenerCampo(t, "Area");
+
+    return `
+      <option value="${codigo}" data-nombre="${nombre}">
+        ${nombre} - ${codigo} ${cargo ? "- " + cargo : ""} ${area ? "- " + area : ""}
+      </option>
+    `;
+  }).join("");
+}
+
+async function asignarPreventivo(p){
+  const select = document.getElementById("tecnico_" + p.clave);
+  const btn = document.getElementById("btn_" + p.clave);
+
+  const codigoTecnico = select.value;
+  const nombreTecnico = select.options[select.selectedIndex].dataset.nombre || "";
+
+  if(!codigoTecnico){
+    alert("Debe seleccionar un técnico.");
+    return;
+  }
+
+  const confirmar = confirm("¿Confirma asignar este preventivo a " + nombreTecnico + "?");
+  if(!confirmar) return;
+
+  btn.disabled = true;
+  btn.innerText = "ASIGNANDO...";
+
+  try{
+    const datos = {
+      accion: "asignar_preventivo",
+      ID_Preventivo: p.id,
+      Orden: p.orden,
+      TecnicoAsignado: codigoTecnico,
+      NombreTecnicoAsignado: nombreTecnico,
+      SupervisorAsignado: usuario.codigo,
+      UsuarioAsignador: usuario.nombre,
+      Area: p.area,
+      Linea: p.linea,
+      Actividad: p.actividad
+    };
+
+    const params = new URLSearchParams(datos);
+    const respuesta = await fetch(URL_API + "?" + params.toString());
+    const resultado = await respuesta.json();
+
+    if(resultado.ok){
+      alert("Preventivo asignado correctamente.");
+      cargarPreventivos();
+    }else{
+      alert("Error: " + resultado.mensaje);
+      btn.disabled = false;
+      btn.innerText = "ASIGNAR PREVENTIVO";
+    }
+
+  }catch(error){
+    alert("Error asignando preventivo: " + error);
+    btn.disabled = false;
+    btn.innerText = "ASIGNAR PREVENTIVO";
+  }
+}
+
+cargarPreventivos();
+</script>
+
+</body>
+</html>
