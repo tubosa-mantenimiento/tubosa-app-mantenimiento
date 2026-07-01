@@ -54,7 +54,7 @@ svg{width:100%;height:210px;background:#f1f5ff;border-radius:16px;}
 <div class="container">
 
   <div class="header">
-    <a class="back" href="menu.html">‹</a>
+    <a class="back" href="dashboard.html">‹</a>
     <div class="logo">TUBOSA</div>
     <div style="width:42px;"></div>
   </div>
@@ -85,17 +85,7 @@ svg{width:100%;height:210px;background:#f1f5ff;border-radius:16px;}
     <div id="graficosServicios"><div class="vacio">Cargando tendencias...</div></div>
   </div>
 
-  <div class="card">
-    <h2>Top líneas con más fallas</h2>
-    <div id="topLineas"><div class="vacio">Cargando...</div></div>
-  </div>
-
-  <div class="card">
-    <h2>Top equipos con más fallas</h2>
-    <div id="topEquipos"><div class="vacio">Cargando...</div></div>
-  </div>
-
-  <div class="card">
+ <div class="card">
     <h2>Vacío PIAB por línea</h2>
     <div id="vacioPIAB"><div class="vacio">Sin datos PIAB todavía.</div></div>
   </div>
@@ -572,10 +562,50 @@ function renderGraficoServicio(titulo, subtitulo, datos, unidad, rango){
       </div>
 
       <div class="chart-values">
-        <span>Min: ${minimo} ${unidad}</span>
-        <span>Último: ${ultimo} ${unidad}</span>
-        <span>Max: ${maximo} ${unidad}</span>
-      </div>
+
+    <span>
+        Min:
+        <strong>${minimo} ${unidad}</strong>
+    </span>
+
+    <span>
+        Último:
+        <strong>${ultimo} ${unidad}</strong>
+    </span>
+
+    <span>
+        Max:
+        <strong>${maximo} ${unidad}</strong>
+    </span>
+
+</div>
+
+<div style="
+margin-top:14px;
+display:flex;
+justify-content:space-around;
+flex-wrap:wrap;
+gap:12px;
+font-size:14px;
+font-weight:bold;
+">
+
+    <span style="color:#0a8a24;">
+        🟢 Meta:
+        ${rango.meta} ${unidad}
+    </span>
+
+    <span style="color:#0a8a24;">
+        🟩 Normal:
+        ${rango.min} - ${rango.max} ${unidad}
+    </span>
+
+    <span style="color:#d00000;">
+        🔴 Crítico:
+        ${rango.criticoMin} - ${rango.criticoMax} ${unidad}
+    </span>
+
+</div>
     </div>
   `;
 }
@@ -716,8 +746,6 @@ function renderDashboard(){
   document.getElementById("kpiCalentamientoHoy").innerText = calentamientosFiltro.length;
 
   renderServicios(BD.servicios);
-  renderBarras("topLineas", ordenarConteo(contarPorCampo(notificacionesFiltro, "Linea"), 10), "fallas");
-  renderRanking("topEquipos", ordenarConteo(contarPorCampo(notificacionesFiltro, "Equipo"), 5), "fallas");
   renderVacioPIAB(obtenerUltimoVacioPIAB(BD.piab));
 
   document.getElementById("estadoCarga").innerText = "Información actualizada correctamente.";
