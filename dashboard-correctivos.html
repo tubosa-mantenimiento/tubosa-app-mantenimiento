@@ -1,1 +1,749 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Correctivos - TUBOSA</title>
 
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
+.container{max-width:760px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
+.logo{font-size:46px;font-weight:900;}
+.card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
+h1{font-size:30px;margin-bottom:8px;}
+h2{font-size:24px;margin-bottom:14px;}
+.subtitle{font-size:17px;opacity:.85;margin-bottom:14px;}
+.info{font-size:16px;opacity:.9;}
+
+.filtros{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-top:16px;
+}
+
+.filtros button{
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:white;
+  color:#001f5b;
+  font-size:16px;
+  font-weight:900;
+}
+
+.filtros button.activo{background:#dbe4f5;}
+
+.main-kpi{
+  background:white;
+  color:#001f5b;
+  border-radius:24px;
+  padding:22px;
+  margin-bottom:18px;
+}
+
+.main-title{
+  font-size:18px;
+  font-weight:900;
+}
+
+.main-num{
+  font-size:46px;
+  font-weight:900;
+  margin-top:8px;
+}
+
+.progress-bg{
+  width:100%;
+  height:18px;
+  background:#dbe4f5;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:14px;
+}
+
+.progress-fill{
+  height:100%;
+  background:#001f5b;
+  border-radius:20px;
+}
+
+.kpis{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.kpi{
+  background:white;
+  color:#001f5b;
+  border-radius:20px;
+  padding:16px;
+}
+
+.kpi-num{
+  font-size:34px;
+  font-weight:900;
+  line-height:1;
+}
+
+.kpi-label{
+  font-size:13px;
+  font-weight:bold;
+  margin-top:6px;
+  opacity:.85;
+}
+
+.bar-item{
+  background:white;
+  color:#001f5b;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:12px;
+}
+
+.bar-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+  font-weight:900;
+  gap:10px;
+}
+
+.bar-bg{
+  width:100%;
+  height:16px;
+  background:#dbe4f5;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.bar-fill{
+  height:100%;
+  background:#001f5b;
+  border-radius:20px;
+}
+
+.estado-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.estado-card{
+  background:white;
+  color:#001f5b;
+  border-radius:18px;
+  padding:16px;
+}
+
+.estado-title{
+  font-size:14px;
+  font-weight:900;
+  opacity:.8;
+}
+
+.estado-num{
+  font-size:32px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+.alerta-item{
+  background:white;
+  color:#001f5b;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:12px;
+}
+
+.alerta-title{
+  font-size:16px;
+  font-weight:900;
+}
+
+.alerta-det{
+  font-size:13px;
+  margin-top:5px;
+  opacity:.85;
+}
+
+.vacio{
+  text-align:center;
+  opacity:.85;
+  margin-top:12px;
+  font-size:16px;
+}
+
+.footer{
+  text-align:center;
+  opacity:.7;
+  font-size:13px;
+  margin-top:24px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <a class="back" href="dashboard.html">‹</a>
+    <div class="logo">TUBOSA</div>
+    <div style="width:42px;"></div>
+  </div>
+
+  <div class="card">
+    <h1>Dashboard Correctivos</h1>
+    <div class="subtitle">Control de fallas, pendientes, cierres, tiempos de intervención y órdenes SAP</div>
+    <div class="info" id="estadoCarga">Cargando información...</div>
+
+    <div class="filtros">
+      <button id="btnHoy" class="activo" onclick="cambiarFiltro('hoy')">Hoy</button>
+      <button id="btnSemana" onclick="cambiarFiltro('semana')">Semana</button>
+      <button id="btnMes" onclick="cambiarFiltro('mes')">Mes</button>
+    </div>
+  </div>
+
+  <div class="main-kpi">
+    <div class="main-title">Cumplimiento de cierre correctivo</div>
+    <div class="main-num" id="kpiCumplimiento">0%</div>
+    <div class="progress-bg">
+      <div class="progress-fill" id="barraCumplimiento" style="width:0%;"></div>
+    </div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi">
+      <div class="kpi-num" id="kpiReportados">0</div>
+      <div class="kpi-label">Correctivos reportados</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiAbiertos">0</div>
+      <div class="kpi-label">Correctivos abiertos</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiCerrados">0</div>
+      <div class="kpi-label">Correctivos cerrados</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiPendientes">0</div>
+      <div class="kpi-label">Pendientes activos</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiCriticos">0</div>
+      <div class="kpi-label">Críticos abiertos</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiOrdenesSAP">0</div>
+      <div class="kpi-label">Órdenes SAP generadas</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiMTTR">0</div>
+      <div class="kpi-label">MTTR correctivo min</div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-num" id="kpiTiempoTotal">0</div>
+      <div class="kpi-label">Tiempo total intervención min</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Correctivos por estado</h2>
+    <div class="estado-grid">
+      <div class="estado-card">
+        <div class="estado-title">Abiertos</div>
+        <div class="estado-num" id="estadoAbiertos">0</div>
+      </div>
+      <div class="estado-card">
+        <div class="estado-title">Cerrados</div>
+        <div class="estado-num" id="estadoCerrados">0</div>
+      </div>
+      <div class="estado-card">
+        <div class="estado-title">Pendientes activos</div>
+        <div class="estado-num" id="estadoPendientes">0</div>
+      </div>
+      <div class="estado-card">
+        <div class="estado-title">Críticos abiertos</div>
+        <div class="estado-num" id="estadoCriticos">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Top líneas con más fallas</h2>
+    <div id="topLineas"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Top equipos con más fallas</h2>
+    <div id="topEquipos"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Modo de falla</h2>
+    <div id="topModos"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Causa probable</h2>
+    <div id="topCausas"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Top técnicos por cierre</h2>
+    <div id="topTecnicos"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Correctivos críticos / pendientes</h2>
+    <div id="listaAlertas"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="footer">
+    TUBOSA - Sistema de Mantenimiento<br>
+    Versión 1.0
+  </div>
+
+</div>
+<script>
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
+if(!usuario){
+  window.location.href = "index.html";
+}
+
+let filtroActual = "hoy";
+let notificaciones = [];
+
+function obtenerCampo(obj, nombre){
+  const clave = Object.keys(obj).find(k => k.trim().toLowerCase() === nombre.trim().toLowerCase());
+  return clave ? obj[clave] : "";
+}
+
+function normalizar(v){
+  return String(v || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"");
+}
+
+function numero(v){
+  if(v === undefined || v === null || v === "") return 0;
+  const n = Number(String(v).replace(",", "."));
+  return isNaN(n) ? 0 : n;
+}
+
+function promedio(arr){
+  if(!arr.length) return 0;
+  const suma = arr.reduce((a,b)=>a+b,0);
+  return Math.round(suma / arr.length);
+}
+
+function suma(arr){
+  return arr.reduce((a,b)=>a+b,0);
+}
+
+function fechaISO(fechaTexto){
+  if(!fechaTexto) return null;
+  if(fechaTexto instanceof Date) return fechaTexto;
+
+  const texto = String(fechaTexto).trim();
+
+  if(texto.includes("T")){
+    const d = new Date(texto);
+    if(!isNaN(d)) return d;
+  }
+
+  if(texto.includes("/")){
+    const partes = texto.split("/");
+    if(partes.length === 3){
+      const dia = partes[0].padStart(2,"0");
+      const mes = partes[1].padStart(2,"0");
+      const anio = partes[2];
+      return new Date(`${anio}-${mes}-${dia}T00:00:00`);
+    }
+  }
+
+  const d = new Date(texto);
+  return isNaN(d) ? null : d;
+}
+
+function estaEnFiltro(fechaTexto){
+  const fecha = fechaISO(fechaTexto);
+  if(!fecha || isNaN(fecha)) return false;
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  const f = new Date(fecha);
+  f.setHours(0,0,0,0);
+
+  if(filtroActual === "hoy"){
+    return f.getTime() === hoy.getTime();
+  }
+
+  if(filtroActual === "semana"){
+    const hace7 = new Date(hoy);
+    hace7.setDate(hoy.getDate() - 7);
+    return f >= hace7 && f <= hoy;
+  }
+
+  if(filtroActual === "mes"){
+    const hace30 = new Date(hoy);
+    hace30.setDate(hoy.getDate() - 30);
+    return f >= hace30 && f <= hoy;
+  }
+
+  return true;
+}
+
+function fechaReferencia(n){
+  return obtenerCampo(n, "FechaCierre") || obtenerCampo(n, "FechaReporte");
+}
+
+function esCerrado(n){
+  const estado = normalizar(obtenerCampo(n, "Estado"));
+  const actividadTerminada = normalizar(obtenerCampo(n, "ActividadTerminada"));
+
+  return (
+    estado === "terminado" ||
+    estado === "cerrado" ||
+    estado === "finalizado" ||
+    actividadTerminada === "si" ||
+    actividadTerminada === "sí"
+  );
+}
+
+function esAbierto(n){
+  return !esCerrado(n);
+}
+
+function esPendienteActivo(n){
+  const quedaPendiente = normalizar(obtenerCampo(n, "quedapendiente"));
+  const tecnicoRecibe = String(obtenerCampo(n, "TecnicoRecibe") || "").trim();
+  const actividadTerminada = normalizar(obtenerCampo(n, "ActividadTerminada"));
+
+  return (
+    (quedaPendiente === "si" || quedaPendiente === "sí" || tecnicoRecibe !== "") &&
+    actividadTerminada !== "si" &&
+    actividadTerminada !== "sí"
+  );
+}
+
+function esCritico(n){
+  const prioridad = normalizar(obtenerCampo(n, "Prioridad"));
+  return prioridad === "critica" || prioridad === "crítica";
+}
+
+function tieneOrdenSAP(n){
+  const orden = String(obtenerCampo(n, "OrdenSAP") || "").trim();
+  return orden !== "";
+}
+
+async function cargarHoja(nombreHoja){
+  const respuesta = await fetch(URL_API + "?accion=listar&hoja=" + encodeURIComponent(nombreHoja));
+  const data = await respuesta.json();
+  return data.datos || [];
+}
+
+function contarPorCampo(datos, campo, defecto){
+  const conteo = {};
+
+  datos.forEach(item => {
+    const valor = String(obtenerCampo(item, campo) || defecto || "Sin dato").trim() || "Sin dato";
+    conteo[valor] = (conteo[valor] || 0) + 1;
+  });
+
+  return Object.entries(conteo)
+    .map(([nombre, valor]) => ({nombre, valor}))
+    .sort((a,b) => b.valor - a.valor);
+}
+
+function renderBarras(contenedorId, datos, sufijo){
+  const contenedor = document.getElementById(contenedorId);
+  contenedor.innerHTML = "";
+
+  if(datos.length === 0){
+    contenedor.innerHTML = '<div class="vacio">Sin información para este periodo.</div>';
+    return;
+  }
+
+  const max = Math.max(...datos.map(d => d.valor));
+
+  datos.forEach(d => {
+    const porcentaje = max > 0 ? (d.valor / max) * 100 : 0;
+
+    const div = document.createElement("div");
+    div.className = "bar-item";
+
+    div.innerHTML = `
+      <div class="bar-head">
+        <span>${d.nombre}</span>
+        <span>${d.valor}${sufijo || ""}</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill" style="width:${porcentaje}%;"></div>
+      </div>
+    `;
+
+    contenedor.appendChild(div);
+  });
+}
+  function renderDashboard(){
+
+    const datosPeriodo = notificaciones.filter(n =>
+        estaEnFiltro(fechaReferencia(n))
+    );
+
+    const abiertos = datosPeriodo.filter(esAbierto);
+
+    const cerrados = datosPeriodo.filter(esCerrado);
+
+    const pendientes = datosPeriodo.filter(esPendienteActivo);
+
+    const criticos = abiertos.filter(esCritico);
+
+    const ordenesSAP = datosPeriodo.filter(tieneOrdenSAP);
+
+    const tiempos = cerrados
+        .map(n => numero(obtenerCampo(n,"TiempoTotalIntervencion")))
+        .filter(n => n>0);
+
+    const tiempoTotal = suma(tiempos);
+
+    const mttr = promedio(tiempos);
+
+    const cumplimiento =
+        datosPeriodo.length>0
+        ? Math.round((cerrados.length/datosPeriodo.length)*100)
+        :0;
+
+    //======================
+    // KPI PRINCIPALES
+    //======================
+
+    document.getElementById("kpiCumplimiento").innerText =
+        cumplimiento+"%";
+
+    document.getElementById("barraCumplimiento").style.width =
+        cumplimiento+"%";
+
+    document.getElementById("kpiReportados").innerText =
+        datosPeriodo.length;
+
+    document.getElementById("kpiAbiertos").innerText =
+        abiertos.length;
+
+    document.getElementById("kpiCerrados").innerText =
+        cerrados.length;
+
+    document.getElementById("kpiPendientes").innerText =
+        pendientes.length;
+
+    document.getElementById("kpiCriticos").innerText =
+        criticos.length;
+
+    document.getElementById("kpiOrdenesSAP").innerText =
+        ordenesSAP.length;
+
+    document.getElementById("kpiMTTR").innerText =
+        mttr;
+
+    document.getElementById("kpiTiempoTotal").innerText =
+        tiempoTotal;
+
+    //======================
+    // ESTADOS
+    //======================
+
+    document.getElementById("estadoAbiertos").innerText =
+        abiertos.length;
+
+    document.getElementById("estadoCerrados").innerText =
+        cerrados.length;
+
+    document.getElementById("estadoPendientes").innerText =
+        pendientes.length;
+
+    document.getElementById("estadoCriticos").innerText =
+        criticos.length;
+
+    //======================
+    // TOP LINEAS
+    //======================
+
+    renderBarras(
+        "topLineas",
+        contarPorCampo(datosPeriodo,"Linea").slice(0,10)
+    );
+
+    //======================
+    // TOP EQUIPOS
+    //======================
+
+    renderBarras(
+        "topEquipos",
+        contarPorCampo(datosPeriodo,"Equipo").slice(0,10)
+    );
+
+    //======================
+    // MODOS DE FALLA
+    //======================
+
+    renderBarras(
+        "topModos",
+        contarPorCampo(datosPeriodo,"ModoFalla").slice(0,10)
+    );
+
+    //======================
+    // CAUSAS
+    //======================
+
+    renderBarras(
+        "topCausas",
+        contarPorCampo(datosPeriodo,"CausaProbable").slice(0,10)
+    );
+
+    //======================
+    // TECNICOS
+    //======================
+
+    const tecnicos={};
+
+    cerrados.forEach(n=>{
+
+        const tecnico=
+            obtenerCampo(n,"NombreTecnicoCierre") ||
+            obtenerCampo(n,"TecnicoCierre") ||
+            "Sin técnico";
+
+        tecnicos[tecnico]=(tecnicos[tecnico]||0)+1;
+
+    });
+
+    const datosTecnicos=
+        Object.entries(tecnicos)
+        .map(([nombre,valor])=>({nombre,valor}))
+        .sort((a,b)=>b.valor-a.valor)
+        .slice(0,10);
+
+    renderBarras(
+        "topTecnicos",
+        datosTecnicos
+    );
+
+    //======================
+    // ALERTAS
+    //======================
+
+    renderAlertas(
+        pendientes
+    );
+
+    document.getElementById("estadoCarga").innerText =
+        "Información actualizada correctamente.";
+
+}
+  function renderAlertas(pendientes){
+
+    const contenedor=document.getElementById("listaAlertas");
+    contenedor.innerHTML="";
+
+    if(pendientes.length===0){
+        contenedor.innerHTML='<div class="vacio">No hay correctivos críticos o pendientes activos en este periodo.</div>';
+        return;
+    }
+
+    pendientes
+        .slice(0,10)
+        .forEach(n=>{
+
+            const id=obtenerCampo(n,"ID_Notificacion") || "";
+            const linea=obtenerCampo(n,"Linea") || "Sin línea";
+            const equipo=obtenerCampo(n,"Equipo") || "Sin equipo";
+            const prioridad=obtenerCampo(n,"Prioridad") || "Sin prioridad";
+            const tecnico=obtenerCampo(n,"NombreTecnicoRecibe") || obtenerCampo(n,"TecnicoRecibe") || "Sin técnico";
+            const descripcion=obtenerCampo(n,"DescripcionFalla") || "Sin descripción";
+            const orden=obtenerCampo(n,"OrdenSAP") || "Sin orden SAP";
+
+            const div=document.createElement("div");
+            div.className="alerta-item";
+
+            div.innerHTML=`
+                <div class="alerta-title">📌 ${linea} · ${equipo}</div>
+                <div class="alerta-det"><strong>ID:</strong> ${id}</div>
+                <div class="alerta-det"><strong>Prioridad:</strong> ${prioridad}</div>
+                <div class="alerta-det"><strong>Técnico recibe:</strong> ${tecnico}</div>
+                <div class="alerta-det"><strong>Orden SAP:</strong> ${orden}</div>
+                <div class="alerta-det"><strong>Falla:</strong> ${descripcion}</div>
+            `;
+
+            contenedor.appendChild(div);
+
+        });
+
+}
+
+function cambiarFiltro(filtro){
+
+    filtroActual=filtro;
+
+    document.getElementById("btnHoy").classList.remove("activo");
+    document.getElementById("btnSemana").classList.remove("activo");
+    document.getElementById("btnMes").classList.remove("activo");
+
+    if(filtro==="hoy"){
+        document.getElementById("btnHoy").classList.add("activo");
+    }
+
+    if(filtro==="semana"){
+        document.getElementById("btnSemana").classList.add("activo");
+    }
+
+    if(filtro==="mes"){
+        document.getElementById("btnMes").classList.add("activo");
+    }
+
+    renderDashboard();
+
+}
+
+async function cargarDashboard(){
+
+    try{
+
+        notificaciones=await cargarHoja("Notificaciones");
+
+        renderDashboard();
+
+    }catch(error){
+
+        document.getElementById("estadoCarga").innerText=
+            "Error cargando dashboard: "+error;
+
+    }
+
+}
+
+cargarDashboard();
+</script>
+
+</body>
+</html>
