@@ -120,6 +120,17 @@ body{min-height:100vh;background:#001f5b;color:white;padding:22px;}
     <div class="arrow">›</div>
   </a>
 
+  <a class="menu-card solo-tecnico" href="dashboard-tecnicos.html">
+    <div class="menu-left">
+      <div class="icon">📊</div>
+      <div>
+        <div class="title">Mis Indicadores</div>
+        <div class="desc">Consulta tu desempeño, pendientes y cumplimiento</div>
+      </div>
+    </div>
+    <div class="arrow">›</div>
+  </a>
+
   <a class="menu-card solo-supervisor" href="preventivos-asignacion.html">
     <div class="menu-left">
       <div class="icon">🗓</div>
@@ -146,7 +157,7 @@ body{min-height:100vh;background:#001f5b;color:white;padding:22px;}
     <div class="menu-left">
       <div class="icon">📈</div>
       <div>
-        <div class="title">Dashboard</div>
+        <div class="title">Dashboard Gerencial</div>
         <div class="desc">Indicadores, tendencias y KPIs de mantenimiento</div>
       </div>
     </div>
@@ -182,8 +193,13 @@ function cerrarSesion(){
 }
 
 const rolUsuario = String(usuario.rol || "").trim().toUpperCase();
+const esSupervisor = ["SUPERVISOR", "PLANEADOR", "COORDINADOR", "ADMIN"].includes(rolUsuario);
 
-if(!["SUPERVISOR", "PLANEADOR", "COORDINADOR", "ADMIN"].includes(rolUsuario)){
+if(esSupervisor){
+  document.querySelectorAll(".solo-tecnico").forEach(el => {
+    el.style.display = "none";
+  });
+}else{
   document.querySelectorAll(".solo-supervisor").forEach(el => {
     el.style.display = "none";
   });
