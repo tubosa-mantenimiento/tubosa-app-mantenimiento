@@ -1,1 +1,765 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - TUBOSA</title>
 
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
+.container{max-width:720px;margin:auto;}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
+.logo{font-size:46px;font-weight:900;}
+.card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
+h1{font-size:30px;margin-bottom:8px;}
+h2{font-size:24px;margin-bottom:14px;}
+.subtitle{font-size:17px;opacity:.85;margin-bottom:18px;}
+.filtros{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;}
+.filtros button{padding:14px;border:none;border-radius:14px;background:white;color:#001f5b;font-size:16px;font-weight:900;}
+.filtros button.activo{background:#dbe4f5;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.kpi{background:white;color:#001f5b;border-radius:20px;padding:20px;text-align:center;}
+.kpi-num{font-size:38px;font-weight:900;}
+.kpi-label{font-size:15px;font-weight:bold;margin-top:6px;}
+.ranking-item,.bar-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
+.ranking-title{font-size:16px;font-weight:900;}
+.ranking-value{font-size:14px;margin-top:4px;opacity:.85;}
+.bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;gap:10px;}
+.bar-bg{width:100%;height:16px;background:#dbe4f5;border-radius:20px;overflow:hidden;}
+.bar-fill{height:100%;background:#001f5b;border-radius:20px;}
+.chart-card{background:white;color:#001f5b;border-radius:22px;padding:18px;margin-bottom:18px;}
+.chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.chart-title{font-size:21px;font-weight:900;line-height:1.1;}
+.chart-sub{font-size:14px;opacity:.75;margin-top:5px;}
+.estado-pill{font-size:13px;font-weight:900;padding:8px 12px;border-radius:12px;white-space:nowrap;}
+.estado-normal{background:#e8f8ee;color:#087a23;border:1px solid #5dcc78;}
+.estado-advertencia{background:#fff5d6;color:#b87900;border:1px solid #f0bf3a;}
+.estado-critico{background:#ffe1e1;color:#b00000;border:1px solid #e53935;}
+.chart-info{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+.info-box{background:#f1f5ff;border-radius:14px;padding:10px;text-align:center;}
+.info-label{font-size:11px;opacity:.75;font-weight:bold;}
+.info-value{font-size:17px;font-weight:900;margin-top:3px;}
+.chart-values{display:flex;justify-content:space-between;font-size:13px;font-weight:bold;margin-top:10px;gap:6px;flex-wrap:wrap;}
+svg{width:100%;height:210px;background:#f1f5ff;border-radius:16px;}
+.semaforo{font-size:20px;margin-left:6px;}
+.vacio{text-align:center;opacity:.85;margin-top:12px;font-size:16px;}
+.footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <a class="back" href="menu.html">‹</a>
+    <div class="logo">TUBOSA</div>
+    <div style="width:42px;"></div>
+  </div>
+
+  <div class="card">
+    <h1>Dashboard</h1>
+    <div class="subtitle">Indicadores operativos de mantenimiento</div>
+    <div id="estadoCarga">Cargando información...</div>
+
+    <div class="filtros">
+      <button id="btnHoy" class="activo" onclick="cambiarFiltro('hoy')">Hoy</button>
+      <button id="btnSemana" onclick="cambiarFiltro('semana')">Semana</button>
+      <button id="btnMes" onclick="cambiarFiltro('mes')">Mes</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="kpi"><div class="kpi-num" id="kpiNovedadesHoy">0</div><div class="kpi-label" id="lblNovedades">Novedades hoy</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiAbiertas">0</div><div class="kpi-label">Novedades abiertas</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiCriticas">0</div><div class="kpi-label">Novedades críticas</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiPIABHoy">0</div><div class="kpi-label" id="lblPIAB">Rutas PIAB hoy</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiServiciosHoy">0</div><div class="kpi-label" id="lblServicios">Servicios hoy</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiCalentamientoHoy">0</div><div class="kpi-label" id="lblCalentamientos">Calentamientos hoy</div></div>
+  </div>
+
+  <div class="card" style="margin-top:18px;">
+    <h2>Servicios Industriales</h2>
+    <div id="graficosServicios"><div class="vacio">Cargando tendencias...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Top líneas con más fallas</h2>
+    <div id="topLineas"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Top equipos con más fallas</h2>
+    <div id="topEquipos"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Vacío PIAB por línea</h2>
+    <div id="vacioPIAB"><div class="vacio">Sin datos PIAB todavía.</div></div>
+  </div>
+
+  <div class="footer">
+    TUBOSA - Sistema de Mantenimiento<br>
+    Versión 1.0
+  </div>
+
+</div>
+
+<script>
+const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
+if(!usuario){
+  window.location.href = "index.html";
+}
+
+let filtroActual = "hoy";
+
+let BD = {
+  notificaciones: [],
+  piab: [],
+  servicios: [],
+  calentamientos: []
+};
+
+const RANGOS_SERVICIOS = {
+  Presion_Aire_SAM: {
+    meta: 100,
+    min: 95,
+    max: 105,
+    criticoMin: 90,
+    criticoMax: 110,
+    unidad: "PSI"
+  },
+  Caudal_Aire: {
+    meta: 1000,
+    min: 600,
+    max: 1600,
+    criticoMin: 500,
+    criticoMax: 1800,
+    unidad: "CFM"
+  },
+  Temperatura_Chiller: {
+    meta: 60,
+    min: 58,
+    max: 64,
+    criticoMin: 58,
+    criticoMax: 64,
+    unidad: "°F"
+  },
+  Carga_Compresores: {
+    meta: 50,
+    min: 0,
+    max: 80,
+    criticoMin: 0,
+    criticoMax: 95,
+    unidad: "%"
+  },
+  Presion_Bombas: {
+    meta: 60,
+    min: 35,
+    max: 70,
+    criticoMin: 30,
+    criticoMax: 70,
+    unidad: "PSI"
+  }
+};
+
+function fechaISO(fechaTexto){
+  if(!fechaTexto) return null;
+
+  if(fechaTexto instanceof Date){
+    return fechaTexto;
+  }
+
+  const texto = String(fechaTexto).trim();
+
+  if(texto.includes("/")){
+    const partes = texto.split("/");
+    if(partes.length === 3){
+      const dia = partes[0].padStart(2,"0");
+      const mes = partes[1].padStart(2,"0");
+      const anio = partes[2];
+      return new Date(`${anio}-${mes}-${dia}T00:00:00`);
+    }
+  }
+
+  return new Date(texto);
+}
+
+function horaA24(horaTexto){
+  if(!horaTexto) return "00:00";
+
+  let texto = String(horaTexto).trim().toLowerCase();
+
+  texto = texto
+    .replaceAll(" ", "")
+    .replaceAll("a. m.", "am")
+    .replaceAll("p. m.", "pm")
+    .replaceAll("a.m.", "am")
+    .replaceAll("p.m.", "pm")
+    .replaceAll("a.m", "am")
+    .replaceAll("p.m", "pm");
+
+  const esPM = texto.includes("pm");
+  const esAM = texto.includes("am");
+
+  texto = texto.replace("am", "").replace("pm", "");
+
+  const match = texto.match(/(\d{1,2})(?::(\d{1,2}))?/);
+
+  if(!match){
+    return "00:00";
+  }
+
+  let h = Number(match[1]);
+  let m = Number(match[2] || 0);
+
+  if(isNaN(h)) h = 0;
+  if(isNaN(m)) m = 0;
+
+  if(esPM && h < 12) h += 12;
+  if(esAM && h === 12) h = 0;
+
+  return String(h).padStart(2,"0") + ":" + String(m).padStart(2,"0");
+}
+
+function fechaHoraObj(fechaTexto, horaTexto){
+  const f = fechaISO(fechaTexto);
+  if(!f || isNaN(f)) return new Date(0);
+
+  const hm = horaA24(horaTexto).split(":");
+  f.setHours(Number(hm[0]), Number(hm[1]), 0, 0);
+  return f;
+}
+
+function formatoPunto(fechaTexto, horaTexto){
+  const f = fechaISO(fechaTexto);
+  const hora = horaA24(horaTexto);
+
+  if(!f || isNaN(f)) return hora;
+
+  const dia = String(f.getDate()).padStart(2,"0");
+  const mes = String(f.getMonth() + 1).padStart(2,"0");
+
+  if(filtroActual === "hoy"){
+    return hora;
+  }
+
+  return `${dia}/${mes} ${hora}`;
+}
+
+function estaEnFiltro(fechaTexto){
+  const fecha = fechaISO(fechaTexto);
+  if(!fecha || isNaN(fecha)) return false;
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  const f = new Date(fecha);
+  f.setHours(0,0,0,0);
+
+  if(filtroActual === "hoy"){
+    return f.getTime() === hoy.getTime();
+  }
+
+  if(filtroActual === "semana"){
+    const hace7 = new Date(hoy);
+    hace7.setDate(hoy.getDate() - 7);
+    return f >= hace7 && f <= hoy;
+  }
+
+  if(filtroActual === "mes"){
+    const hace30 = new Date(hoy);
+    hace30.setDate(hoy.getDate() - 30);
+    return f >= hace30 && f <= hoy;
+  }
+
+  return true;
+}
+
+async function cargarHoja(nombreHoja){
+  const respuesta = await fetch(URL_API + "?accion=listar&hoja=" + encodeURIComponent(nombreHoja));
+  const data = await respuesta.json();
+  return data.datos || [];
+}
+
+function esAbierta(estado){
+  const e = String(estado || "").trim().toLowerCase();
+
+  return ![
+    "terminado",
+    "cerrado",
+    "cancelado",
+    "finalizado"
+  ].includes(e);
+}
+
+function limpiarTexto(valor){
+  let texto = String(valor || "").trim();
+  return texto || "Sin dato";
+}
+
+function numero(valor){
+  if(valor === undefined || valor === null || valor === "") return null;
+  const n = Number(String(valor).replace(",", "."));
+  return isNaN(n) ? null : n;
+}
+
+function contarPorCampo(datos, campo){
+  const conteo = {};
+
+  datos.forEach(item => {
+    const valor = limpiarTexto(item[campo]);
+    conteo[valor] = (conteo[valor] || 0) + 1;
+  });
+
+  return conteo;
+}
+
+function ordenarConteo(conteo, limite){
+  return Object.entries(conteo)
+    .map(([nombre, cantidad]) => ({nombre, cantidad}))
+    .sort((a,b) => b.cantidad - a.cantidad)
+    .slice(0, limite);
+}
+
+function renderRanking(idContenedor, datos, etiqueta){
+  const contenedor = document.getElementById(idContenedor);
+  contenedor.innerHTML = "";
+
+  if(datos.length === 0){
+    contenedor.innerHTML = '<div class="vacio">Sin información disponible.</div>';
+    return;
+  }
+
+  datos.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.className = "ranking-item";
+
+    div.innerHTML = `
+      <div class="ranking-title">${index + 1}. ${item.nombre}</div>
+      <div class="ranking-value">${item.cantidad} ${etiqueta}</div>
+    `;
+
+    contenedor.appendChild(div);
+  });
+}
+
+function renderBarras(idContenedor, datos, etiqueta){
+  const contenedor = document.getElementById(idContenedor);
+  contenedor.innerHTML = "";
+
+  if(datos.length === 0){
+    contenedor.innerHTML = '<div class="vacio">Sin información disponible.</div>';
+    return;
+  }
+
+  const maximo = Math.max(...datos.map(d => Number(d.cantidad) || 0));
+
+  datos.forEach((item, index) => {
+    const porcentaje = maximo > 0 ? (item.cantidad / maximo) * 100 : 0;
+
+    const div = document.createElement("div");
+    div.className = "bar-item";
+
+    div.innerHTML = `
+      <div class="bar-head">
+        <span>${index + 1}. ${item.nombre}</span>
+        <span>${item.cantidad} ${etiqueta}</span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill" style="width:${porcentaje}%;"></div>
+      </div>
+    `;
+
+    contenedor.appendChild(div);
+  });
+}
+
+function prepararSerieServicios(servicios, campo){
+  return servicios
+    .filter(r => estaEnFiltro(r.Fecha))
+    .map(r => ({
+      fecha: r.Fecha || "",
+      hora: r.Hora || "",
+      etiqueta: formatoPunto(r.Fecha, r.Hora),
+      valor: numero(r[campo]),
+      fechaObj: fechaHoraObj(r.Fecha, r.Hora)
+    }))
+    .filter(r => r.valor !== null)
+    .sort((a,b) => a.fechaObj - b.fechaObj)
+    .slice(-12);
+}
+
+function estadoValor(valor, rango){
+  if(valor === null || valor === undefined || valor === "-"){
+    return {
+      texto: "SIN DATO",
+      clase: "estado-advertencia",
+      color: "#f0a000",
+      icono: "⚠"
+    };
+  }
+
+  if(
+    (rango.criticoMin !== undefined && valor < rango.criticoMin) ||
+    (rango.criticoMax !== undefined && valor > rango.criticoMax)
+  ){
+    return {
+      texto: "CRÍTICO",
+      clase: "estado-critico",
+      color: "#e00000",
+      icono: "🔴"
+    };
+  }
+
+  if(valor < rango.min || valor > rango.max){
+    return {
+      texto: "ADVERTENCIA",
+      clase: "estado-advertencia",
+      color: "#f0a000",
+      icono: "🟡"
+    };
+  }
+
+  return {
+    texto: "NORMAL",
+    clase: "estado-normal",
+    color: "#0a8a24",
+    icono: "🟢"
+  };
+}
+
+function promedio(datos){
+  if(!datos.length) return "-";
+  const suma = datos.reduce((acc,d) => acc + d.valor, 0);
+  return Number((suma / datos.length).toFixed(1));
+}
+
+function crearSVGSerie(datos, unidad, rango){
+  if(datos.length === 0){
+    return '<div class="vacio">Sin datos registrados para este filtro.</div>';
+  }
+
+  const ancho = 380;
+  const alto = 220;
+  const margenIzq = 42;
+  const margenDer = 28;
+  const margenTop = 24;
+  const margenBottom = 44;
+  const chartW = ancho - margenIzq - margenDer;
+  const chartH = alto - margenTop - margenBottom;
+
+  const valores = datos.map(d => d.valor);
+
+  let minGraf = Math.min(...valores, rango.min, rango.meta);
+  let maxGraf = Math.max(...valores, rango.max, rango.meta);
+
+  if(rango.criticoMin !== undefined) minGraf = Math.min(minGraf, rango.criticoMin);
+  if(rango.criticoMax !== undefined) maxGraf = Math.max(maxGraf, rango.criticoMax);
+
+  const padding = (maxGraf - minGraf) * 0.12 || 5;
+  minGraf -= padding;
+  maxGraf += padding;
+
+  const escalaY = valor => {
+    return margenTop + ((maxGraf - valor) / (maxGraf - minGraf)) * chartH;
+  };
+
+  const escalaX = i => {
+    if(datos.length === 1) return margenIzq + chartW / 2;
+    return margenIzq + (i * (chartW / (datos.length - 1)));
+  };
+
+  const yMin = escalaY(rango.min);
+  const yMax = escalaY(rango.max);
+  const yMeta = escalaY(rango.meta);
+  const yCritMin = rango.criticoMin !== undefined ? escalaY(rango.criticoMin) : null;
+  const yCritMax = rango.criticoMax !== undefined ? escalaY(rango.criticoMax) : null;
+
+  const puntosObj = datos.map((d,i) => ({
+    x: escalaX(i),
+    y: escalaY(d.valor),
+    valor: d.valor,
+    etiqueta: d.etiqueta,
+    estado: estadoValor(d.valor, rango)
+  }));
+
+  const puntosLinea = puntosObj.map(p => `${p.x},${p.y}`).join(" ");
+
+  const elementos = puntosObj.map((p,i) => {
+    const yTexto = Math.max(15, p.y - 10);
+    const mostrarEtiqueta = datos.length <= 6 || i === 0 || i === datos.length - 1;
+
+    return `
+      <text x="${p.x}" y="${yTexto}" text-anchor="middle" font-size="11" font-weight="900" fill="#001f5b">${p.valor}</text>
+      <circle cx="${p.x}" cy="${p.y}" r="6" fill="${p.estado.color}" stroke="#001f5b" stroke-width="2"></circle>
+      ${mostrarEtiqueta ? `<text x="${p.x}" y="198" text-anchor="middle" font-size="10" font-weight="700" fill="#001f5b">${p.etiqueta}</text>` : ""}
+    `;
+  }).join("");
+
+  const labelsEje = `
+    <text x="8" y="${escalaY(maxGraf) + 5}" font-size="10" fill="#001f5b">${Math.round(maxGraf)}</text>
+    <text x="8" y="${escalaY((maxGraf + minGraf) / 2) + 5}" font-size="10" fill="#001f5b">${Math.round((maxGraf + minGraf) / 2)}</text>
+    <text x="8" y="${escalaY(minGraf) + 5}" font-size="10" fill="#001f5b">${Math.round(minGraf)}</text>
+  `;
+
+  return `
+    <svg viewBox="0 0 ${ancho} ${alto}">
+      <rect x="${margenIzq}" y="${yMax}" width="${chartW}" height="${yMin - yMax}" fill="#dff5e7" opacity="0.85"></rect>
+
+      <line x1="${margenIzq}" y1="${yMeta}" x2="${margenIzq + chartW}" y2="${yMeta}" stroke="#0a8a24" stroke-width="2" stroke-dasharray="6,5"></line>
+      <text x="${margenIzq + chartW - 2}" y="${yMeta - 5}" text-anchor="end" font-size="11" font-weight="900" fill="#0a8a24">Meta ${rango.meta} ${unidad}</text>
+
+      <line x1="${margenIzq}" y1="${yMax}" x2="${margenIzq + chartW}" y2="${yMax}" stroke="#0a8a24" stroke-width="1.5" stroke-dasharray="5,5"></line>
+      <line x1="${margenIzq}" y1="${yMin}" x2="${margenIzq + chartW}" y2="${yMin}" stroke="#0a8a24" stroke-width="1.5" stroke-dasharray="5,5"></line>
+      <text x="${margenIzq + chartW - 2}" y="${yMin - 5}" text-anchor="end" font-size="11" font-weight="900" fill="#0a8a24">Rango ${rango.min}-${rango.max}</text>
+
+      ${yCritMin !== null ? `<line x1="${margenIzq}" y1="${yCritMin}" x2="${margenIzq + chartW}" y2="${yCritMin}" stroke="#e00000" stroke-width="2" stroke-dasharray="6,5"></line>` : ""}
+      ${yCritMax !== null ? `<line x1="${margenIzq}" y1="${yCritMax}" x2="${margenIzq + chartW}" y2="${yCritMax}" stroke="#e00000" stroke-width="2" stroke-dasharray="6,5"></line>` : ""}
+
+      ${labelsEje}
+
+      <polyline points="${puntosLinea}" fill="none" stroke="#001f5b" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+
+      ${elementos}
+    </svg>
+  `;
+}
+
+function renderGraficoServicio(titulo, subtitulo, datos, unidad, rango){
+  const ultimo = datos.length ? datos[datos.length - 1].valor : "-";
+  const minimo = datos.length ? Math.min(...datos.map(d => d.valor)) : "-";
+  const maximo = datos.length ? Math.max(...datos.map(d => d.valor)) : "-";
+  const prom = promedio(datos);
+
+  const anterior = datos.length >= 2 ? datos[datos.length - 2].valor : null;
+  const dif = anterior !== null && ultimo !== "-" ? Number((ultimo - anterior).toFixed(1)) : 0;
+  const flecha = dif > 0 ? "⬆" : dif < 0 ? "⬇" : "➡";
+  const tendencia = datos.length >= 2 ? `${flecha} ${dif > 0 ? "+" : ""}${dif} ${unidad}` : "Sin tendencia";
+
+  const estado = estadoValor(ultimo, rango);
+
+  return `
+    <div class="chart-card">
+      <div class="chart-head">
+        <div>
+          <div class="chart-title">${titulo}</div>
+          <div class="chart-sub">${subtitulo}</div>
+        </div>
+        <div class="estado-pill ${estado.clase}">${estado.icono} ${estado.texto}</div>
+      </div>
+
+      ${crearSVGSerie(datos, unidad, rango)}
+
+      <div class="chart-info">
+        <div class="info-box">
+          <div class="info-label">Valor actual</div>
+          <div class="info-value">${ultimo} ${unidad}</div>
+        </div>
+        <div class="info-box">
+          <div class="info-label">Tendencia</div>
+          <div class="info-value">${tendencia}</div>
+        </div>
+        <div class="info-box">
+          <div class="info-label">Promedio</div>
+          <div class="info-value">${prom} ${unidad}</div>
+        </div>
+      </div>
+
+      <div class="chart-values">
+        <span>Min: ${minimo} ${unidad}</span>
+        <span>Último: ${ultimo} ${unidad}</span>
+        <span>Max: ${maximo} ${unidad}</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderServicios(servicios){
+  const contenedor = document.getElementById("graficosServicios");
+
+  const presion = prepararSerieServicios(servicios, "Presion_Aire_SAM");
+  const caudal = prepararSerieServicios(servicios, "Caudal_Aire");
+  const tempChiller = prepararSerieServicios(servicios, "Temperatura_Chiller");
+  const cargaChiller = prepararSerieServicios(servicios, "Carga_Compresores");
+  const presionBombas = prepararSerieServicios(servicios, "Presion_Bombas");
+
+  contenedor.innerHTML = `
+    ${renderGraficoServicio("Presión aire comprimido SAM", "Tendencia según filtro seleccionado", presion, "PSI", RANGOS_SERVICIOS.Presion_Aire_SAM)}
+    ${renderGraficoServicio("Caudal aire comprimido", "CFM total salida sistema de compresores", caudal, "CFM", RANGOS_SERVICIOS.Caudal_Aire)}
+    ${renderGraficoServicio("Temperatura chiller", "Lectura en pantalla del chiller", tempChiller, "°F", RANGOS_SERVICIOS.Temperatura_Chiller)}
+    ${renderGraficoServicio("% carga compresores chiller", "Ocupación de capacidad del chiller", cargaChiller, "%", RANGOS_SERVICIOS.Carga_Compresores)}
+    ${renderGraficoServicio("Presión bombas agua fría", "Presión de agua hacia planta", presionBombas, "PSI", RANGOS_SERVICIOS.Presion_Bombas)}
+  `;
+}
+
+function formatoVacio(valor, unidad){
+  const n = numero(valor);
+  if(n === null) return "-";
+
+  const abs = Math.abs(n);
+  const signo = n < 0 ? "-" : "-";
+  return `${signo}${abs} ${unidad || ""}`.trim();
+}
+
+function semaforoVacio(valor, unidad){
+  const n = Math.abs(numero(valor) || 0);
+  const u = String(unidad || "").toLowerCase();
+
+  if(u.includes("inhg")){
+    if(n >= 15) return "🟢";
+    if(n >= 12) return "🟡";
+    return "🔴";
+  }
+
+  if(u.includes("bar")){
+    if(n >= 0.65) return "🟢";
+    if(n >= 0.50) return "🟡";
+    return "🔴";
+  }
+
+  if(n >= 15) return "🟢";
+  if(n >= 12) return "🟡";
+  return "🔴";
+}
+
+function obtenerUltimoVacioPIAB(piab){
+  const registrosValidos = piab
+    .filter(r => estaEnFiltro(r.Fecha))
+    .filter(r => String(r.BombaInstalada || "").trim().toLowerCase() === "sí" || String(r.BombaInstalada || "").trim().toLowerCase() === "si")
+    .filter(r => r.VacioPIAB !== "" && r.VacioPIAB !== undefined && r.VacioPIAB !== null)
+    .map(r => ({
+      linea: r.PuntoInspeccion || r.Linea || "Sin dato",
+      vacio: numero(r.VacioPIAB),
+      unidad: r.UnidadVacio || "",
+      fechaObj: fechaHoraObj(r.Fecha, r.Hora)
+    }))
+    .filter(r => r.vacio !== null);
+
+  const ultimoPorLinea = {};
+
+  registrosValidos.forEach(r => {
+    const key = r.linea;
+
+    if(!ultimoPorLinea[key] || r.fechaObj > ultimoPorLinea[key].fechaObj){
+      ultimoPorLinea[key] = r;
+    }
+  });
+
+  return Object.values(ultimoPorLinea)
+    .sort((a,b) => Math.abs(a.vacio) - Math.abs(b.vacio));
+}
+
+function renderVacioPIAB(datos){
+  const contenedor = document.getElementById("vacioPIAB");
+  contenedor.innerHTML = "";
+
+  if(datos.length === 0){
+    contenedor.innerHTML = '<div class="vacio">Sin datos PIAB para este filtro.</div>';
+    return;
+  }
+
+  const maxAbs = Math.max(...datos.map(d => Math.abs(Number(d.vacio) || 0)));
+
+  datos.forEach(item => {
+    const porcentaje = maxAbs > 0 ? (Math.abs(item.vacio) / maxAbs) * 100 : 0;
+    const valorTexto = formatoVacio(item.vacio, item.unidad);
+    const sem = semaforoVacio(item.vacio, item.unidad);
+
+    const div = document.createElement("div");
+    div.className = "bar-item";
+
+    div.innerHTML = `
+      <div class="bar-head">
+        <span>${item.linea}</span>
+        <span>${valorTexto} <span class="semaforo">${sem}</span></span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill" style="width:${porcentaje}%;"></div>
+      </div>
+    `;
+
+    contenedor.appendChild(div);
+  });
+}
+
+function actualizarLabels(){
+  const texto = filtroActual === "hoy" ? "hoy" : filtroActual === "semana" ? "semana" : "mes";
+
+  document.getElementById("lblNovedades").innerText = "Novedades " + texto;
+  document.getElementById("lblPIAB").innerText = "Rutas PIAB " + texto;
+  document.getElementById("lblServicios").innerText = "Servicios " + texto;
+  document.getElementById("lblCalentamientos").innerText = "Calentamientos " + texto;
+}
+
+function renderDashboard(){
+  const notificacionesFiltro = BD.notificaciones.filter(n => estaEnFiltro(n.FechaReporte));
+  const piabFiltro = BD.piab.filter(r => estaEnFiltro(r.Fecha));
+  const serviciosFiltro = BD.servicios.filter(r => estaEnFiltro(r.Fecha));
+  const calentamientosFiltro = BD.calentamientos.filter(r => estaEnFiltro(r.Fecha));
+
+  actualizarLabels();
+
+  document.getElementById("kpiNovedadesHoy").innerText = notificacionesFiltro.length;
+  document.getElementById("kpiAbiertas").innerText = notificacionesFiltro.filter(n => esAbierta(n.Estado)).length;
+  document.getElementById("kpiCriticas").innerText = notificacionesFiltro.filter(n =>
+    String(n.Prioridad || "").trim().toLowerCase() === "crítica" && esAbierta(n.Estado)
+  ).length;
+
+  document.getElementById("kpiPIABHoy").innerText = piabFiltro.length;
+  document.getElementById("kpiServiciosHoy").innerText = serviciosFiltro.length;
+  document.getElementById("kpiCalentamientoHoy").innerText = calentamientosFiltro.length;
+
+  renderServicios(BD.servicios);
+  renderBarras("topLineas", ordenarConteo(contarPorCampo(notificacionesFiltro, "Linea"), 10), "fallas");
+  renderRanking("topEquipos", ordenarConteo(contarPorCampo(notificacionesFiltro, "Equipo"), 5), "fallas");
+  renderVacioPIAB(obtenerUltimoVacioPIAB(BD.piab));
+
+  document.getElementById("estadoCarga").innerText = "Información actualizada correctamente.";
+}
+
+function cambiarFiltro(filtro){
+  filtroActual = filtro;
+
+  document.getElementById("btnHoy").classList.remove("activo");
+  document.getElementById("btnSemana").classList.remove("activo");
+  document.getElementById("btnMes").classList.remove("activo");
+
+  if(filtro === "hoy") document.getElementById("btnHoy").classList.add("activo");
+  if(filtro === "semana") document.getElementById("btnSemana").classList.add("activo");
+  if(filtro === "mes") document.getElementById("btnMes").classList.add("activo");
+
+  renderDashboard();
+}
+
+async function cargarDashboard(){
+  try{
+    const [notificaciones, piab, servicios, calentamientos] = await Promise.all([
+      cargarHoja("Notificaciones"),
+      cargarHoja("Rutas_PIAB"),
+      cargarHoja("Rutas_Servicios"),
+      cargarHoja("Rutas_Calentamiento")
+    ]);
+
+    BD.notificaciones = notificaciones;
+    BD.piab = piab;
+    BD.servicios = servicios;
+    BD.calentamientos = calentamientos;
+
+    renderDashboard();
+
+  }catch(error){
+    document.getElementById("estadoCarga").innerText = "Error cargando dashboard: " + error;
+  }
+}
+
+cargarDashboard();
+</script>
+
+</body>
+</html>
