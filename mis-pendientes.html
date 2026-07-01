@@ -17,14 +17,16 @@ h1{font-size:30px;margin-bottom:8px;}
 .subtitle{font-size:17px;opacity:.85;margin-bottom:20px;}
 .info{font-size:16px;opacity:.9;}
 .titulo{font-size:22px;font-weight:900;margin-bottom:8px;}
-.detalle{font-size:16px;margin-top:6px;opacity:.95;}
-.badge{background:white;color:#001f5b;border-radius:14px;padding:12px;margin-top:12px;font-weight:900;}
+.detalle{font-size:16px;margin-top:6px;opacity:.95;line-height:1.35;}
+.badge{background:white;color:#001f5b;border-radius:14px;padding:14px;margin-top:12px;font-weight:900;word-break:break-word;}
 label{display:block;font-weight:bold;font-size:16px;margin-top:14px;margin-bottom:6px;}
 textarea,input{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
 textarea{min-height:90px;}
 button{width:100%;padding:16px;border:none;border-radius:15px;background:white;color:#001f5b;font-size:18px;font-weight:900;margin-top:14px;}
+button:disabled{opacity:.6;}
 .vacio{text-align:center;opacity:.85;margin-top:30px;font-size:17px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
+.estado{display:inline-block;background:white;color:#001f5b;border-radius:12px;padding:8px 12px;font-weight:900;margin-top:10px;}
 </style>
 </head>
 
@@ -40,7 +42,7 @@ button{width:100%;padding:16px;border:none;border-radius:15px;background:white;c
 
 <div class="card">
 <h1>Mis Pendientes</h1>
-<div class="subtitle">Actividades recibidas de otro turno y mantenimientos preventivos asignados</div>
+<div class="subtitle">Actividades recibidas de otro turno y preventivos asignados</div>
 <div class="info" id="tecnico"></div>
 </div>
 
@@ -67,13 +69,17 @@ if(!usuario){
 document.getElementById("tecnico").innerText = usuario.nombre + " - " + usuario.codigo;
 
 function obtenerCampo(obj, nombre){
-  const clave = Object.keys(obj).find(k => k.trim() === nombre);
+  const clave = Object.keys(obj).find(k => k.trim().toLowerCase() === nombre.trim().toLowerCase());
   return clave ? obj[clave] : "";
 }
 
 function formatearFecha(fecha){
   if(!fecha) return "";
-  const texto = String(fecha);
+  const texto = String(fecha).trim();
+
+  if(/^\d{8}$/.test(texto)){
+    return texto.substring(6,8) + "/" + texto.substring(4,6) + "/" + texto.substring(0,4);
+  }
 
   if(texto.includes("T")){
     const d = new Date(texto);
@@ -83,71 +89,52 @@ function formatearFecha(fecha){
   return texto;
 }
 
-async function cargarPendientes(){
+function clavePreventivo(p){
+  return obtenerCampo(p, "ID_Preventivo") || obtenerCampo(p, "Orden");
+}
 
+async function cargarPendientes(){
   const lista = document.getElementById("lista");
 
   try{
-    const respuesta = await fetch(URL_API + "?accion=listar&hoja=Notificaciones");
-    const data = await respuesta.json();
+    const respNoti = await fetch(URL_API + "?accion=listar&hoja=Notificaciones");
+    const dataNoti = await respNoti.json();
 
-    const novedades = data.datos || [];
+    const respPrev = await fetch(URL_API + "?accion=listar&hoja=Preventivos");
+    const dataPrev = await respPrev.json();
 
-    const pendientes = novedades.filter(n =>
+    const novedades = dataNoti.datos || [];
+    const preventivos = dataPrev.datos || [];
+
+    const pendientesCorrectivos = novedades.filter(n =>
       String(obtenerCampo(n, "TecnicoRecibe")).trim() === String(usuario.codigo).trim() &&
       String(obtenerCampo(n, "ActividadTerminada")).trim().toLowerCase() !== "sí" &&
       String(obtenerCampo(n, "ActividadTerminada")).trim().toLowerCase() !== "si"
     );
 
+    const pendientesPreventivos = preventivos.filter(p => {
+      const tecnico = String(obtenerCampo(p, "TecnicoAsignado")).trim();
+      const estado = String(obtenerCampo(p, "Estado")).trim().toLowerCase();
+
+      return (
+        tecnico === String(usuario.codigo).trim() &&
+        (estado === "asignado" || estado === "en ejecución" || estado === "en ejecucion")
+      );
+    });
+
     lista.innerHTML = "";
 
-    if(pendientes.length === 0){
+    if(pendientesCorrectivos.length === 0 && pendientesPreventivos.length === 0){
       lista.innerHTML = '<div class="vacio">No tienes pendientes asignados.</div>';
       return;
     }
 
-    pendientes.reverse().forEach(n => {
-      const id = obtenerCampo(n, "ID_Notificacion");
-      const linea = obtenerCampo(n, "Linea");
-      const equipo = obtenerCampo(n, "Equipo");
-      const area = obtenerCampo(n, "Area");
-      const fecha = obtenerCampo(n, "FechaReporte");
-      const hora = obtenerCampo(n, "Horareporte");
-      const reportadoPor = obtenerCampo(n, "NombreReportadoPor");
-      const descripcion = obtenerCampo(n, "DescripcionFalla");
-      const trabajoPendiente = obtenerCampo(n, "TrabajoPendiente");
-      const prioridad = obtenerCampo(n, "Prioridad");
-      const ordenSAP = obtenerCampo(n, "OrdenSAP") || "Sin orden SAP";
-      const tiempoInicial = obtenerCampo(n, "TiempoParadaInicial") || "0";
+    pendientesCorrectivos.reverse().forEach(n => {
+      lista.appendChild(crearTarjetaCorrectivo(n));
+    });
 
-      const div = document.createElement("div");
-      div.className = "item";
-
-      div.innerHTML = `
-        <div class="titulo">📌 ${linea || ""} - ${equipo || "Equipo no definido"}</div>
-        <div class="detalle"><strong>ID:</strong> ${id}</div>
-        <div class="detalle"><strong>Fecha reporte:</strong> ${formatearFecha(fecha)} ${hora || ""}</div>
-        <div class="detalle"><strong>Área:</strong> ${area || "Sin área"}</div>
-        <div class="detalle"><strong>Reportado por:</strong> ${reportadoPor || ""}</div>
-        <div class="detalle"><strong>Prioridad:</strong> ${prioridad || ""}</div>
-        <div class="detalle"><strong>Orden SAP:</strong> ${ordenSAP}</div>
-        <div class="detalle"><strong>Tiempo inicial reportado:</strong> ${tiempoInicial} min</div>
-        <div class="detalle"><strong>Falla:</strong> ${descripcion || ""}</div>
-
-        <div class="badge">
-          Trabajo pendiente:<br>${trabajoPendiente || "Sin descripción"}
-        </div>
-
-        <label>Tiempo utilizado para terminar (min)</label>
-        <input id="tiempo_${id}" type="number" min="1" step="1" placeholder="Ej: 45">
-
-        <label>Observación de cierre</label>
-        <textarea id="obs_${id}" placeholder="Describa qué se realizó para cerrar el pendiente..."></textarea>
-
-        <button id="btn_${id}" onclick="cerrarPendiente('${id}')">FINALIZAR PENDIENTE</button>
-      `;
-
-      lista.appendChild(div);
+    pendientesPreventivos.reverse().forEach(p => {
+      lista.appendChild(crearTarjetaPreventivo(p));
     });
 
   }catch(error){
@@ -155,8 +142,212 @@ async function cargarPendientes(){
   }
 }
 
-async function cerrarPendiente(id){
+function crearTarjetaCorrectivo(n){
+  const id = obtenerCampo(n, "ID_Notificacion");
+  const linea = obtenerCampo(n, "Linea");
+  const equipo = obtenerCampo(n, "Equipo");
+  const area = obtenerCampo(n, "Area");
+  const fecha = obtenerCampo(n, "FechaReporte");
+  const hora = obtenerCampo(n, "Horareporte");
+  const reportadoPor = obtenerCampo(n, "NombreReportadoPor");
+  const descripcion = obtenerCampo(n, "DescripcionFalla");
+  const trabajoPendiente = obtenerCampo(n, "TrabajoPendiente");
+  const prioridad = obtenerCampo(n, "Prioridad");
+  const ordenSAP = obtenerCampo(n, "OrdenSAP") || "Sin orden SAP";
+  const tiempoInicial = obtenerCampo(n, "TiempoParadaInicial") || "0";
 
+  const div = document.createElement("div");
+  div.className = "item";
+
+  div.innerHTML = `
+    <div class="titulo">📌 ${linea || ""} - ${equipo || "Equipo no definido"}</div>
+    <div class="detalle"><strong>ID:</strong> ${id}</div>
+    <div class="detalle"><strong>Fecha reporte:</strong> ${formatearFecha(fecha)} ${hora || ""}</div>
+    <div class="detalle"><strong>Área:</strong> ${area || "Sin área"}</div>
+    <div class="detalle"><strong>Reportado por:</strong> ${reportadoPor || ""}</div>
+    <div class="detalle"><strong>Prioridad:</strong> ${prioridad || ""}</div>
+    <div class="detalle"><strong>Orden SAP:</strong> ${ordenSAP}</div>
+    <div class="detalle"><strong>Tiempo inicial reportado:</strong> ${tiempoInicial} min</div>
+    <div class="detalle"><strong>Falla:</strong> ${descripcion || ""}</div>
+
+    <div class="badge">
+      Trabajo pendiente:<br>${trabajoPendiente || "Sin descripción"}
+    </div>
+
+    <label>Tiempo utilizado para terminar (min)</label>
+    <input id="tiempo_${id}" type="number" min="1" step="1" placeholder="Ej: 45">
+
+    <label>Observación de cierre</label>
+    <textarea id="obs_${id}" placeholder="Describa qué se realizó para cerrar el pendiente..."></textarea>
+
+    <button id="btn_${id}" onclick="cerrarPendiente('${id}')">FINALIZAR PENDIENTE</button>
+  `;
+
+  return div;
+}
+
+function crearTarjetaPreventivo(p){
+  const id = obtenerCampo(p, "ID_Preventivo");
+  const orden = obtenerCampo(p, "Orden");
+  const clave = clavePreventivo(p);
+  const estado = obtenerCampo(p, "Estado");
+  const fechaInicio = obtenerCampo(p, "Fe.inic.extrema");
+  const fechaFin = obtenerCampo(p, "Fe.fin extrema");
+  const area = obtenerCampo(p, "Area");
+  const linea = obtenerCampo(p, "Linea");
+  const equipo = obtenerCampo(p, "Equipo");
+  const denominacionEquipo = obtenerCampo(p, "DenominaciónEquipo");
+  const denominacionTecnica = obtenerCampo(p, "DenominaciónTecnica");
+  const actividad = obtenerCampo(p, "Actividad") || obtenerCampo(p, "Texto breve");
+
+  const estaEnEjecucion = String(estado).trim().toLowerCase() === "en ejecución" ||
+                          String(estado).trim().toLowerCase() === "en ejecucion";
+
+  const div = document.createElement("div");
+  div.className = "item";
+
+  let controles = "";
+
+  if(!estaEnEjecucion){
+    controles = `
+      <button id="btn_ini_${clave}" onclick="iniciarPreventivo('${id}', '${orden}', '${clave}')">
+        INICIAR PREVENTIVO
+      </button>
+    `;
+  }else{
+    controles = `
+      <label>Tiempo utilizado para ejecutar (min)</label>
+      <input id="tiempo_prev_${clave}" type="number" min="1" step="1" placeholder="Ej: 60">
+
+      <label>Trabajo realizado</label>
+      <textarea id="trabajo_prev_${clave}" placeholder="Describa el trabajo realizado..."></textarea>
+
+      <label>Observaciones</label>
+      <textarea id="obs_prev_${clave}" placeholder="Observaciones adicionales..."></textarea>
+
+      <button id="btn_cerrar_prev_${clave}" onclick="cerrarPreventivo('${id}', '${orden}', '${clave}')">
+        FINALIZAR PREVENTIVO
+      </button>
+    `;
+  }
+
+  div.innerHTML = `
+    <div class="titulo">🗓 Preventivo</div>
+
+    <div class="estado">${estado || "Asignado"}</div>
+
+    <div class="detalle"><strong>Orden SAP:</strong> ${orden || "Sin orden"}</div>
+    <div class="detalle"><strong>Fecha inicio:</strong> ${formatearFecha(fechaInicio)}</div>
+    <div class="detalle"><strong>Fecha fin:</strong> ${formatearFecha(fechaFin)}</div>
+    <div class="detalle"><strong>Área:</strong> ${area || "Sin área"}</div>
+    <div class="detalle"><strong>Línea:</strong> ${linea || "Sin línea"}</div>
+    <div class="detalle"><strong>Equipo:</strong> ${equipo || "Sin equipo"}</div>
+    <div class="detalle"><strong>Denominación equipo:</strong> ${denominacionEquipo || ""}</div>
+    <div class="detalle"><strong>Denominación técnica:</strong> ${denominacionTecnica || ""}</div>
+
+    <div class="badge">
+      Actividad:<br>${actividad || "Sin actividad definida"}
+    </div>
+
+    ${controles}
+  `;
+
+  return div;
+}
+
+async function iniciarPreventivo(id, orden, clave){
+  const btn = document.getElementById("btn_ini_" + clave);
+
+  const confirmar = confirm("¿Confirma iniciar este preventivo?");
+  if(!confirmar) return;
+
+  btn.disabled = true;
+  btn.innerText = "INICIANDO...";
+
+  try{
+    const datos = {
+      accion: "iniciar_preventivo",
+      ID_Preventivo: id,
+      Orden: orden,
+      TecnicoEjecutor: usuario.codigo,
+      NombreTecnicoEjecutor: usuario.nombre
+    };
+
+    const params = new URLSearchParams(datos);
+    const respuesta = await fetch(URL_API + "?" + params.toString());
+    const resultado = await respuesta.json();
+
+    if(resultado.ok){
+      alert("Preventivo iniciado correctamente.");
+      cargarPendientes();
+    }else{
+      alert("Error: " + resultado.mensaje);
+      btn.disabled = false;
+      btn.innerText = "INICIAR PREVENTIVO";
+    }
+
+  }catch(error){
+    alert("Error iniciando preventivo: " + error);
+    btn.disabled = false;
+    btn.innerText = "INICIAR PREVENTIVO";
+  }
+}
+
+async function cerrarPreventivo(id, orden, clave){
+  const tiempo = document.getElementById("tiempo_prev_" + clave).value.trim();
+  const trabajo = document.getElementById("trabajo_prev_" + clave).value.trim();
+  const obs = document.getElementById("obs_prev_" + clave).value.trim();
+  const btn = document.getElementById("btn_cerrar_prev_" + clave);
+
+  if(!tiempo || Number(tiempo) <= 0){
+    alert("Debe ingresar el tiempo utilizado en minutos.");
+    return;
+  }
+
+  if(!trabajo){
+    alert("Debe escribir el trabajo realizado.");
+    return;
+  }
+
+  const confirmar = confirm("¿Confirma finalizar este preventivo?");
+  if(!confirmar) return;
+
+  btn.disabled = true;
+  btn.innerText = "CERRANDO...";
+
+  try{
+    const datos = {
+      accion: "cerrar_preventivo",
+      ID_Preventivo: id,
+      Orden: orden,
+      TrabajoRealizado: trabajo,
+      Observaciones: obs,
+      TiempoEjecucionMin: tiempo,
+      TecnicoEjecutor: usuario.codigo,
+      NombreTecnicoEjecutor: usuario.nombre
+    };
+
+    const params = new URLSearchParams(datos);
+    const respuesta = await fetch(URL_API + "?" + params.toString());
+    const resultado = await respuesta.json();
+
+    if(resultado.ok){
+      alert("Preventivo cerrado correctamente.");
+      cargarPendientes();
+    }else{
+      alert("Error: " + resultado.mensaje);
+      btn.disabled = false;
+      btn.innerText = "FINALIZAR PREVENTIVO";
+    }
+
+  }catch(error){
+    alert("Error cerrando preventivo: " + error);
+    btn.disabled = false;
+    btn.innerText = "FINALIZAR PREVENTIVO";
+  }
+}
+
+async function cerrarPendiente(id){
   const obs = document.getElementById("obs_" + id).value.trim();
   const tiempo = document.getElementById("tiempo_" + id).value.trim();
   const btn = document.getElementById("btn_" + id);
@@ -172,9 +363,7 @@ async function cerrarPendiente(id){
   }
 
   const confirmar = confirm("¿Confirma que este pendiente ya fue finalizado?");
-  if(!confirmar){
-    return;
-  }
+  if(!confirmar) return;
 
   btn.disabled = true;
   btn.innerText = "CERRANDO...";
