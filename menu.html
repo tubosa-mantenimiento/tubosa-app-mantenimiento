@@ -8,11 +8,14 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 body{min-height:100vh;background:#001f5b;color:white;padding:22px;}
-.container{max-width:520px;margin:auto;}
+.container{max-width:620px;margin:auto;}
 .logo{text-align:center;font-size:50px;font-weight:900;margin:18px 0 26px;}
-.card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:20px;}
-.user-card h1{font-size:28px;margin-bottom:12px;}
-.info{font-size:18px;margin:7px 0;opacity:.95;}
+.card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:24px;margin-bottom:20px;}
+.user-card h1{font-size:30px;margin-bottom:18px;}
+.user-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px;}
+.user-item{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px;}
+.user-label{font-size:14px;opacity:.75;margin-bottom:5px;}
+.user-value{font-size:18px;font-weight:900;line-height:1.2;}
 .menu-card{display:flex;align-items:center;justify-content:space-between;background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:22px;padding:22px;margin-bottom:16px;color:white;text-decoration:none;}
 .menu-left{display:flex;align-items:center;gap:18px;}
 .icon{font-size:34px;width:42px;text-align:center;}
@@ -21,6 +24,10 @@ body{min-height:100vh;background:#001f5b;color:white;padding:22px;}
 .arrow{font-size:34px;font-weight:900;}
 .logout{margin-top:24px;background:white;color:#001f5b;justify-content:center;font-size:20px;font-weight:900;}
 .footer{text-align:center;opacity:.7;font-size:14px;margin-top:26px;}
+
+@media(max-width:430px){
+  .user-grid{grid-template-columns:1fr;}
+}
 </style>
 </head>
 
@@ -31,11 +38,29 @@ body{min-height:100vh;background:#001f5b;color:white;padding:22px;}
   <div class="logo">TUBOSA</div>
 
   <div class="card user-card">
-    <h1 id="bienvenida">¡Bienvenido!</h1>
-    <div class="info" id="nombre"></div>
-    <div class="info" id="turno"></div>
-    <div class="info" id="area"></div>
-    <div class="info" id="rol"></div>
+    <h1>¡Bienvenido!</h1>
+
+    <div class="user-grid">
+      <div class="user-item">
+        <div class="user-label">Nombre</div>
+        <div class="user-value" id="nombre"></div>
+      </div>
+
+      <div class="user-item">
+        <div class="user-label">Turno / Cargo</div>
+        <div class="user-value" id="turno"></div>
+      </div>
+
+      <div class="user-item">
+        <div class="user-label">Área</div>
+        <div class="user-value" id="area"></div>
+      </div>
+
+      <div class="user-item">
+        <div class="user-label">Rol</div>
+        <div class="user-value" id="rol"></div>
+      </div>
+    </div>
   </div>
 
   <a class="menu-card" href="notificacion.html">
@@ -133,10 +158,10 @@ if(!usuario){
   window.location.href = "index.html";
 }
 
-document.getElementById("nombre").innerText = usuario.nombre;
-document.getElementById("turno").innerText = usuario.turno;
-document.getElementById("area").innerText = "Área: " + usuario.area;
-document.getElementById("rol").innerText = "Rol: " + usuario.rol;
+document.getElementById("nombre").innerText = usuario.nombre || "";
+document.getElementById("turno").innerText = usuario.turno || "";
+document.getElementById("area").innerText = usuario.area || "";
+document.getElementById("rol").innerText = usuario.rol || "";
 
 function cerrarSesion(){
   localStorage.removeItem("usuarioActivo");
