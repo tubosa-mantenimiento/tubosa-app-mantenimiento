@@ -8,38 +8,46 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
 body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
-.container{max-width:760px;margin:auto;}
+.container{max-width:780px;margin:auto;}
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
 .back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
 .logo{font-size:46px;font-weight:900;}
+
 .card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:22px;margin-bottom:18px;}
 h1{font-size:30px;margin-bottom:8px;}
 h2{font-size:24px;margin-bottom:14px;}
 .subtitle{font-size:17px;opacity:.85;margin-bottom:14px;}
 .info{font-size:16px;opacity:.9;}
+
 .filtros{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;}
 .filtros button{padding:14px;border:none;border-radius:14px;background:white;color:#001f5b;font-size:16px;font-weight:900;}
 .filtros button.activo{background:#dbe4f5;}
-.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
-.kpi{background:white;color:#001f5b;border-radius:20px;padding:16px;}
-.kpi-num{font-size:34px;font-weight:900;line-height:1;}
-.kpi-label{font-size:13px;font-weight:bold;margin-top:6px;opacity:.85;}
+
 .main-kpi{background:white;color:#001f5b;border-radius:24px;padding:22px;margin-bottom:18px;}
 .main-title{font-size:18px;font-weight:900;}
 .main-num{font-size:46px;font-weight:900;margin-top:8px;}
 .progress-bg{width:100%;height:18px;background:#dbe4f5;border-radius:20px;overflow:hidden;margin-top:14px;}
 .progress-fill{height:100%;background:#001f5b;border-radius:20px;}
-.bar-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
-.bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;gap:10px;}
-.bar-bg{width:100%;height:16px;background:#dbe4f5;border-radius:20px;overflow:hidden;}
-.bar-fill{height:100%;background:#001f5b;border-radius:20px;}
+
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;}
+.kpi{background:white;color:#001f5b;border-radius:20px;padding:16px;}
+.kpi-num{font-size:34px;font-weight:900;line-height:1;}
+.kpi-label{font-size:13px;font-weight:bold;margin-top:6px;opacity:.85;}
+
 .estado-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .estado-card{background:white;color:#001f5b;border-radius:18px;padding:16px;}
 .estado-title{font-size:14px;font-weight:900;opacity:.8;}
 .estado-num{font-size:32px;font-weight:900;margin-top:6px;}
-.vencido-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
-.vencido-title{font-size:16px;font-weight:900;}
-.vencido-det{font-size:13px;margin-top:5px;opacity:.85;}
+
+.bar-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
+.bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900;gap:10px;}
+.bar-bg{width:100%;height:16px;background:#dbe4f5;border-radius:20px;overflow:hidden;}
+.bar-fill{height:100%;background:#001f5b;border-radius:20px;}
+
+.item-alerta{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
+.item-title{font-size:16px;font-weight:900;}
+.item-det{font-size:13px;margin-top:5px;opacity:.85;}
+
 .vacio{text-align:center;opacity:.85;margin-top:12px;font-size:16px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
 </style>
@@ -57,7 +65,7 @@ h2{font-size:24px;margin-bottom:14px;}
 
   <div class="card">
     <h1>Dashboard Preventivos</h1>
-    <div class="subtitle">Control de programación, asignación, ejecución y backlog preventivo</div>
+    <div class="subtitle">Control de programación, asignación, ejecución, cumplimiento y backlog preventivo</div>
     <div class="info" id="estadoCarga">Cargando información...</div>
 
     <div class="filtros">
@@ -82,7 +90,9 @@ h2{font-size:24px;margin-bottom:14px;}
     <div class="kpi"><div class="kpi-num" id="kpiEjecucion">0</div><div class="kpi-label">En ejecución</div></div>
     <div class="kpi"><div class="kpi-num" id="kpiEjecutados">0</div><div class="kpi-label">Ejecutados</div></div>
     <div class="kpi"><div class="kpi-num" id="kpiVencidos">0</div><div class="kpi-label">Vencidos</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiPorVencer">0</div><div class="kpi-label">Próximos a vencer</div></div>
     <div class="kpi"><div class="kpi-num" id="kpiBacklog">0</div><div class="kpi-label">Backlog activo</div></div>
+    <div class="kpi"><div class="kpi-num" id="kpiReprogramados">0</div><div class="kpi-label">Reprogramados</div></div>
     <div class="kpi"><div class="kpi-num" id="kpiPromTiempo">0</div><div class="kpi-label">Promedio ejecución min</div></div>
   </div>
 
@@ -112,28 +122,44 @@ h2{font-size:24px;margin-bottom:14px;}
   </div>
 
   <div class="card">
-    <h2>Últimos preventivos vencidos</h2>
+    <h2>Preventivos por línea</h2>
+    <div id="preventivosLinea"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Próximos a vencer</h2>
+    <div id="proximosVencer"><div class="vacio">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Preventivos vencidos</h2>
     <div id="listaVencidos"><div class="vacio">Cargando...</div></div>
   </div>
 
-  <div class="footer">
-    TUBOSA - Sistema de Mantenimiento<br>
-    Versión 1.0
+  <div class="card">
+    <h2>Reprogramaciones</h2>
+    <div id="listaReprogramados"><div class="vacio">Cargando...</div></div>
   </div>
-
-</div>
-
-<script>
+  <script>
 const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
 
 const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
-if(!usuario){ window.location.href = "index.html"; }
+
+if(!usuario){
+  window.location.href = "index.html";
+}
 
 let filtroActual = "hoy";
 let preventivos = [];
 
+//===========================
+// UTILIDADES GENERALES
+//===========================
+
 function obtenerCampo(obj, nombre){
-  const clave = Object.keys(obj).find(k => k.trim().toLowerCase() === nombre.trim().toLowerCase());
+  const clave = Object.keys(obj).find(k => 
+    k.trim().toLowerCase() === nombre.trim().toLowerCase()
+  );
   return clave ? obj[clave] : "";
 }
 
@@ -142,7 +168,7 @@ function normalizar(v){
     .trim()
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g,"");
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
 function numero(v){
@@ -153,7 +179,7 @@ function numero(v){
 
 function promedio(arr){
   if(!arr.length) return 0;
-  return Math.round(arr.reduce((a,b)=>a+b,0) / arr.length);
+  return Math.round(arr.reduce((a,b) => a + b, 0) / arr.length);
 }
 
 function fechaISO(fechaTexto){
@@ -188,6 +214,12 @@ function fechaISO(fechaTexto){
   return isNaN(d) ? null : d;
 }
 
+function formatearFecha(fechaTexto){
+  const f = fechaISO(fechaTexto);
+  if(!f || isNaN(f)) return fechaTexto || "";
+  return f.toLocaleDateString("es-CO");
+}
+
 function estaEnFiltro(fechaTexto){
   const fecha = fechaISO(fechaTexto);
   if(!fecha || isNaN(fecha)) return false;
@@ -217,28 +249,43 @@ function estaEnFiltro(fechaTexto){
   return true;
 }
 
+async function cargarHoja(nombreHoja){
+  const respuesta = await fetch(URL_API + "?accion=listar&hoja=" + encodeURIComponent(nombreHoja));
+  const data = await respuesta.json();
+  return data.datos || [];
+}
+
+//===========================
+// LÓGICA DE PREVENTIVOS
+//===========================
+
 function fechaReferencia(p){
-  return obtenerCampo(p,"FechaEjecucion") ||
-         obtenerCampo(p,"FechaAsignacion") ||
-         obtenerCampo(p,"Fe.inic.extrema") ||
-         obtenerCampo(p,"Fe.fin extrema");
+  return obtenerCampo(p, "FechaEjecucion") ||
+         obtenerCampo(p, "FechaAsignacion") ||
+         obtenerCampo(p, "Fe.inic.extrema") ||
+         obtenerCampo(p, "Fe.fin extrema");
 }
 
 function fechaFinPreventivo(p){
-  return obtenerCampo(p,"Fe.fin extrema") || obtenerCampo(p,"Fe.inic.extrema");
+  return obtenerCampo(p, "Fe.fin extrema") ||
+         obtenerCampo(p, "Fe.inic.extrema");
 }
 
 function estadoPreventivo(p){
-  const e = normalizar(obtenerCampo(p,"Estado"));
+  const estado = normalizar(obtenerCampo(p, "Estado"));
+  const estadoEjecucion = normalizar(obtenerCampo(p, "EstadoEjecucion"));
 
-  if(e === "" || e === "programado" || e === "pendiente de asignacion") return "pendiente";
-  if(e === "asignado") return "asignado";
-  if(e === "en ejecucion") return "ejecucion";
-  if(e === "ejecutado") return "ejecutado";
-  if(e === "cancelado") return "cancelado";
-  if(e === "reprogramado") return "reprogramado";
+  if(estadoEjecucion === "en ejecucion") return "ejecucion";
+  if(estadoEjecucion === "ejecutado") return "ejecutado";
 
-  return e || "pendiente";
+  if(estado === "" || estado === "programado" || estado.includes("pendiente")) return "pendiente";
+  if(estado === "asignado") return "asignado";
+  if(estado.includes("ejecucion")) return "ejecucion";
+  if(estado === "ejecutado") return "ejecutado";
+  if(estado === "cancelado") return "cancelado";
+  if(estado === "reprogramado") return "reprogramado";
+
+  return estado || "pendiente";
 }
 
 function esActivo(p){
@@ -246,78 +293,136 @@ function esActivo(p){
   return ["pendiente","asignado","ejecucion","reprogramado"].includes(e);
 }
 
-function esVencido(p){
-  if(estadoPreventivo(p) === "ejecutado" || estadoPreventivo(p) === "cancelado") return false;
+function esEjecutado(p){
+  return estadoPreventivo(p) === "ejecutado";
+}
 
-  const f = fechaISO(fechaFinPreventivo(p));
-  if(!f || isNaN(f)) return false;
+function esVencido(p){
+  if(esEjecutado(p) || estadoPreventivo(p) === "cancelado") return false;
+
+  const fecha = fechaISO(fechaFinPreventivo(p));
+  if(!fecha || isNaN(fecha)) return false;
 
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
 
-  f.setHours(0,0,0,0);
+  fecha.setHours(0,0,0,0);
 
-  return f < hoy;
+  return fecha < hoy;
 }
 
-async function cargarHoja(nombreHoja){
-  const respuesta = await fetch(URL_API + "?accion=listar&hoja=" + encodeURIComponent(nombreHoja));
-  const data = await respuesta.json();
-  return data.datos || [];
+function diasAtraso(p){
+  const fecha = fechaISO(fechaFinPreventivo(p));
+  if(!fecha || isNaN(fecha)) return 0;
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  fecha.setHours(0,0,0,0);
+
+  return Math.max(0, Math.round((hoy - fecha) / (1000*60*60*24)));
 }
 
-function contarPorEstado(datos){
-  return {
-    pendiente: datos.filter(p => estadoPreventivo(p) === "pendiente").length,
-    asignado: datos.filter(p => estadoPreventivo(p) === "asignado").length,
-    ejecucion: datos.filter(p => estadoPreventivo(p) === "ejecucion").length,
-    ejecutado: datos.filter(p => estadoPreventivo(p) === "ejecutado").length
-  };
+function esProximoAVencer(p){
+  if(esEjecutado(p) || estadoPreventivo(p) === "cancelado") return false;
+
+  const fecha = fechaISO(fechaFinPreventivo(p));
+  if(!fecha || isNaN(fecha)) return false;
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  fecha.setHours(0,0,0,0);
+
+  const dias = Math.round((fecha - hoy) / (1000*60*60*24));
+  return dias >= 0 && dias <= 3;
 }
+
+function diasParaVencer(p){
+  const fecha = fechaISO(fechaFinPreventivo(p));
+  if(!fecha || isNaN(fecha)) return 0;
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  fecha.setHours(0,0,0,0);
+
+  return Math.round((fecha - hoy) / (1000*60*60*24));
+}
+
+function esReprogramado(p){
+  return (
+    estadoPreventivo(p) === "reprogramado" ||
+    String(obtenerCampo(p, "FechaReprogramacion") || "").trim() !== "" ||
+    String(obtenerCampo(p, "MotivoReprogramacion") || "").trim() !== ""
+  );
+}
+    //===========================
+// RENDER PRINCIPAL
+//===========================
 
 function renderDashboard(){
   const datosPeriodo = preventivos.filter(p => estaEnFiltro(fechaReferencia(p)));
-  const ejecutados = datosPeriodo.filter(p => estadoPreventivo(p) === "ejecutado");
-  const activos = preventivos.filter(esActivo);
-  const vencidos = preventivos.filter(esVencido);
 
-  const pendientesAsignacion = preventivos.filter(p => estadoPreventivo(p) === "pendiente");
+  const pendientes = preventivos.filter(p => estadoPreventivo(p) === "pendiente");
   const asignados = preventivos.filter(p => estadoPreventivo(p) === "asignado");
-  const ejecucion = preventivos.filter(p => estadoPreventivo(p) === "ejecucion");
+  const enEjecucion = preventivos.filter(p => estadoPreventivo(p) === "ejecucion");
+  const ejecutadosPeriodo = datosPeriodo.filter(esEjecutado);
 
-  const baseCumplimiento = datosPeriodo.filter(p => ["pendiente","asignado","ejecucion","ejecutado"].includes(estadoPreventivo(p)));
-  const cumplimiento = baseCumplimiento.length > 0 ? Math.round((ejecutados.length / baseCumplimiento.length) * 100) : 0;
+  const vencidos = preventivos.filter(esVencido);
+  const proximos = preventivos.filter(esProximoAVencer);
+  const activos = preventivos.filter(esActivo);
+  const reprogramados = preventivos.filter(esReprogramado);
 
-  const tiempos = ejecutados.map(p => numero(obtenerCampo(p,"TiempoEjecucionMin"))).filter(n => n > 0);
+  const baseCumplimiento = datosPeriodo.filter(p => {
+    const e = estadoPreventivo(p);
+    return ["pendiente","asignado","ejecucion","ejecutado"].includes(e);
+  });
 
-  document.getElementById("kpiCargados").innerText = datosPeriodo.length;
-  document.getElementById("kpiPendAsignacion").innerText = pendientesAsignacion.length;
-  document.getElementById("kpiAsignados").innerText = asignados.length;
-  document.getElementById("kpiEjecucion").innerText = ejecucion.length;
-  document.getElementById("kpiEjecutados").innerText = ejecutados.length;
-  document.getElementById("kpiVencidos").innerText = vencidos.length;
-  document.getElementById("kpiBacklog").innerText = activos.length;
-  document.getElementById("kpiPromTiempo").innerText = promedio(tiempos);
+  const cumplimiento = baseCumplimiento.length > 0
+    ? Math.round((ejecutadosPeriodo.length / baseCumplimiento.length) * 100)
+    : 0;
+
+  const tiempos = ejecutadosPeriodo
+    .map(p => numero(obtenerCampo(p, "TiempoEjecucionMin")))
+    .filter(n => n > 0);
 
   document.getElementById("kpiCumplimiento").innerText = cumplimiento + "%";
   document.getElementById("barraCumplimiento").style.width = cumplimiento + "%";
 
-  const estados = contarPorEstado(preventivos);
-  document.getElementById("estadoPendiente").innerText = estados.pendiente;
-  document.getElementById("estadoAsignado").innerText = estados.asignado;
-  document.getElementById("estadoEjecucion").innerText = estados.ejecucion;
-  document.getElementById("estadoEjecutado").innerText = estados.ejecutado;
+  document.getElementById("kpiCargados").innerText = datosPeriodo.length;
+  document.getElementById("kpiPendAsignacion").innerText = pendientes.length;
+  document.getElementById("kpiAsignados").innerText = asignados.length;
+  document.getElementById("kpiEjecucion").innerText = enEjecucion.length;
+  document.getElementById("kpiEjecutados").innerText = ejecutadosPeriodo.length;
+  document.getElementById("kpiVencidos").innerText = vencidos.length;
+  document.getElementById("kpiPorVencer").innerText = proximos.length;
+  document.getElementById("kpiBacklog").innerText = activos.length;
+  document.getElementById("kpiReprogramados").innerText = reprogramados.length;
+  document.getElementById("kpiPromTiempo").innerText = promedio(tiempos);
+
+  document.getElementById("estadoPendiente").innerText = pendientes.length;
+  document.getElementById("estadoAsignado").innerText = asignados.length;
+  document.getElementById("estadoEjecucion").innerText = enEjecucion.length;
+  document.getElementById("estadoEjecutado").innerText = preventivos.filter(esEjecutado).length;
 
   renderCumplimientoArea(datosPeriodo);
   renderPreventivosTecnico(datosPeriodo);
   renderBacklogArea(activos);
+  renderPreventivosLinea(datosPeriodo);
+  renderProximosVencer(proximos);
   renderVencidos(vencidos);
+  renderReprogramaciones(reprogramados);
 
   document.getElementById("estadoCarga").innerText = "Información actualizada correctamente.";
 }
 
-function renderBarras(contenedorId, datos, sufijo){
-  const contenedor = document.getElementById(contenedorId);
+//===========================
+// BARRAS
+//===========================
+
+function renderBarras(idContenedor, datos, sufijo){
+  const contenedor = document.getElementById(idContenedor);
   contenedor.innerHTML = "";
 
   if(datos.length === 0){
@@ -347,24 +452,36 @@ function renderBarras(contenedorId, datos, sufijo){
   });
 }
 
+//===========================
+// GRÁFICAS / SECCIONES
+//===========================
+
 function renderCumplimientoArea(datos){
   const areas = {};
 
   datos.forEach(p => {
-    const area = obtenerCampo(p,"Area") || "Sin área";
-    if(!areas[area]) areas[area] = {total:0, ejecutados:0};
+    const area = obtenerCampo(p, "Area") || "Sin área";
+
+    if(!areas[area]){
+      areas[area] = {total:0, ejecutados:0};
+    }
 
     const e = estadoPreventivo(p);
+
     if(["pendiente","asignado","ejecucion","ejecutado"].includes(e)){
       areas[area].total++;
-      if(e === "ejecutado") areas[area].ejecutados++;
+      if(e === "ejecutado"){
+        areas[area].ejecutados++;
+      }
     }
   });
 
-  const salida = Object.entries(areas).map(([area,d]) => ({
-    nombre: area,
-    valor: d.total > 0 ? Math.round((d.ejecutados / d.total) * 100) : 0
-  })).sort((a,b) => b.valor - a.valor);
+  const salida = Object.entries(areas)
+    .map(([nombre,d]) => ({
+      nombre,
+      valor: d.total > 0 ? Math.round((d.ejecutados / d.total) * 100) : 0
+    }))
+    .sort((a,b) => b.valor - a.valor);
 
   renderBarras("cumplimientoArea", salida, "%");
 }
@@ -374,17 +491,17 @@ function renderPreventivosTecnico(datos){
 
   datos.forEach(p => {
     const tecnico =
-      obtenerCampo(p,"NombreTecnicoAsignado") ||
-      obtenerCampo(p,"NombreTecnicoEjecutor") ||
-      obtenerCampo(p,"TecnicoAsignado") ||
-      obtenerCampo(p,"TecnicoEjecutor") ||
+      obtenerCampo(p, "NombreTecnicoAsignado") ||
+      obtenerCampo(p, "NombreTecnicoEjecutor") ||
+      obtenerCampo(p, "TecnicoAsignado") ||
+      obtenerCampo(p, "TecnicoEjecutor") ||
       "Sin técnico";
 
     tecnicos[tecnico] = (tecnicos[tecnico] || 0) + 1;
   });
 
   const salida = Object.entries(tecnicos)
-    .map(([nombre,valor]) => ({nombre,valor}))
+    .map(([nombre,valor]) => ({nombre, valor}))
     .sort((a,b) => b.valor - a.valor)
     .slice(0,10);
 
@@ -395,26 +512,70 @@ function renderBacklogArea(activos){
   const areas = {};
 
   activos.forEach(p => {
-    const area = obtenerCampo(p,"Area") || "Sin área";
+    const area = obtenerCampo(p, "Area") || "Sin área";
     areas[area] = (areas[area] || 0) + 1;
   });
 
   const salida = Object.entries(areas)
-    .map(([nombre,valor]) => ({nombre,valor}))
+    .map(([nombre,valor]) => ({nombre, valor}))
     .sort((a,b) => b.valor - a.valor);
 
   renderBarras("backlogArea", salida, "");
 }
 
-function diasAtraso(p){
-  const f = fechaISO(fechaFinPreventivo(p));
-  if(!f || isNaN(f)) return 0;
+function renderPreventivosLinea(datos){
+  const lineas = {};
 
-  const hoy = new Date();
-  hoy.setHours(0,0,0,0);
-  f.setHours(0,0,0,0);
+  datos.forEach(p => {
+    const linea = obtenerCampo(p, "Linea") || "Sin línea";
+    lineas[linea] = (lineas[linea] || 0) + 1;
+  });
 
-  return Math.max(0, Math.round((hoy - f) / (1000*60*60*24)));
+  const salida = Object.entries(lineas)
+    .map(([nombre,valor]) => ({nombre, valor}))
+    .sort((a,b) => b.valor - a.valor)
+    .slice(0,10);
+
+  renderBarras("preventivosLinea", salida, "");
+}
+    //===========================
+// LISTAS EJECUTIVAS
+//===========================
+
+function renderProximosVencer(proximos){
+  const contenedor = document.getElementById("proximosVencer");
+  contenedor.innerHTML = "";
+
+  if(proximos.length === 0){
+    contenedor.innerHTML = '<div class="vacio">No hay preventivos próximos a vencer.</div>';
+    return;
+  }
+
+  proximos
+    .sort((a,b) => diasParaVencer(a) - diasParaVencer(b))
+    .slice(0,10)
+    .forEach(p => {
+      const orden = obtenerCampo(p,"Orden") || "Sin orden";
+      const area = obtenerCampo(p,"Area") || "Sin área";
+      const linea = obtenerCampo(p,"Linea") || "Sin línea";
+      const equipo = obtenerCampo(p,"Equipo") || obtenerCampo(p,"DenominaciónEquipo") || "Sin equipo";
+      const tecnico = obtenerCampo(p,"NombreTecnicoAsignado") || obtenerCampo(p,"TecnicoAsignado") || "Sin técnico";
+      const dias = diasParaVencer(p);
+      const fecha = formatearFecha(fechaFinPreventivo(p));
+
+      const div = document.createElement("div");
+      div.className = "item-alerta";
+
+      div.innerHTML = `
+        <div class="item-title">🟡 Orden SAP ${orden} · vence en ${dias} días</div>
+        <div class="item-det"><strong>Fecha límite:</strong> ${fecha}</div>
+        <div class="item-det"><strong>Área / Línea:</strong> ${area} · ${linea}</div>
+        <div class="item-det"><strong>Equipo:</strong> ${equipo}</div>
+        <div class="item-det"><strong>Técnico:</strong> ${tecnico}</div>
+      `;
+
+      contenedor.appendChild(div);
+    });
 }
 
 function renderVencidos(vencidos){
@@ -432,23 +593,64 @@ function renderVencidos(vencidos){
     .forEach(p => {
       const orden = obtenerCampo(p,"Orden") || "Sin orden";
       const area = obtenerCampo(p,"Area") || "Sin área";
+      const linea = obtenerCampo(p,"Linea") || "Sin línea";
       const equipo = obtenerCampo(p,"Equipo") || obtenerCampo(p,"DenominaciónEquipo") || "Sin equipo";
       const tecnico = obtenerCampo(p,"NombreTecnicoAsignado") || obtenerCampo(p,"TecnicoAsignado") || "Sin técnico";
       const dias = diasAtraso(p);
+      const fecha = formatearFecha(fechaFinPreventivo(p));
 
       const div = document.createElement("div");
-      div.className = "vencido-item";
+      div.className = "item-alerta";
 
       div.innerHTML = `
-        <div class="vencido-title">Orden SAP ${orden} · ${dias} días atraso</div>
-        <div class="vencido-det"><strong>Área:</strong> ${area}</div>
-        <div class="vencido-det"><strong>Equipo:</strong> ${equipo}</div>
-        <div class="vencido-det"><strong>Técnico:</strong> ${tecnico}</div>
+        <div class="item-title">🔴 Orden SAP ${orden} · ${dias} días atraso</div>
+        <div class="item-det"><strong>Fecha límite:</strong> ${fecha}</div>
+        <div class="item-det"><strong>Área / Línea:</strong> ${area} · ${linea}</div>
+        <div class="item-det"><strong>Equipo:</strong> ${equipo}</div>
+        <div class="item-det"><strong>Técnico:</strong> ${tecnico}</div>
       `;
 
       contenedor.appendChild(div);
     });
 }
+
+function renderReprogramaciones(reprogramados){
+  const contenedor = document.getElementById("listaReprogramados");
+  contenedor.innerHTML = "";
+
+  if(reprogramados.length === 0){
+    contenedor.innerHTML = '<div class="vacio">No hay preventivos reprogramados.</div>';
+    return;
+  }
+
+  reprogramados
+    .slice(0,10)
+    .forEach(p => {
+      const orden = obtenerCampo(p,"Orden") || "Sin orden";
+      const area = obtenerCampo(p,"Area") || "Sin área";
+      const linea = obtenerCampo(p,"Linea") || "Sin línea";
+      const tecnico = obtenerCampo(p,"NombreTecnicoAsignado") || obtenerCampo(p,"TecnicoAsignado") || "Sin técnico";
+      const fecha = formatearFecha(obtenerCampo(p,"FechaReprogramacion"));
+      const motivo = obtenerCampo(p,"MotivoReprogramacion") || "Sin motivo registrado";
+
+      const div = document.createElement("div");
+      div.className = "item-alerta";
+
+      div.innerHTML = `
+        <div class="item-title">🟠 Orden SAP ${orden} · Reprogramado</div>
+        <div class="item-det"><strong>Fecha reprogramación:</strong> ${fecha}</div>
+        <div class="item-det"><strong>Área / Línea:</strong> ${area} · ${linea}</div>
+        <div class="item-det"><strong>Técnico:</strong> ${tecnico}</div>
+        <div class="item-det"><strong>Motivo:</strong> ${motivo}</div>
+      `;
+
+      contenedor.appendChild(div);
+    });
+}
+
+//===========================
+// FILTROS
+//===========================
 
 function cambiarFiltro(filtro){
   filtroActual = filtro;
@@ -464,6 +666,10 @@ function cambiarFiltro(filtro){
   renderDashboard();
 }
 
+//===========================
+// CARGA INICIAL
+//===========================
+
 async function cargarDashboard(){
   try{
     preventivos = await cargarHoja("Preventivos");
@@ -475,6 +681,13 @@ async function cargarDashboard(){
 
 cargarDashboard();
 </script>
+
+  <div class="footer">
+    TUBOSA - Sistema de Mantenimiento<br>
+    Versión 1.0
+  </div>
+
+</div>
 
 </body>
 </html>
