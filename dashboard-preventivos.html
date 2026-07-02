@@ -183,35 +183,79 @@ function promedio(arr){
 }
 
 function fechaISO(fechaTexto){
-  if(!fechaTexto) return null;
-  if(fechaTexto instanceof Date) return fechaTexto;
 
-  const texto = String(fechaTexto).trim();
+    if(!fechaTexto) return null;
 
-  if(/^\d{8}$/.test(texto)){
-    const y = texto.substring(0,4);
-    const m = texto.substring(4,6);
-    const d = texto.substring(6,8);
-    return new Date(`${y}-${m}-${d}T00:00:00`);
-  }
-
-  if(texto.includes("T")){
-    const d = new Date(texto);
-    if(!isNaN(d)) return d;
-  }
-
-  if(texto.includes("/")){
-    const partes = texto.split("/");
-    if(partes.length === 3){
-      const dia = partes[0].padStart(2,"0");
-      const mes = partes[1].padStart(2,"0");
-      const anio = partes[2];
-      return new Date(`${anio}-${mes}-${dia}T00:00:00`);
+    if(fechaTexto instanceof Date){
+        return fechaTexto;
     }
-  }
 
-  const d = new Date(texto);
-  return isNaN(d) ? null : d;
+    const texto = String(fechaTexto).trim();
+
+    // yyyyMMdd
+    if(/^\d{8}$/.test(texto)){
+        const y = texto.substring(0,4);
+        const m = texto.substring(4,6);
+        const d = texto.substring(6,8);
+        return new Date(Number(y),Number(m)-1,Number(d));
+    }
+
+    // dd.mm.yyyy
+    if(texto.includes(".")){
+
+        const p = texto.split(".");
+
+        if(p.length===3){
+
+            return new Date(
+                Number(p[2]),
+                Number(p[1])-1,
+                Number(p[0])
+            );
+
+        }
+
+    }
+
+    // dd/mm/yyyy
+    if(texto.includes("/")){
+
+        const p = texto.split("/");
+
+        if(p.length===3){
+
+            return new Date(
+                Number(p[2]),
+                Number(p[1])-1,
+                Number(p[0])
+            );
+
+        }
+
+    }
+
+    // yyyy-mm-dd
+
+    if(texto.includes("-")){
+
+        const p = texto.split("-");
+
+        if(p.length===3){
+
+            return new Date(
+                Number(p[0]),
+                Number(p[1])-1,
+                Number(p[2])
+            );
+
+        }
+
+    }
+
+    const d = new Date(texto);
+
+    return isNaN(d) ? null : d;
+
 }
 
 function formatearFecha(fechaTexto){
