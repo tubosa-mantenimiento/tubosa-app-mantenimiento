@@ -31,6 +31,7 @@ label{display:block;font-weight:bold;font-size:16px;margin-top:14px;margin-botto
 select{width:100%;padding:14px;border:none;border-radius:14px;font-size:16px;color:#001f5b;}
 button{width:100%;padding:15px;border:none;border-radius:15px;background:white;color:#001f5b;font-size:18px;font-weight:900;margin-top:14px;}
 button:disabled{opacity:.6;}
+.btn-no-realizado{ background:#ffe1e1; color:#b00000; border:1px solid #e53935;}
 .vacio{text-align:center;opacity:.85;margin-top:24px;font-size:17px;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
 </style>
@@ -327,12 +328,15 @@ function renderAsignacion(){
       </select>
 
       <button id="btn_${p.clave}">ASIGNAR PREVENTIVO</button>
+      <button class="btn-no-realizado" id="btnNo_${p.clave}">NO REALIZADO</button>
     `;
 
     lista.appendChild(div);
 
     document.getElementById("btn_" + p.clave).onclick = function(){
       asignarPreventivo(p);
+       document.getElementById("btnNo_" + p.clave).onclick = function(){
+      marcarNoRealizado(p);
     };
   });
 }
