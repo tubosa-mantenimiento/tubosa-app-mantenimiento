@@ -369,19 +369,44 @@ async function cargarUsuarios(){
     select.innerHTML = '<option value="">Seleccione técnico...</option>';
     selectCompanero.innerHTML = '<option value="">Seleccione compañero...</option>';
 
-    tecnicos.forEach(t => {
-      const option = document.createElement("option");
-      option.value = t.Codigo;
-      option.textContent = t.Nombre;
-      select.appendChild(option);
+   tecnicos.forEach(t => {
 
-      if(String(t.Codigo).trim() !== String(usuario.codigo).trim()){
-        const optionCompanero = document.createElement("option");
-        optionCompanero.value = t.Codigo;
-        optionCompanero.textContent = t.Nombre;
-        selectCompanero.appendChild(optionCompanero);
-      }
-    });
+  const codigo = String(
+    t.Codigo ||
+    t.Código ||
+    t.codigo ||
+    ""
+  ).trim();
+
+  const nombre = String(
+    t.Nombre ||
+    t.nombre ||
+    ""
+  ).trim();
+
+  if(!codigo || !nombre){
+    return;
+  }
+
+  // Técnico que recibe continuidad
+  const option = document.createElement("option");
+  option.value = codigo;
+  option.textContent = nombre;
+  select.appendChild(option);
+
+  // Compañero: todos menos el usuario conectado
+  if(codigo !== String(usuario.codigo).trim()){
+
+    const optionCompanero =
+      document.createElement("option");
+
+    optionCompanero.value = codigo;
+    optionCompanero.textContent = nombre;
+
+    selectCompanero.appendChild(optionCompanero);
+  }
+
+});
 
   }catch(error){
     alert("Error cargando técnicos: " + error);
