@@ -677,9 +677,33 @@ pendientesCorrectivos
 .reverse()
 .forEach(n => {
 
+const tecnicoCompanero =
+String(
+obtenerCampo(n,"TecnicoCompanero")
+).trim();
+
+const estadoCompanero =
+normalizar(
+obtenerCampo(n,"EstadoPendienteCompanero")
+);
+
+if(
+tecnicoCompanero === String(usuario.codigo).trim()
+&&
+estadoCompanero === "pendiente"
+){
+
+lista.appendChild(
+crearTarjetaApoyoCorrectivo(n)
+);
+
+}else{
+
 lista.appendChild(
 crearTarjetaCorrectivo(n)
 );
+
+}
 
 });
 
@@ -889,7 +913,121 @@ return div;
 
 }
 
+// =====================================================
+// TARJETA APOYO EN CORRECTIVO
+// =====================================================
 
+function crearTarjetaApoyoCorrectivo(n){
+
+const id =
+obtenerCampo(n,"ID_Notificacion");
+
+const linea =
+obtenerCampo(n,"Linea");
+
+const equipo =
+obtenerCampo(n,"Equipo");
+
+const area =
+obtenerCampo(n,"Area");
+
+const descripcion =
+obtenerCampo(n,"DescripcionFalla");
+
+const reportadoPor =
+obtenerCampo(n,"NombreReportadoPor");
+
+const ordenSAP =
+obtenerCampo(n,"OrdenSAP") ||
+"Sin orden SAP";
+
+const tecnicoPrincipal =
+obtenerCampo(n,"NombreReportadoPor") ||
+"Técnico principal";
+
+const div =
+document.createElement("div");
+
+div.className = "item";
+
+div.innerHTML = `
+
+<div class="titulo">
+🤝 Apoyo en correctivo
+</div>
+
+<div class="estado">
+Pendiente registrar tiempo
+</div>
+
+<div class="detalle">
+<strong>ID novedad:</strong>
+${id}
+</div>
+
+<div class="detalle">
+<strong>Orden SAP:</strong>
+${ordenSAP}
+</div>
+
+<div class="detalle">
+<strong>Área:</strong>
+${area || "Sin área"}
+</div>
+
+<div class="detalle">
+<strong>Línea:</strong>
+${linea || "Sin línea"}
+</div>
+
+<div class="detalle">
+<strong>Equipo:</strong>
+${equipo || "Sin equipo"}
+</div>
+
+<div class="detalle">
+<strong>Reportado por:</strong>
+${reportadoPor || tecnicoPrincipal}
+</div>
+
+<div class="badge">
+Falla / actividad apoyada:<br>
+${descripcion || "Sin descripción"}
+</div>
+
+<label>
+Tiempo de apoyo realizado (min)
+</label>
+
+<input
+id="tiempo_comp_corr_${id}"
+type="number"
+min="1"
+step="1"
+placeholder="Ej: 45"
+>
+
+<label>
+Observación del apoyo
+</label>
+
+<textarea
+id="obs_comp_corr_${id}"
+placeholder="Describe brevemente qué apoyo realizaste..."
+></textarea>
+
+<button
+id="btn_comp_corr_${id}"
+onclick="registrarTiempoCompaneroCorrectivo('${id}')"
+>
+REGISTRAR MI TIEMPO
+</button>
+
+`;
+
+return div;
+
+}
 // =====================================================
 // TARJETA PREVENTIVO
 // =====================================================
@@ -1853,6 +1991,72 @@ btn.innerText =
 
 }
 
+  async function registrarTiempoCompaneroCorrectivo(id){
+
+const tiempo =
+document.getElementById(
+"tiempo_comp_corr_" + id
+).value.trim();
+
+const obs =
+document.getElementById(
+"obs_comp_corr_" + id
+).value.trim();
+
+const btn =
+document.getElementById(
+"btn_comp_corr_" + id
+);
+
+if(!tiempo || Number(tiempo) <= 0){
+alert("Debe ingresar el tiempo de apoyo en minutos.");
+return;
+}
+
+const confirmar =
+confirm("¿Confirma registrar su tiempo de apoyo en el correctivo?");
+
+if(!confirmar) return;
+
+btn.disabled = true;
+btn.innerText = "REGISTRANDO...";
+
+try{
+
+const datos = {
+accion: "registrar_tiempo_companero_correctivo",
+ID_Notificacion: id,
+TiempoCompanero: tiempo,
+ObservacionCompanero: obs,
+TecnicoCompanero: usuario.codigo,
+NombreTecnicoCompanero: usuario.nombre
+};
+
+const params = new URLSearchParams(datos);
+
+const respuesta =
+await fetch(URL_API + "?" + params.toString());
+
+const resultado =
+await respuesta.json();
+
+if(resultado.ok){
+alert("Tiempo de apoyo en correctivo registrado correctamente.");
+cargarPendientes();
+}else{
+alert("Error: " + resultado.mensaje);
+btn.disabled = false;
+btn.innerText = "REGISTRAR MI TIEMPO";
+}
+
+}catch(error){
+alert("Error registrando tiempo de apoyo en correctivo: " + error);
+btn.disabled = false;
+btn.innerText = "REGISTRAR MI TIEMPO";
+}
+
+}
+  
 // =====================================================
 // REGISTRAR TIEMPO DEL COMPAÑERO
 // =====================================================
