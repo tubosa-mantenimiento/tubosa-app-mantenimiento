@@ -351,8 +351,9 @@ function cargarInicial(){
 async function cargarUsuarios(){
   const select = document.getElementById("tecnicoRecibe");
   const selectCompanero = document.getElementById("tecnicoCompanero");
+
   select.innerHTML = '<option value="">Cargando técnicos...</option>';
-  selectCompanero.innerHTML = '<option value="">Seleccione compañero...</option>';
+  selectCompanero.innerHTML = '<option value="">Cargando compañeros...</option>';
 
   try{
     const respuesta = await fetch(URL_API + "?accion=listar&hoja=Usuarios");
@@ -366,35 +367,28 @@ async function cargarUsuarios(){
     );
 
     select.innerHTML = '<option value="">Seleccione técnico...</option>';
+    selectCompanero.innerHTML = '<option value="">Seleccione compañero...</option>';
 
     tecnicos.forEach(t => {
       const option = document.createElement("option");
       option.value = t.Codigo;
       option.textContent = t.Nombre;
       select.appendChild(option);
+
+      if(String(t.Codigo).trim() !== String(usuario.codigo).trim()){
+        const optionCompanero = document.createElement("option");
+        optionCompanero.value = t.Codigo;
+        optionCompanero.textContent = t.Nombre;
+        selectCompanero.appendChild(optionCompanero);
+      }
     });
-if(String(t.Codigo).trim() !== String(usuario.codigo).trim()){
 
-  const optionCompanero =
-  document.createElement("option");
-
-  optionCompanero.value =
-  t.Codigo;
-
-  optionCompanero.textContent =
-  t.Nombre;
-
-  selectCompanero.appendChild(
-  optionCompanero
-  );
-
-}
   }catch(error){
     alert("Error cargando técnicos: " + error);
     select.innerHTML = '<option value="">Error cargando técnicos</option>';
+    selectCompanero.innerHTML = '<option value="">Error cargando compañeros</option>';
   }
 }
-
 async function cargarEquipos(){
   const selectLinea = document.getElementById("linea");
   selectLinea.innerHTML = '<option value="">Cargando líneas...</option>';
