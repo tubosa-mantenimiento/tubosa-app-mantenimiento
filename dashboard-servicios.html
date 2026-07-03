@@ -608,7 +608,19 @@ function renderVacioPIAB(datos){
 
     div.innerHTML = `
       <div class="bar-head">
-      function normalizarSiNo(valor){
+        <span>${item.linea}</span>
+        <span>${valorTexto} <span class="semaforo">${sem}</span></span>
+      </div>
+      <div class="bar-bg">
+        <div class="bar-fill" style="width:${porcentaje}%;"></div>
+      </div>
+    `;
+
+    contenedor.appendChild(div);
+  });
+}
+
+function normalizarSiNo(valor){
   const t = String(valor || "").trim().toLowerCase();
   return t === "sí" || t === "si";
 }
@@ -628,7 +640,6 @@ function obtenerInventarioPIAB(piab){
 
   registros.forEach(r => {
     const key = r.linea;
-
     if(!ultimoPorLinea[key] || r.fechaObj > ultimoPorLinea[key].fechaObj){
       ultimoPorLinea[key] = r;
     }
@@ -649,16 +660,8 @@ function renderInventarioPIAB(datos){
   datos.forEach(item => {
     const estadoLineaTexto = String(item.estadoLinea || "").toLowerCase();
 
-    let texto = "";
-    let clase = "";
-
-    if(item.bombaInstalada){
-      texto = "🟢 Instalada";
-      clase = "inv-ok";
-    }else{
-      texto = "🔴 Sin bomba";
-      clase = "inv-no";
-    }
+    let texto = item.bombaInstalada ? "🟢 Instalada" : "🔴 Sin bomba";
+    let clase = item.bombaInstalada ? "inv-ok" : "inv-no";
 
     if(estadoLineaTexto.includes("no") || estadoLineaTexto.includes("parada")){
       clase = item.bombaInstalada ? "inv-parada" : "inv-no";
@@ -680,18 +683,6 @@ function renderInventarioPIAB(datos){
     contenedor.appendChild(div);
   });
 }
-        <span>${item.linea}</span>
-        <span>${valorTexto} <span class="semaforo">${sem}</span></span>
-      </div>
-      <div class="bar-bg">
-        <div class="bar-fill" style="width:${porcentaje}%;"></div>
-      </div>
-    `;
-
-    contenedor.appendChild(div);
-  });
-}
-
 function actualizarLabels(){
   const texto = filtroActual === "hoy" ? "hoy" : filtroActual === "semana" ? "semana" : "mes";
 
@@ -713,7 +704,8 @@ function renderDashboard(){
 
   renderServicios(BD.servicios);
   renderVacioPIAB(obtenerUltimoVacioPIAB(BD.piab));
-
+  renderInventarioPIAB(obtenerInventarioPIAB(BD.piab));
+  
   document.getElementById("estadoCarga").innerText = "Información actualizada correctamente.";
 }
 
