@@ -1822,7 +1822,161 @@ btn.innerText =
 
 }
 
+// =====================================================
+// REGISTRAR TIEMPO DEL COMPAÑERO
+// =====================================================
 
+
+async function registrarTiempoCompanero(
+id,
+orden,
+clave
+){
+
+const tiempo =
+document.getElementById(
+"tiempo_comp_" + clave
+).value.trim();
+
+
+const obs =
+document.getElementById(
+"obs_comp_" + clave
+).value.trim();
+
+
+const btn =
+document.getElementById(
+"btn_comp_" + clave
+);
+
+
+// -----------------------------------------------------
+// VALIDAR TIEMPO
+// -----------------------------------------------------
+
+
+if(!tiempo || Number(tiempo) <= 0){
+
+alert(
+"Debe ingresar el tiempo de apoyo en minutos."
+);
+
+return;
+
+}
+
+
+// -----------------------------------------------------
+// CONFIRMACIÓN
+// -----------------------------------------------------
+
+
+const confirmar =
+confirm(
+"¿Confirma registrar su tiempo de apoyo?"
+);
+
+
+if(!confirmar) return;
+
+
+// -----------------------------------------------------
+// DESACTIVAR BOTÓN
+// -----------------------------------------------------
+
+
+btn.disabled = true;
+
+btn.innerText =
+"REGISTRANDO...";
+
+
+try{
+
+
+const datos = {
+
+accion:
+"registrar_tiempo_companero",
+
+ID_Preventivo:
+id,
+
+Orden:
+orden,
+
+TiempoCompanero:
+tiempo,
+
+ObservacionCompanero:
+obs,
+
+TecnicoCompanero:
+usuario.codigo,
+
+NombreTecnicoCompanero:
+usuario.nombre
+
+};
+
+
+const params =
+new URLSearchParams(datos);
+
+
+const respuesta =
+await fetch(
+URL_API +
+"?" +
+params.toString()
+);
+
+
+const resultado =
+await respuesta.json();
+
+
+if(resultado.ok){
+
+alert(
+"Tiempo de apoyo registrado correctamente."
+);
+
+cargarPendientes();
+
+}
+else{
+
+alert(
+"Error: " +
+resultado.mensaje
+);
+
+btn.disabled = false;
+
+btn.innerText =
+"REGISTRAR MI TIEMPO";
+
+}
+
+
+}
+catch(error){
+
+alert(
+"Error registrando tiempo de apoyo: " +
+error
+);
+
+btn.disabled = false;
+
+btn.innerText =
+"REGISTRAR MI TIEMPO";
+
+}
+
+}
 // =====================================================
 // CERRAR PENDIENTE CORRECTIVO
 // =====================================================
