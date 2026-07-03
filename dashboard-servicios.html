@@ -53,6 +53,13 @@ h2{font-size:24px;margin-bottom:14px;}
 svg{width:100%;height:210px;background:#f1f5ff;border-radius:16px;}
 .semaforo{font-size:20px;margin-left:6px;}
 .vacio{text-align:center;opacity:.85;margin-top:12px;font-size:16px;}
+.inv-item{background:white;color:#001f5b;border-radius:16px;padding:14px;margin-bottom:12px;}
+.inv-head{display:flex;justify-content:space-between;align-items:center;font-weight:900;gap:10px;}
+.inv-sub{font-size:13px;opacity:.8;margin-top:6px;font-weight:bold;}
+.inv-pill{padding:7px 10px;border-radius:12px;font-size:13px;font-weight:900;white-space:nowrap;}
+.inv-ok{background:#e8f8ee;color:#087a23;border:1px solid #5dcc78;}
+.inv-no{background:#ffe1e1;color:#b00000;border:1px solid #e53935;}
+.inv-parada{background:#e8e8e8;color:#444;border:1px solid #aaa;}
 .footer{text-align:center;opacity:.7;font-size:13px;margin-top:24px;}
 </style>
 </head>
@@ -118,6 +125,11 @@ svg{width:100%;height:210px;background:#f1f5ff;border-radius:16px;}
     <div id="vacioPIAB"><div class="vacio">Sin datos PIAB todavía.</div></div>
   </div>
 
+ <div class="card">
+    <h2>Inventario bombas PIAB por línea</h2>
+    <div id="inventarioPIAB"><div class="vacio">Sin inventario PIAB todavía.</div></div>
+  </div>
+  
   <div class="footer">
     TUBOSA - Sistema de Mantenimiento<br>
     Versión 1.0
@@ -596,6 +608,78 @@ function renderVacioPIAB(datos){
 
     div.innerHTML = `
       <div class="bar-head">
+      function normalizarSiNo(valor){
+  const t = String(valor || "").trim().toLowerCase();
+  return t === "sí" || t === "si";
+}
+
+function obtenerInventarioPIAB(piab){
+  const registros = piab
+    .filter(r => estaEnFiltro(r.Fecha))
+    .map(r => ({
+      linea: r.PuntoInspeccion || r.Linea || "Sin dato",
+      extrusora: r.Extrusora || "",
+      bombaInstalada: normalizarSiNo(r.BombaInstalada),
+      estadoLinea: r.EstadoLinea || "Sin dato",
+      fechaObj: fechaHoraObj(r.Fecha, r.Hora)
+    }));
+
+  const ultimoPorLinea = {};
+
+  registros.forEach(r => {
+    const key = r.linea;
+
+    if(!ultimoPorLinea[key] || r.fechaObj > ultimoPorLinea[key].fechaObj){
+      ultimoPorLinea[key] = r;
+    }
+  });
+
+  return Object.values(ultimoPorLinea).sort((a,b) => a.linea.localeCompare(b.linea));
+}
+
+function renderInventarioPIAB(datos){
+  const contenedor = document.getElementById("inventarioPIAB");
+  contenedor.innerHTML = "";
+
+  if(datos.length === 0){
+    contenedor.innerHTML = '<div class="vacio">Sin inventario PIAB para este filtro.</div>';
+    return;
+  }
+
+  datos.forEach(item => {
+    const estadoLineaTexto = String(item.estadoLinea || "").toLowerCase();
+
+    let texto = "";
+    let clase = "";
+
+    if(item.bombaInstalada){
+      texto = "🟢 Instalada";
+      clase = "inv-ok";
+    }else{
+      texto = "🔴 Sin bomba";
+      clase = "inv-no";
+    }
+
+    if(estadoLineaTexto.includes("no") || estadoLineaTexto.includes("parada")){
+      clase = item.bombaInstalada ? "inv-parada" : "inv-no";
+    }
+
+    const div = document.createElement("div");
+    div.className = "inv-item";
+
+    div.innerHTML = `
+      <div class="inv-head">
+        <span>${item.linea}</span>
+        <span class="inv-pill ${clase}">${texto}</span>
+      </div>
+      <div class="inv-sub">
+        Estado línea: ${item.estadoLinea || "Sin dato"} ${item.extrusora ? " | Extrusora: " + item.extrusora : ""}
+      </div>
+    `;
+
+    contenedor.appendChild(div);
+  });
+}
         <span>${item.linea}</span>
         <span>${valorTexto} <span class="semaforo">${sem}</span></span>
       </div>
