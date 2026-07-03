@@ -148,6 +148,22 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
       <textarea id="trabajoPendiente" placeholder="Describa qué debe continuar el técnico del siguiente turno..."></textarea>
     </div>
 
+<div class="grid">
+  <div>
+    <label>Trabajó con compañero</label>
+    <select id="realizadoConCompanero" onchange="controlarCompanero()">
+      <option>No</option>
+      <option>Sí</option>
+    </select>
+  </div>
+  <div>
+    <label>Compañero</label>
+    <select id="tecnicoCompanero" disabled>
+      <option value="">Seleccione...</option>
+    </select>
+  </div>
+</div>
+    
     <label>Consecuencia producción</label>
     <select id="consecuenciaProduccion">
       <option value="">Cargando consecuencias...</option>
@@ -244,6 +260,35 @@ function controlarPendiente(){
   }
 }
 
+function controlarCompanero(){
+  const realizado = document.getElementById("realizadoConCompanero").value;
+  const selectCompanero = document.getElementById("tecnicoCompanero");
+
+  if(realizado === "Sí"){
+    selectCompanero.disabled = false;
+  }else{
+    selectCompanero.disabled = true;
+    selectCompanero.value = "";
+  }
+}
+
+function obtenerTecnicoCompanero(){
+  const select = document.getElementById("tecnicoCompanero");
+  const opt = select.options[select.selectedIndex];
+
+  if(!opt || !select.value){
+    return {
+      codigo: "",
+      nombre: ""
+    };
+  }
+
+  return {
+    codigo: select.value,
+    nombre: opt.textContent
+  };
+}
+  
 function obtenerTecnicoRecibe(){
   const select = document.getElementById("tecnicoRecibe");
   const opt = select.options[select.selectedIndex];
@@ -305,7 +350,9 @@ function cargarInicial(){
 
 async function cargarUsuarios(){
   const select = document.getElementById("tecnicoRecibe");
+  const selectCompanero = document.getElementById("tecnicoCompanero");
   select.innerHTML = '<option value="">Cargando técnicos...</option>';
+  selectCompanero.innerHTML = '<option value="">Seleccione compañero...</option>';
 
   try{
     const respuesta = await fetch(URL_API + "?accion=listar&hoja=Usuarios");
@@ -326,7 +373,22 @@ async function cargarUsuarios(){
       option.textContent = t.Nombre;
       select.appendChild(option);
     });
+if(String(t.Codigo).trim() !== String(usuario.codigo).trim()){
 
+  const optionCompanero =
+  document.createElement("option");
+
+  optionCompanero.value =
+  t.Codigo;
+
+  optionCompanero.textContent =
+  t.Nombre;
+
+  selectCompanero.appendChild(
+  optionCompanero
+  );
+
+}
   }catch(error){
     alert("Error cargando técnicos: " + error);
     select.innerHTML = '<option value="">Error cargando técnicos</option>';
@@ -406,7 +468,9 @@ async function guardarNovedad(){
   const tecnicoRecibe = obtenerTecnicoRecibe();
   const quedaPendiente = document.getElementById("quedaPendiente").value;
   const trabajoPendiente = document.getElementById("trabajoPendiente").value;
-
+  const realizadoConCompanero = document.getElementById("realizadoConCompanero").value;
+  const tecnicoCompanero = obtenerTecnicoCompanero();
+  
   const datos = {
     hoja: "Notificaciones",
     ID_Notificacion: "NOT-" + Date.now(),
@@ -440,6 +504,16 @@ async function guardarNovedad(){
     NombreTecnicoRecibe: quedaPendiente === "Sí" ? tecnicoRecibe.nombre : "",
     TrabajoPendiente: quedaPendiente === "Sí" ? trabajoPendiente : "",
     ActividadTerminada: quedaPendiente === "Sí" ? "No" : "Sí",
+    RealizadoConCompanero: realizadoConCompanero,
+    TecnicoCompanero: realizadoConCompanero === "Sí" ? tecnicoCompanero.codigo : "",
+    NombreTecnicoCompanero: realizadoConCompanero === "Sí" ? tecnicoCompanero.nombre : "",
+    EstadoPendienteCompanero: realizadoConCompanero === "Sí" ? "Pendiente" : "",
+
+    TiempoCompanero: "",
+    ObservacionCompanero: "",
+    FechaRegistroCompanero: "",
+    HistorialIntervenciones: "",
+
     FechaCierre: "",
     ObservacionCierre: ""
   };
@@ -464,7 +538,15 @@ async function guardarNovedad(){
     btn.innerText = "GUARDAR NOVEDAD";
     return;
   }
-
+if(
+  realizadoConCompanero === "Sí" &&
+  !tecnicoCompanero.codigo
+){
+  alert("Debe seleccionar el compañero que participó en el trabajo.");
+  btn.disabled = false;
+  btn.innerText = "GUARDAR NOVEDAD";
+  return;
+}
   if(!document.getElementById("consecuenciaProduccion").value){
     alert("Debe seleccionar la consecuencia de producción.");
     btn.disabled = false;
@@ -498,6 +580,7 @@ cargarEquipos();
 cargarUsuarios();
 cargarCatalogos();
 controlarPendiente();
+controlarCompanero();
 </script>
 
 </body>
