@@ -528,19 +528,32 @@ normalizar(
 obtenerCampo(n,"ActividadTerminada")
 );
 
-return (
+const tecnicoCompanero =
+String(
+obtenerCampo(n,"TecnicoCompanero")
+).trim();
 
-tecnicoRecibe ===
-String(usuario.codigo).trim()
+const estadoCompanero =
+normalizar(
+obtenerCampo(n,"EstadoPendienteCompanero")
+);
 
+const recibidoContinuidad =
+tecnicoRecibe === String(usuario.codigo).trim()
 &&
+terminada !== "si";
 
-terminada !== "si"
+const apoyoCompanero =
+tecnicoCompanero === String(usuario.codigo).trim()
+&&
+estadoCompanero === "pendiente";
 
+return (
+recibidoContinuidad ||
+apoyoCompanero
 );
 
 });
-
 
 // -----------------------------------------------------
 // PREVENTIVOS PRINCIPALES
