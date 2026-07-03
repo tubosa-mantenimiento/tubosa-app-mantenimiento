@@ -560,6 +560,16 @@ String(
 obtenerCampo(p,"TecnicoRecibe")
 ).trim();
 
+const tecnicoCompanero =
+String(
+obtenerCampo(p,"TecnicoCompanero")
+).trim();
+
+const estadoCompanero =
+normalizar(
+obtenerCampo(p,"EstadoPendienteCompanero")
+);
+  
 const estado =
 normalizar(
 obtenerCampo(p,"Estado")
@@ -597,10 +607,20 @@ actividadTerminada !== "si"
 
 estado === "en ejecucion";
 
+const apoyoCompanero =
+
+tecnicoCompanero ===
+String(usuario.codigo).trim()
+
+&&
+
+estadoCompanero === "pendiente";
+
 
 return (
 asignadoPrincipal ||
-recibidoContinuidad
+recibidoContinuidad ||
+apoyoCompanero
 );
 
 });
@@ -637,12 +657,35 @@ pendientesPreventivos
 .reverse()
 .forEach(p => {
 
+const tecnicoCompanero =
+String(
+obtenerCampo(p,"TecnicoCompanero")
+).trim();
+
+const estadoCompanero =
+normalizar(
+obtenerCampo(p,"EstadoPendienteCompanero")
+);
+
+if(
+tecnicoCompanero === String(usuario.codigo).trim()
+&&
+estadoCompanero === "pendiente"
+){
+
+lista.appendChild(
+crearTarjetaApoyoCompanero(p)
+);
+
+}else{
+
 lista.appendChild(
 crearTarjetaPreventivo(p)
 );
 
-});
+}
 
+});
 
 }
 catch(error){
@@ -1171,7 +1214,137 @@ return div;
 
 }
 
+// =====================================================
+// TARJETA APOYO COMO COMPAÑERO
+// =====================================================
 
+
+function crearTarjetaApoyoCompanero(p){
+
+const id =
+obtenerCampo(p,"ID_Preventivo");
+
+const orden =
+obtenerCampo(p,"Orden");
+
+const clave =
+clavePreventivo(p);
+
+const area =
+obtenerCampo(p,"Area");
+
+const linea =
+obtenerCampo(p,"Linea");
+
+const equipo =
+obtenerCampo(p,"Equipo");
+
+const actividad =
+obtenerCampo(p,"Actividad") ||
+obtenerCampo(p,"Texto breve");
+
+const tecnicoPrincipal =
+obtenerCampo(p,"NombreTecnicoEjecutor") ||
+obtenerCampo(p,"NombreTecnicoAsignado") ||
+"Técnico principal";
+
+
+const div =
+document.createElement("div");
+
+div.className = "item";
+
+
+div.innerHTML = `
+
+<div class="titulo">
+🤝 Apoyo como compañero
+</div>
+
+
+<div class="estado">
+Pendiente registrar tiempo
+</div>
+
+
+<div class="detalle">
+<strong>Orden SAP:</strong>
+${orden || "Sin orden"}
+</div>
+
+
+<div class="detalle">
+<strong>Área:</strong>
+${area || "Sin área"}
+</div>
+
+
+<div class="detalle">
+<strong>Línea:</strong>
+${linea || "Sin línea"}
+</div>
+
+
+<div class="detalle">
+<strong>Equipo:</strong>
+${equipo || "Sin equipo"}
+</div>
+
+
+<div class="detalle">
+<strong>Técnico principal:</strong>
+${tecnicoPrincipal}
+</div>
+
+
+<div class="badge">
+
+Actividad apoyada:<br>
+
+${actividad ||
+"Sin actividad definida"}
+
+</div>
+
+
+<label>
+Tiempo de apoyo realizado (min)
+</label>
+
+<input
+id="tiempo_comp_${clave}"
+type="number"
+min="1"
+step="1"
+placeholder="Ej: 45"
+>
+
+
+<label>
+Observación del apoyo
+</label>
+
+<textarea
+id="obs_comp_${clave}"
+placeholder="Describe brevemente qué apoyo realizaste..."
+></textarea>
+
+
+<button
+id="btn_comp_${clave}"
+onclick="registrarTiempoCompanero('${id}','${orden}','${clave}')"
+>
+
+REGISTRAR MI TIEMPO
+
+</button>
+
+`;
+
+
+return div;
+
+}
 // =====================================================
 // INICIAR PREVENTIVO
 // =====================================================
