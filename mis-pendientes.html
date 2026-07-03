@@ -589,8 +589,26 @@ String(usuario.codigo).trim()
 &&
 
 (
-estado === "asignado" ||
+estado === "asignado"
+
+||
+
+(
 estado === "en ejecucion"
+
+&&
+
+(
+tecnicoRecibe === ""
+
+||
+
+tecnicoRecibe ===
+String(usuario.codigo).trim()
+)
+
+)
+
 );
 
 
