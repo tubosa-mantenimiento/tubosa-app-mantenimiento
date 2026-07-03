@@ -331,11 +331,13 @@ function renderAsignacion(){
       <button class="btn-no-realizado" id="btnNo_${p.clave}">NO REALIZADO</button>
     `;
 
-    lista.appendChild(div);
+        lista.appendChild(div);
 
     document.getElementById("btn_" + p.clave).onclick = function(){
       asignarPreventivo(p);
-       document.getElementById("btnNo_" + p.clave).onclick = function(){
+    };
+
+    document.getElementById("btnNo_" + p.clave).onclick = function(){
       marcarNoRealizado(p);
     };
   });
@@ -430,7 +432,57 @@ async function asignarPreventivo(p){
     btn.innerText = "ASIGNAR PREVENTIVO";
   }
 }
+async function marcarNoRealizado(p){
+  const btn = document.getElementById("btnNo_" + p.clave);
 
+  const motivo = prompt(
+    "Ingrese el motivo por el cual el preventivo NO fue realizado:\n\n" +
+    "Ejemplo: Línea en producción, falta de repuesto, falta de personal, equipo no disponible, prioridad correctiva, otro."
+  );
+
+  if(!motivo || motivo.trim() === ""){
+    alert("Debe ingresar un motivo para marcar el preventivo como NO REALIZADO.");
+    return;
+  }
+
+  const confirmar = confirm("¿Confirma marcar este preventivo como NO REALIZADO?");
+  if(!confirmar) return;
+
+  btn.disabled = true;
+  btn.innerText = "GUARDANDO...";
+
+  try{
+    const datos = {
+      accion: "no_realizar_preventivo",
+      ID_Preventivo: p.id,
+      Orden: p.orden,
+      UsuarioAsignador: usuario.nombre,
+      SupervisorAsignado: usuario.codigo,
+      MotivoNoRealizado: motivo.trim(),
+      Area: p.area,
+      Linea: p.linea,
+      Actividad: p.actividad
+    };
+
+    const params = new URLSearchParams(datos);
+    const respuesta = await fetch(URL_API + "?" + params.toString());
+    const resultado = await respuesta.json();
+
+    if(resultado.ok){
+      alert("Preventivo marcado como NO REALIZADO.");
+      cargarPreventivos();
+    }else{
+      alert("Error: " + resultado.mensaje);
+      btn.disabled = false;
+      btn.innerText = "NO REALIZADO";
+    }
+
+  }catch(error){
+    alert("Error marcando preventivo como NO REALIZADO: " + error);
+    btn.disabled = false;
+    btn.innerText = "NO REALIZADO";
+  }
+}
 cargarPreventivos();
 </script>
 
