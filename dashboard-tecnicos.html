@@ -383,12 +383,16 @@ function renderDashboard(){
     return estado === "ejecutado" && estaEnFiltro(fechaPreventivo(p));
   });
 
-  const preventivosAsignadosPeriodo = preventivosTecnico.filter(p =>
-    estaEnFiltro(obtenerCampo(p, "FechaAsignacion"))
+    const preventivosProgramadosPeriodo = preventivosTecnico.filter(p =>
+    estaEnFiltro(obtenerCampo(p, "FechaAsignacion")) ||
+    estaEnFiltro(obtenerCampo(p, "Fe.inic.extrema")) ||
+    estaEnFiltro(obtenerCampo(p, "FechaEjecucion"))
   );
 
-  const baseCumplimiento = preventivosAsignadosPeriodo.length + preventivosEjecutados.length;
-  const cumplimiento = baseCumplimiento > 0 ? Math.round((preventivosEjecutados.length / baseCumplimiento) * 100) : 0;
+  const baseCumplimiento = preventivosProgramadosPeriodo.length;
+  const cumplimiento = baseCumplimiento > 0
+    ? Math.round((preventivosEjecutados.length / baseCumplimiento) * 100)
+    : 0;
 
   const correctivosCerrados = notificacionesTecnico.filter(n =>
     esCorrectivoCerrado(n) &&
