@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Planos Eléctricos - TUBOSA</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#001f5b;
+  color:white;
+  min-height:100vh;
+  padding:22px;
+}
+
+.container{
+  max-width:720px;
+  margin:auto;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:22px;
+}
+
+.back{
+  color:white;
+  text-decoration:none;
+  font-size:42px;
+  font-weight:bold;
+}
+
+.logo{
+  font-size:46px;
+  font-weight:900;
+}
+
+
+/* =========================
+   TARJETA ENCABEZADO
+========================= */
+
+.card{
+  background:#0b3475;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:24px;
+  padding:22px;
+  margin-bottom:18px;
+}
+
+h1{
+  font-size:30px;
+  margin-bottom:8px;
+}
+
+.subtitle{
+  font-size:16px;
+  opacity:.85;
+  line-height:1.4;
+}
+
+.contador{
+  margin-top:16px;
+  display:inline-block;
+  background:rgba(255,255,255,.12);
+  padding:9px 14px;
+  border-radius:14px;
+  font-size:14px;
+  font-weight:bold;
+}
+
+
+/* =========================
+   BUSCADOR
+========================= */
+
+.buscador{
+  background:white;
+  border-radius:18px;
+  padding:5px;
+  margin-bottom:18px;
+  display:flex;
+  align-items:center;
+}
+
+.buscador-icono{
+  color:#001f5b;
+  font-size:20px;
+  padding-left:12px;
+}
+
+.buscador input{
+  width:100%;
+  padding:15px 12px;
+  border:none;
+  outline:none;
+  font-size:16px;
+  color:#001f5b;
+  background:transparent;
+}
+
+
+/* =========================
+   DOCUMENTOS
+========================= */
+
+.documento{
+  background:white;
+  color:#001f5b;
+  border-radius:20px;
+  padding:18px;
+  margin-bottom:14px;
+}
+
+.documento-top{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+}
+
+.icono-pdf{
+  width:52px;
+  height:52px;
+  background:#e8edf7;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
+  flex-shrink:0;
+}
+
+.documento-info{
+  flex:1;
+  min-width:0;
+}
+
+.documento-nombre{
+  font-size:17px;
+  font-weight:900;
+  line-height:1.3;
+  word-break:break-word;
+}
+
+.documento-tipo{
+  display:inline-block;
+  margin-top:8px;
+  background:#dbe4f5;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.btn-abrir{
+  display:block;
+  width:100%;
+  margin-top:15px;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:#001f5b;
+  color:white;
+  text-decoration:none;
+  text-align:center;
+  font-size:15px;
+  font-weight:900;
+}
+
+
+/* =========================
+   MENSAJES
+========================= */
+
+.estado{
+  text-align:center;
+  padding:35px 20px;
+  opacity:.85;
+  font-size:16px;
+}
+
+.loader{
+  width:42px;
+  height:42px;
+  border:5px solid rgba(255,255,255,.25);
+  border-top-color:white;
+  border-radius:50%;
+  margin:0 auto 16px auto;
+  animation:girar 1s linear infinite;
+}
+
+@keyframes girar{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer{
+  text-align:center;
+  opacity:.7;
+  font-size:13px;
+  margin-top:24px;
+  line-height:1.5;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:430px){
+
+  body{
+    padding:16px;
+  }
+
+  .logo{
+    font-size:36px;
+  }
+
+  h1{
+    font-size:26px;
+  }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+  <!-- HEADER -->
+
+  <div class="header">
+
+    <a class="back" href="menu.html">‹</a>
+
+    <div class="logo">
+      TUBOSA
+    </div>
+
+    <div style="width:42px;"></div>
+
+  </div>
+
+
+  <!-- INFORMACIÓN -->
+
+  <div class="card">
+
+    <h1>📐 Planos eléctricos</h1>
+
+    <div class="subtitle">
+      Biblioteca técnica de planos eléctricos y documentación de equipos.
+    </div>
+
+    <div class="contador" id="contadorDocumentos">
+      Consultando documentos...
+    </div>
+
+  </div>
+
+
+  <!-- BUSCADOR -->
+
+  <div class="buscador">
+
+    <div class="buscador-icono">
+      🔎
+    </div>
+
+    <input
+      type="text"
+      id="buscador"
+      placeholder="Buscar plano, línea o manual..."
+      oninput="filtrarDocumentos()"
+    >
+
+  </div>
+
+
+  <!-- LISTADO -->
+
+  <div id="listaDocumentos">
+
+    <div class="estado">
+
+      <div class="loader"></div>
+
+      Cargando biblioteca técnica...
+
+    </div>
+
+  </div>
+
+
+  <!-- FOOTER -->
+
+  <div class="footer">
+
+    TUBOSA - Sistema de Mantenimiento<br>
+    Biblioteca Técnica
+
+  </div>
+
+
+</div>
+
+
+<script>
+
+
+/* =========================================================
+   CONFIGURACIÓN
+========================================================= */
+
+const URL_API =
+"https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+
+let documentos = [];
+
+
+/* =========================================================
+   CARGAR DOCUMENTOS
+========================================================= */
+
+async function cargarDocumentos(){
+
+  const contenedor =
+    document.getElementById("listaDocumentos");
+
+  try{
+
+    const url =
+      URL_API +
+      "?accion=listar_planos_electricos";
+
+    const respuesta =
+      await fetch(url);
+
+    const data =
+      await respuesta.json();
+
+
+    if(!data.ok){
+
+      throw new Error(
+        data.mensaje ||
+        "No fue posible consultar los documentos."
+      );
+
+    }
+
+
+    documentos =
+      Array.isArray(data.datos)
+      ? data.datos
+      : [];
+
+
+    actualizarContador(
+      documentos.length
+    );
+
+
+    renderDocumentos(
+      documentos
+    );
+
+
+  }catch(error){
+
+    console.error(error);
+
+    document.getElementById(
+      "contadorDocumentos"
+    ).innerText =
+      "Error de consulta";
+
+
+    contenedor.innerHTML = `
+
+      <div class="card">
+
+        <div class="estado">
+
+          No fue posible cargar los documentos.<br><br>
+
+          ${error.message}
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =========================================================
+   CONTADOR
+========================================================= */
+
+function actualizarContador(cantidad){
+
+  const texto =
+    cantidad === 1
+    ? "1 documento disponible"
+    : cantidad + " documentos disponibles";
+
+  document.getElementById(
+    "contadorDocumentos"
+  ).innerText = texto;
+
+}
+
+
+/* =========================================================
+   MOSTRAR DOCUMENTOS
+========================================================= */
+
+function renderDocumentos(lista){
+
+  const contenedor =
+    document.getElementById(
+      "listaDocumentos"
+    );
+
+
+  contenedor.innerHTML = "";
+
+
+  if(lista.length === 0){
+
+    contenedor.innerHTML = `
+
+      <div class="card">
+
+        <div class="estado">
+          No se encontraron documentos.
+        </div>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  lista.forEach(doc => {
+
+    const div =
+      document.createElement("div");
+
+    div.className =
+      "documento";
+
+
+    div.innerHTML = `
+
+      <div class="documento-top">
+
+        <div class="icono-pdf">
+          📄
+        </div>
+
+        <div class="documento-info">
+
+          <div class="documento-nombre">
+            ${escaparHTML(doc.nombre)}
+          </div>
+
+          <div class="documento-tipo">
+            ${escaparHTML(doc.tipo)}
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <a
+        class="btn-abrir"
+        href="${doc.url}"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Abrir PDF
+      </a>
+
+    `;
+
+
+    contenedor.appendChild(div);
+
+  });
+
+}
+
+
+/* =========================================================
+   BUSCADOR
+========================================================= */
+
+function filtrarDocumentos(){
+
+  const texto =
+    document.getElementById(
+      "buscador"
+    )
+    .value
+    .trim()
+    .toLowerCase();
+
+
+  if(!texto){
+
+    renderDocumentos(
+      documentos
+    );
+
+    return;
+
+  }
+
+
+  const filtrados =
+    documentos.filter(doc => {
+
+      const nombre =
+        String(doc.nombre || "")
+        .toLowerCase();
+
+      const tipo =
+        String(doc.tipo || "")
+        .toLowerCase();
+
+
+      return (
+        nombre.includes(texto) ||
+        tipo.includes(texto)
+      );
+
+    });
+
+
+  renderDocumentos(
+    filtrados
+  );
+
+}
+
+
+/* =========================================================
+   SEGURIDAD TEXTO HTML
+========================================================= */
+
+function escaparHTML(texto){
+
+  return String(texto || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+   INICIAR
+========================================================= */
+
+cargarDocumentos();
+
+
+</script>
+
+</body>
+
+</html>
