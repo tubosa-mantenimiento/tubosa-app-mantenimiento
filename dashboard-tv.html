@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+>
+
+<title>Centro Visual de Mantenimiento - TUBOSA</title>
+
+<style>
+
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+========================================================= */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
+}
+
+html,
+body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#001f5b;
+  color:white;
+}
+
+body{
+  display:flex;
+  flex-direction:column;
+}
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.header{
+  height:11vh;
+  min-height:82px;
+  padding:14px 28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:25px;
+  background:#001f5b;
+  border-bottom:1px solid rgba(255,255,255,.20);
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:22px;
+  min-width:0;
+}
+
+.logo{
+  font-size:clamp(30px,3vw,52px);
+  font-weight:900;
+  letter-spacing:1px;
+  white-space:nowrap;
+}
+
+.header-title{
+  border-left:2px solid rgba(255,255,255,.40);
+  padding-left:22px;
+  min-width:0;
+}
+
+.header-title h1{
+  font-size:clamp(20px,2vw,34px);
+  line-height:1.05;
+}
+
+.header-title p{
+  margin-top:5px;
+  font-size:clamp(12px,1vw,17px);
+  opacity:.78;
+}
+
+.header-right{
+  text-align:right;
+  white-space:nowrap;
+}
+
+.reloj{
+  font-size:clamp(25px,2.5vw,44px);
+  font-weight:900;
+}
+
+.fecha{
+  margin-top:3px;
+  font-size:clamp(12px,1.1vw,18px);
+  opacity:.80;
+}
+
+/* =========================================================
+   CONTENIDO PRINCIPAL
+========================================================= */
+
+.main{
+  position:relative;
+  flex:1;
+  min-height:0;
+  padding:18px 26px 14px;
+}
+
+.slide{
+  position:absolute;
+  inset:18px 26px 14px;
+  opacity:0;
+  visibility:hidden;
+  transform:translateX(30px);
+  transition:
+    opacity .55s ease,
+    transform .55s ease,
+    visibility .55s;
+}
+
+.slide.activo{
+  opacity:1;
+  visibility:visible;
+  transform:translateX(0);
+}
+
+.panel{
+  height:100%;
+  background:#0b3475;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:24px;
+  padding:18px 22px;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 18px 45px rgba(0,0,0,.16);
+}
+
+/* =========================================================
+   TÍTULO DE CADA INDICADOR
+========================================================= */
+
+.panel-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:14px;
+}
+
+.nombre-indicador{
+  min-width:0;
+}
+
+.nombre-indicador h2{
+  font-size:clamp(27px,2.8vw,48px);
+  line-height:1;
+}
+
+.nombre-indicador p{
+  margin-top:7px;
+  font-size:clamp(14px,1.2vw,20px);
+  opacity:.82;
+}
+
+.estado{
+  min-width:170px;
+  padding:12px 18px;
+  border-radius:16px;
+  font-size:clamp(14px,1.3vw,21px);
+  font-weight:900;
+  text-align:center;
+  white-space:nowrap;
+}
+
+.estado-normal{
+  background:#e4f7ea;
+  color:#087a23;
+  border:2px solid #52c86d;
+}
+
+.estado-advertencia{
+  background:#fff2c9;
+  color:#a86a00;
+  border:2px solid #e2aa22;
+}
+
+.estado-critico{
+  background:#ffe0e0;
+  color:#b00000;
+  border:2px solid #e53935;
+}
+
+.estado-sindato{
+  background:#e6ebf5;
+  color:#4c5870;
+  border:2px solid #8490a5;
+}
+
+/* =========================================================
+   TARJETAS KPI
+========================================================= */
+
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.kpi{
+  background:white;
+  color:#001f5b;
+  border-radius:17px;
+  padding:11px 14px;
+  min-height:76px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  text-align:center;
+}
+
+.kpi-label{
+  font-size:clamp(11px,.9vw,15px);
+  font-weight:bold;
+  opacity:.67;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+
+.kpi-value{
+  margin-top:4px;
+  font-size:clamp(22px,2.2vw,38px);
+  font-weight:900;
+  line-height:1;
+}
+
+/* =========================================================
+   ÁREA DE LA GRÁFICA
+========================================================= */
+
+.chart-card{
+  flex:1;
+  min-height:0;
+  background:white;
+  color:#001f5b;
+  border-radius:20px;
+  padding:12px 14px 7px;
+  display:flex;
+  flex-direction:column;
+}
+
+.chart-container{
+  flex:1;
+  min-height:0;
+  position:relative;
+}
+
+.chart-container svg{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+/* =========================================================
+   LEYENDA INFERIOR
+========================================================= */
+
+.chart-footer{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  padding:5px 10px 3px;
+  font-size:clamp(11px,1vw,16px);
+  font-weight:bold;
+}
+
+.leyenda{
+  display:flex;
+  flex-wrap:wrap;
+  gap:18px;
+}
+
+.leyenda-meta{
+  color:#0a8a24;
+}
+
+.leyenda-normal{
+  color:#087a23;
+}
+
+.ultimo-registro{
+  text-align:right;
+  color:#44516b;
+}
+
+/* =========================================================
+   PIE DE PÁGINA
+========================================================= */
+
+.footer{
+  height:7vh;
+  min-height:52px;
+  padding:9px 26px 10px;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:20px;
+  border-top:1px solid rgba(255,255,255,.17);
+  background:#001f5b;
+}
+
+.footer-left{
+  font-size:clamp(11px,1vw,15px);
+  opacity:.82;
+}
+
+.footer-center{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.control{
+  width:40px;
+  height:36px;
+  border:none;
+  border-radius:11px;
+  background:white;
+  color:#001f5b;
+  font-size:20px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.control:hover{
+  background:#dbe4f5;
+}
+
+.contador{
+  min-width:78px;
+  text-align:center;
+  font-size:15px;
+  font-weight:900;
+}
+
+.footer-right{
+  text-align:right;
+  font-size:clamp(11px,1vw,15px);
+  opacity:.82;
+}
+
+/* =========================================================
+   BARRA DE PROGRESO
+========================================================= */
+
+.progress-wrap{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:5px;
+  background:rgba(255,255,255,.16);
+}
+
+.progress{
+  width:0%;
+  height:100%;
+  background:white;
+}
+
+/* =========================================================
+   MENSAJES
+========================================================= */
+
+.mensaje-central{
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px;
+  font-size:clamp(20px,2vw,34px);
+  font-weight:900;
+  color:#66738d;
+}
+
+.error-global{
+  position:fixed;
+  z-index:100;
+  top:15px;
+  left:50%;
+  transform:translateX(-50%);
+  max-width:80%;
+  padding:12px 20px;
+  border-radius:14px;
+  background:#ffe0e0;
+  color:#a00000;
+  border:2px solid #e53935;
+  font-weight:900;
+  display:none;
+}
+
+/* =========================================================
+   ADAPTACIÓN A PANTALLAS PEQUEÑAS
+========================================================= */
+
+@media(max-width:850px){
+
+  .header-title{
+    display:none;
+  }
+
+  .kpis{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .panel{
+    padding:14px;
+  }
+
+  .chart-footer{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:5px;
+  }
+
+  .ultimo-registro{
+    text-align:left;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="errorGlobal" class="error-global"></div>
+
+<header class="header">
+
+  <div class="header-left">
+
+    <div class="logo">TUBOSA</div>
+
+    <div class="header-title">
+      <h1>Centro Visual de Mantenimiento</h1>
+      <p>Monitoreo operacional de Servicios Industriales</p>
+    </div>
+
+  </div>
+
+  <div class="header-right">
+    <div id="reloj" class="reloj">--:--:--</div>
+    <div id="fechaActual" class="fecha">Cargando fecha...</div>
+  </div>
+
+</header>
+
+<main id="contenedorSlides" class="main">
+
+  <section class="slide activo" data-campo="Presion_Aire_SAM"></section>
+
+  <section class="slide" data-campo="Caudal_Aire"></section>
+
+  <section class="slide" data-campo="Temperatura_Chiller"></section>
+
+  <section class="slide" data-campo="Carga_Compresores"></section>
+
+  <section class="slide" data-campo="Presion_Bombas"></section>
+
+</main>
+
+<footer class="footer">
+
+  <div class="footer-left">
+    <span id="estadoCarga">Cargando información...</span>
+  </div>
+
+  <div class="footer-center">
+
+    <button
+      class="control"
+      onclick="anteriorSlide()"
+      title="Anterior"
+    >
+      ‹
+    </button>
+
+    <button
+      id="btnPausa"
+      class="control"
+      onclick="alternarPausa()"
+      title="Pausar o continuar"
+    >
+      ❚❚
+    </button>
+
+    <div id="contador" class="contador">1 / 5</div>
+
+    <button
+      class="control"
+      onclick="siguienteSlide(true)"
+      title="Siguiente"
+    >
+      ›
+    </button>
+
+    <button
+      class="control"
+      onclick="alternarPantallaCompleta()"
+      title="Pantalla completa"
+    >
+      ⛶
+    </button>
+
+  </div>
+
+  <div class="footer-right">
+    Última actualización:
+    <strong id="ultimaActualizacion">--</strong>
+  </div>
+
+  <div class="progress-wrap">
+    <div id="progress" class="progress"></div>
+  </div>
+
+</footer>
+
+<script>
+
+/* =========================================================
+   CONEXIÓN CON APPS SCRIPT
+========================================================= */
+
+const URL_API =
+  "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+const HOJA_SERVICIOS = "Rutas_Servicios";
+
+/* =========================================================
+   TIEMPOS DE FUNCIONAMIENTO
+========================================================= */
+
+/* Cada indicador permanece 20 segundos. */
+const DURACION_SLIDE = 20000;
+
+/* Los datos se vuelven a consultar cada 5 minutos. */
+const ACTUALIZACION_DATOS = 5 * 60 * 1000;
+
+/* =========================================================
+   CONFIGURACIÓN DE INDICADORES
+========================================================= */
+
+const CONFIG_INDICADORES = {
+
+  Presion_Aire_SAM:{
+    titulo:"Presión de aire comprimido SAM",
+    subtitulo:"Últimos 10 registros y comportamiento semanal",
+    unidad:"PSI",
+    meta:100,
+    min:95,
+    max:105,
+    criticoMin:90,
+    criticoMax:110
+  },
+
+  Caudal_Aire:{
+    titulo:"Caudal de aire comprimido",
+    subtitulo:"Caudal total de salida del sistema de compresores",
+    unidad:"CFM",
+    meta:1000,
+    min:600,
+    max:1600,
+    criticoMin:500,
+    criticoMax:1800
+  },
+
+  Temperatura_Chiller:{
+    titulo:"Temperatura de salida del chiller",
+    subtitulo:"Control de temperatura del sistema de agua fría",
+    unidad:"°F",
+    meta:60,
+    min:58,
+    max:64,
+    criticoMin:56,
+    criticoMax:66
+  },
+
+  Carga_Compresores:{
+    titulo:"Carga de compresores",
+    subtitulo:"Porcentaje de ocupación del sistema de aire comprimido",
+    unidad:"%",
+    meta:50,
+    min:0,
+    max:80,
+    criticoMin:0,
+    criticoMax:95
+  },
+
+  Presion_Bombas:{
+    titulo:"Presión de bombas de agua fría",
+    subtitulo:"Presión de suministro de agua hacia la planta",
+    unidad:"PSI",
+    meta:60,
+    min:35,
+    max:70,
+    criticoMin:30,
+    criticoMax:75
+  }
+
+};
+
+/* =========================================================
+   VARIABLES GLOBALES
+========================================================= */
+
+let registrosServicios = [];
+
+let indiceActual = 0;
+
+let pausado = false;
+
+let temporizadorSlide = null;
+
+let temporizadorProgreso = null;
+
+let inicioSlide = Date.now();
+
+const slides = Array.from(document.querySelectorAll(".slide"));
+
+/* =========================================================
+   FUNCIONES DE FECHA Y HORA
+========================================================= */
+
+function fechaISO(fechaTexto){
+
+  if(!fechaTexto) return null;
+
+  if(fechaTexto instanceof Date){
+    return new Date(fechaTexto);
+  }
+
+  const texto = String(fechaTexto).trim();
+
+  if(!texto) return null;
+
+  if(texto.includes("/")){
+
+    const partes = texto.split("/");
+
+    if(partes.length === 3){
+
+      const dia = Number(partes[0]);
+      const mes = Number(partes[1]) - 1;
+      const anio = Number(partes[2]);
+
+      const fecha = new Date(anio, mes, dia);
+
+      return isNaN(fecha.getTime()) ? null : fecha;
+
+    }
+
+  }
+
+  const fecha = new Date(texto);
+
+  return isNaN(fecha.getTime()) ? null : fecha;
+
+}
+
+function horaA24(horaTexto){
+
+  if(!horaTexto) return "00:00";
+
+  let texto = String(horaTexto)
+    .trim()
+    .toLowerCase()
+    .replace(/\s/g,"")
+    .replace(/a\.\s*m\./g,"am")
+    .replace(/p\.\s*m\./g,"pm")
+    .replace(/a\.m\./g,"am")
+    .replace(/p\.m\./g,"pm")
+    .replace(/a\.m/g,"am")
+    .replace(/p\.m/g,"pm");
+
+  const esPM = texto.includes("pm");
+  const esAM = texto.includes("am");
+
+  texto = texto
+    .replace("am","")
+    .replace("pm","");
+
+  const coincidencia = texto.match(/(\d{1,2})(?::(\d{1,2}))?/);
+
+  if(!coincidencia) return "00:00";
+
+  let horas = Number(coincidencia[1]);
+  let minutos = Number(coincidencia[2] || 0);
+
+  if(esPM && horas < 12) horas += 12;
+
+  if(esAM && horas === 12) horas = 0;
+
+  return (
+    String(horas).padStart(2,"0") +
+    ":" +
+    String(minutos).padStart(2,"0")
+  );
+
+}
+
+function fechaHoraObj(fechaTexto, horaTexto){
+
+  const fecha = fechaISO(fechaTexto);
+
+  if(!fecha) return new Date(0);
+
+  const partesHora = horaA24(horaTexto).split(":");
+
+  fecha.setHours(
+    Number(partesHora[0]),
+    Number(partesHora[1]),
+    0,
+    0
+  );
+
+  return fecha;
+
+}
+
+function inicioSemanaActual(){
+
+  const hoy = new Date();
+
+  hoy.setHours(0,0,0,0);
+
+  const dia = hoy.getDay();
+
+  const diferencia = dia === 0 ? -6 : 1 - dia;
+
+  const lunes = new Date(hoy);
+
+  lunes.setDate(hoy.getDate() + diferencia);
+
+  lunes.setHours(0,0,0,0);
+
+  return lunes;
+
+}
+
+function formatearFechaHora(fecha){
+
+  if(!fecha || isNaN(fecha.getTime())) return "Sin fecha";
+
+  return fecha.toLocaleString("es-CO",{
+    day:"2-digit",
+    month:"2-digit",
+    hour:"2-digit",
+    minute:"2-digit",
+    hour12:true
+  });
+
+}
+
+function actualizarReloj(){
+
+  const ahora = new Date();
+
+  document.getElementById("reloj").textContent =
+    ahora.toLocaleTimeString("es-CO",{
+      hour:"2-digit",
+      minute:"2-digit",
+      second:"2-digit",
+      hour12:true
+    });
+
+  document.getElementById("fechaActual").textContent =
+    ahora.toLocaleDateString("es-CO",{
+      weekday:"long",
+      day:"numeric",
+      month:"long",
+      year:"numeric"
+    });
+
+}
+
+/* =========================================================
+   CONVERSIÓN DE DATOS
+========================================================= */
+
+function numero(valor){
+
+  if(
+    valor === undefined ||
+    valor === null ||
+    valor === ""
+  ){
+    return null;
+  }
+
+  let texto = String(valor)
+    .trim()
+    .replace(/\s/g,"")
+    .replace("%","");
+
+  /*
+    Si el valor usa coma decimal:
+    98,5 → 98.5
+  */
+  if(texto.includes(",") && !texto.includes(".")){
+    texto = texto.replace(",",".");
+  }
+
+  const n = Number(texto);
+
+  return isNaN(n) ? null : n;
+
+}
+
+function redondear(valor){
+
+  if(valor === null || valor === undefined) return "-";
+
+  return Number(valor.toFixed(1));
+
+}
+
+/* =========================================================
+   CONSULTA A LA HOJA
+========================================================= */
+
+async function cargarHoja(nombreHoja){
+
+  const url =
+    URL_API +
+    "?accion=listar&hoja=" +
+    encodeURIComponent(nombreHoja) +
+    "&t=" +
+    Date.now();
+
+  const respuesta = await fetch(url,{
+    method:"GET",
+    cache:"no-store"
+  });
+
+  if(!respuesta.ok){
+    throw new Error(
+      "La API respondió con estado " + respuesta.status
+    );
+  }
+
+  const data = await respuesta.json();
+
+  if(data.error){
+    throw new Error(data.error);
+  }
+
+  return Array.isArray(data.datos) ? data.datos : [];
+
+}
+
+async function cargarDatos(){
+
+  ocultarError();
+
+  document.getElementById("estadoCarga").textContent =
+    "Actualizando datos...";
+
+  try{
+
+    const datos = await cargarHoja(HOJA_SERVICIOS);
+
+    registrosServicios = datos;
+
+    renderizarTodosLosIndicadores();
+
+    const ahora = new Date();
+
+    document.getElementById("ultimaActualizacion").textContent =
+      ahora.toLocaleTimeString("es-CO",{
+        hour:"2-digit",
+        minute:"2-digit",
+        hour12:true
+      });
+
+    document.getElementById("estadoCarga").textContent =
+      datos.length +
+      " registros disponibles · Actualización automática cada 5 minutos";
+
+  }catch(error){
+
+    console.error(error);
+
+    mostrarError(
+      "No fue posible actualizar los datos: " + error.message
+    );
+
+    document.getElementById("estadoCarga").textContent =
+      "Error de conexión. Se conservarán los datos anteriores.";
+
+    if(registrosServicios.length === 0){
+      renderizarErrorEnSlides(error.message);
+    }
+
+  }
+
+}
+
+/* =========================================================
+   PREPARACIÓN DE SERIES
+========================================================= */
+
+function obtenerSerieCompleta(campo){
+
+  return registrosServicios
+    .map(registro => ({
+
+      valor:numero(registro[campo]),
+
+      fecha:registro.Fecha || "",
+
+      hora:registro.Hora || "",
+
+      fechaObj:fechaHoraObj(
+        registro.Fecha,
+        registro.Hora
+      )
+
+    }))
+    .filter(item =>
+      item.valor !== null &&
+      item.fechaObj.getTime() > 0
+    )
+    .sort((a,b) => a.fechaObj - b.fechaObj);
+
+}
+
+function obtenerUltimos10(campo){
+
+  return obtenerSerieCompleta(campo).slice(-10);
+
+}
+
+function obtenerDatosSemana(campo){
+
+  const lunes = inicioSemanaActual();
+
+  const ahora = new Date();
+
+  return obtenerSerieCompleta(campo)
+    .filter(item =>
+      item.fechaObj >= lunes &&
+      item.fechaObj <= ahora
+    );
+
+}
+
+function calcularEstadisticas(datos){
+
+  if(!datos.length){
+
+    return{
+      promedio:null,
+      minimo:null,
+      maximo:null
+    };
+
+  }
+
+  const valores = datos.map(item => item.valor);
+
+  const suma = valores.reduce(
+    (acumulado,valor) => acumulado + valor,
+    0
+  );
+
+  return{
+    promedio:redondear(suma / valores.length),
+    minimo:redondear(Math.min(...valores)),
+    maximo:redondear(Math.max(...valores))
+  };
+
+}
+
+/* =========================================================
+   ESTADOS DEL INDICADOR
+========================================================= */
+
+function obtenerEstado(valor,config){
+
+  if(valor === null || valor === undefined){
+
+    return{
+      texto:"SIN INFORMACIÓN",
+      icono:"⚪",
+      clase:"estado-sindato",
+      color:"#7e889d"
+    };
+
+  }
+
+  if(
+    valor < config.criticoMin ||
+    valor > config.criticoMax
+  ){
+
+    return{
+      texto:"CRÍTICO",
+      icono:"🔴",
+      clase:"estado-critico",
+      color:"#e00000"
+    };
+
+  }
+
+  if(
+    valor < config.min ||
+    valor > config.max
+  ){
+
+    return{
+      texto:"ADVERTENCIA",
+      icono:"🟡",
+      clase:"estado-advertencia",
+      color:"#e1a000"
+    };
+
+  }
+
+  return{
+    texto:"NORMAL",
+    icono:"🟢",
+    clase:"estado-normal",
+    color:"#0a8a24"
+  };
+
+}
+
+/* =========================================================
+   GENERACIÓN DE LA GRÁFICA SVG
+========================================================= */
+
+function crearGrafica(datos,config){
+
+  if(!datos.length){
+
+    return `
+      <div class="mensaje-central">
+        No existen datos registrados para este indicador.
+      </div>
+    `;
+
+  }
+
+  const ancho = 1200;
+  const alto = 420;
+
+  const margenIzquierdo = 85;
+  const margenDerecho = 35;
+  const margenSuperior = 38;
+  const margenInferior = 72;
+
+  const anchoGrafica =
+    ancho - margenIzquierdo - margenDerecho;
+
+  const altoGrafica =
+    alto - margenSuperior - margenInferior;
+
+  const valores = datos.map(item => item.valor);
+
+  let minimoGrafica = Math.min(
+    ...valores,
+    config.min,
+    config.meta,
+    config.criticoMin
+  );
+
+  let maximoGrafica = Math.max(
+    ...valores,
+    config.max,
+    config.meta,
+    config.criticoMax
+  );
+
+  const distancia = maximoGrafica - minimoGrafica;
+
+  const margenExtra = distancia > 0
+    ? distancia * .12
+    : 5;
+
+  minimoGrafica -= margenExtra;
+  maximoGrafica += margenExtra;
+
+  const escalaY = valor => {
+
+    return margenSuperior +
+      (
+        (maximoGrafica - valor) /
+        (maximoGrafica - minimoGrafica)
+      ) *
+      altoGrafica;
+
+  };
+
+  const escalaX = indice => {
+
+    if(datos.length === 1){
+      return margenIzquierdo + anchoGrafica / 2;
+    }
+
+    return margenIzquierdo +
+      indice *
+      (
+        anchoGrafica /
+        (datos.length - 1)
+      );
+
+  };
+
+  const yNormalSuperior = escalaY(config.max);
+  const yNormalInferior = escalaY(config.min);
+  const yMeta = escalaY(config.meta);
+
+  const puntos = datos.map((item,indice) => {
+
+    const estado = obtenerEstado(
+      item.valor,
+      config
+    );
+
+    return{
+      x:escalaX(indice),
+      y:escalaY(item.valor),
+      valor:item.valor,
+      fecha:item.fechaObj,
+      color:estado.color
+    };
+
+  });
+
+  const linea = puntos
+    .map(punto => punto.x + "," + punto.y)
+    .join(" ");
+
+  const elementosPuntos = puntos
+    .map((punto,indice) => {
+
+      const etiquetaFecha =
+        punto.fecha.toLocaleString("es-CO",{
+          day:"2-digit",
+          month:"2-digit",
+          hour:"2-digit",
+          minute:"2-digit",
+          hour12:false
+        });
+
+      const yTexto = Math.max(
+        margenSuperior + 16,
+        punto.y - 16
+      );
+
+      return `
+        <circle
+          cx="${punto.x}"
+          cy="${punto.y}"
+          r="9"
+          fill="${punto.color}"
+          stroke="#001f5b"
+          stroke-width="4"
+        ></circle>
+
+        <text
+          x="${punto.x}"
+          y="${yTexto}"
+          text-anchor="middle"
+          font-size="22"
+          font-weight="900"
+          fill="#001f5b"
+        >
+          ${redondear(punto.valor)}
+        </text>
+
+        <text
+          x="${punto.x}"
+          y="${alto - 30}"
+          text-anchor="middle"
+          font-size="15"
+          font-weight="700"
+          fill="#42506b"
+        >
+          ${etiquetaFecha}
+        </text>
+      `;
+
+    })
+    .join("");
+
+  const cantidadLineasEje = 5;
+
+  let lineasEje = "";
+
+  for(let i = 0; i < cantidadLineasEje; i++){
+
+    const proporcion =
+      i / (cantidadLineasEje - 1);
+
+    const valor =
+      maximoGrafica -
+      proporcion *
+      (maximoGrafica - minimoGrafica);
+
+    const y = escalaY(valor);
+
+    lineasEje += `
+
+      <line
+        x1="${margenIzquierdo}"
+        y1="${y}"
+        x2="${ancho - margenDerecho}"
+        y2="${y}"
+        stroke="#ccd6e8"
+        stroke-width="1"
+      ></line>
+
+      <text
+        x="${margenIzquierdo - 15}"
+        y="${y + 6}"
+        text-anchor="end"
+        font-size="17"
+        font-weight="700"
+        fill="#53617a"
+      >
+        ${redondear(valor)}
+      </text>
+
+    `;
+
+  }
+
+  return `
+
+    <svg
+      viewBox="0 0 ${ancho} ${alto}"
+      preserveAspectRatio="none"
+      role="img"
+      aria-label="Gráfica del indicador"
+    >
+
+      <rect
+        x="${margenIzquierdo}"
+        y="${yNormalSuperior}"
+        width="${anchoGrafica}"
+        height="${yNormalInferior - yNormalSuperior}"
+        fill="#dff5e7"
+        opacity=".85"
+      ></rect>
+
+      ${lineasEje}
+
+      <line
+        x1="${margenIzquierdo}"
+        y1="${yMeta}"
+        x2="${ancho - margenDerecho}"
+        y2="${yMeta}"
+        stroke="#0a8a24"
+        stroke-width="4"
+        stroke-dasharray="12,9"
+      ></line>
+
+      <text
+        x="${ancho - margenDerecho - 6}"
+        y="${yMeta - 9}"
+        text-anchor="end"
+        font-size="17"
+        font-weight="900"
+        fill="#0a8a24"
+      >
+        Meta ${config.meta} ${config.unidad}
+      </text>
+
+      <polyline
+        points="${linea}"
+        fill="none"
+        stroke="#001f5b"
+        stroke-width="7"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></polyline>
+
+      ${elementosPuntos}
+
+    </svg>
+
+  `;
+
+}
+
+/* =========================================================
+   RENDERIZADO DE CADA PANTALLA
+========================================================= */
+
+function mostrarValor(valor,unidad){
+
+  if(valor === null || valor === undefined){
+    return "-";
+  }
+
+  return redondear(valor) + " " + unidad;
+
+}
+
+function renderizarIndicador(slide,campo){
+
+  const config = CONFIG_INDICADORES[campo];
+
+  const ultimos10 = obtenerUltimos10(campo);
+
+  const datosSemana = obtenerDatosSemana(campo);
+
+  const estadisticas = calcularEstadisticas(datosSemana);
+
+  const ultimo = ultimos10.length
+    ? ultimos10[ultimos10.length - 1]
+    : null;
+
+  const estado = obtenerEstado(
+    ultimo ? ultimo.valor : null,
+    config
+  );
+
+  const fechaUltimoRegistro = ultimo
+    ? formatearFechaHora(ultimo.fechaObj)
+    : "Sin registro";
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>${config.titulo}</h2>
+
+          <p>
+            ${config.subtitulo}
+            · ${ultimos10.length} registros visibles
+            · ${datosSemana.length} registros esta semana
+          </p>
+
+        </div>
+
+        <div class="estado ${estado.clase}">
+          ${estado.icono} ${estado.texto}
+        </div>
+
+      </div>
+
+      <div class="kpis">
+
+        <div class="kpi">
+
+          <div class="kpi-label">
+            Valor actual
+          </div>
+
+          <div class="kpi-value">
+            ${
+              mostrarValor(
+                ultimo ? ultimo.valor : null,
+                config.unidad
+              )
+            }
+          </div>
+
+        </div>
+
+        <div class="kpi">
+
+          <div class="kpi-label">
+            Promedio semanal
+          </div>
+
+          <div class="kpi-value">
+            ${
+              mostrarValor(
+                estadisticas.promedio,
+                config.unidad
+              )
+            }
+          </div>
+
+        </div>
+
+        <div class="kpi">
+
+          <div class="kpi-label">
+            Mínimo semanal
+          </div>
+
+          <div class="kpi-value">
+            ${
+              mostrarValor(
+                estadisticas.minimo,
+                config.unidad
+              )
+            }
+          </div>
+
+        </div>
+
+        <div class="kpi">
+
+          <div class="kpi-label">
+            Máximo semanal
+          </div>
+
+          <div class="kpi-value">
+            ${
+              mostrarValor(
+                estadisticas.maximo,
+                config.unidad
+              )
+            }
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="chart-card">
+
+        <div class="chart-container">
+          ${crearGrafica(ultimos10,config)}
+        </div>
+
+        <div class="chart-footer">
+
+          <div class="leyenda">
+
+            <span class="leyenda-meta">
+              ━ Meta: ${config.meta} ${config.unidad}
+            </span>
+
+            <span class="leyenda-normal">
+              ▰ Rango normal:
+              ${config.min}–${config.max}
+              ${config.unidad}
+            </span>
+
+          </div>
+
+          <div class="ultimo-registro">
+            Último registro:
+            <strong>${fechaUltimoRegistro}</strong>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+function renderizarTodosLosIndicadores(){
+
+  slides.forEach(slide => {
+
+    const campo = slide.dataset.campo;
+
+    renderizarIndicador(slide,campo);
+
+  });
+
+}
+
+function renderizarErrorEnSlides(mensaje){
+
+  slides.forEach(slide => {
+
+    slide.innerHTML = `
+
+      <div class="panel">
+
+        <div class="mensaje-central">
+
+          No fue posible consultar los datos.<br><br>
+
+          ${mensaje}
+
+        </div>
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+/* =========================================================
+   ROTACIÓN DE PANTALLAS
+========================================================= */
+
+function mostrarSlide(indice){
+
+  if(indice < 0){
+    indice = slides.length - 1;
+  }
+
+  if(indice >= slides.length){
+    indice = 0;
+  }
+
+  slides.forEach(slide => {
+    slide.classList.remove("activo");
+  });
+
+  indiceActual = indice;
+
+  slides[indiceActual].classList.add("activo");
+
+  document.getElementById("contador").textContent =
+    (indiceActual + 1) + " / " + slides.length;
+
+  reiniciarProgreso();
+
+}
+
+function siguienteSlide(manual = false){
+
+  mostrarSlide(indiceActual + 1);
+
+  if(manual && !pausado){
+    reiniciarTemporizadorSlide();
+  }
+
+}
+
+function anteriorSlide(){
+
+  mostrarSlide(indiceActual - 1);
+
+  if(!pausado){
+    reiniciarTemporizadorSlide();
+  }
+
+}
+
+function reiniciarTemporizadorSlide(){
+
+  clearInterval(temporizadorSlide);
+
+  if(pausado) return;
+
+  temporizadorSlide = setInterval(() => {
+    siguienteSlide(false);
+  },DURACION_SLIDE);
+
+}
+
+function alternarPausa(){
+
+  pausado = !pausado;
+
+  const boton = document.getElementById("btnPausa");
+
+  if(pausado){
+
+    boton.textContent = "▶";
+
+    clearInterval(temporizadorSlide);
+
+    clearInterval(temporizadorProgreso);
+
+  }else{
+
+    boton.textContent = "❚❚";
+
+    reiniciarTemporizadorSlide();
+
+    reiniciarProgreso();
+
+  }
+
+}
+
+/* =========================================================
+   BARRA DE PROGRESO
+========================================================= */
+
+function reiniciarProgreso(){
+
+  clearInterval(temporizadorProgreso);
+
+  inicioSlide = Date.now();
+
+  const barra = document.getElementById("progress");
+
+  barra.style.width = "0%";
+
+  if(pausado) return;
+
+  temporizadorProgreso = setInterval(() => {
+
+    const transcurrido = Date.now() - inicioSlide;
+
+    const porcentaje = Math.min(
+      100,
+      transcurrido / DURACION_SLIDE * 100
+    );
+
+    barra.style.width = porcentaje + "%";
+
+    if(porcentaje >= 100){
+      clearInterval(temporizadorProgreso);
+    }
+
+  },100);
+
+}
+
+/* =========================================================
+   PANTALLA COMPLETA
+========================================================= */
+
+async function alternarPantallaCompleta(){
+
+  try{
+
+    if(!document.fullscreenElement){
+
+      await document.documentElement.requestFullscreen();
+
+    }else{
+
+      await document.exitFullscreen();
+
+    }
+
+  }catch(error){
+
+    mostrarError(
+      "El navegador no permitió activar pantalla completa."
+    );
+
+  }
+
+}
+
+/* =========================================================
+   MENSAJES DE ERROR
+========================================================= */
+
+function mostrarError(mensaje){
+
+  const caja = document.getElementById("errorGlobal");
+
+  caja.textContent = mensaje;
+
+  caja.style.display = "block";
+
+  setTimeout(() => {
+    caja.style.display = "none";
+  },10000);
+
+}
+
+function ocultarError(){
+
+  document.getElementById("errorGlobal").style.display =
+    "none";
+
+}
+
+/* =========================================================
+   CONTROLES DEL TECLADO
+========================================================= */
+
+document.addEventListener("keydown",evento => {
+
+  if(evento.key === "ArrowRight"){
+    siguienteSlide(true);
+  }
+
+  if(evento.key === "ArrowLeft"){
+    anteriorSlide();
+  }
+
+  if(evento.key === " "){
+    evento.preventDefault();
+    alternarPausa();
+  }
+
+  if(
+    evento.key === "f" ||
+    evento.key === "F"
+  ){
+    alternarPantallaCompleta();
+  }
+
+});
+
+/* =========================================================
+   INICIO DEL SISTEMA
+========================================================= */
+
+function iniciarPantallaTV(){
+
+  actualizarReloj();
+
+  setInterval(actualizarReloj,1000);
+
+  renderizarTodosLosIndicadores();
+
+  mostrarSlide(0);
+
+  reiniciarTemporizadorSlide();
+
+  cargarDatos();
+
+  setInterval(
+    cargarDatos,
+    ACTUALIZACION_DATOS
+  );
+
+}
+
+iniciarPantallaTV();
+
+</script>
+
+</body>
+</html>
