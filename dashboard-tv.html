@@ -1296,6 +1296,38 @@ function finSemanaActual(){
 
 }
 
+function inicioMesActual(){
+
+  const hoy = new Date();
+
+  return new Date(
+    hoy.getFullYear(),
+    hoy.getMonth(),
+    1,
+    0,
+    0,
+    0,
+    0
+  );
+
+}
+
+function finPeriodoMesActual(){
+
+  const ahora = new Date();
+
+  return new Date(
+    ahora.getFullYear(),
+    ahora.getMonth(),
+    ahora.getDate(),
+    23,
+    59,
+    59,
+    999
+  );
+
+}
+
 function formatearFechaHora(fecha){
 
   if(
@@ -2345,10 +2377,10 @@ function esAsignadoPreventivo(registro){
   );
 
 }
-function preventivosSemana(){
+function preventivosMesActual(){
 
-  const lunes = inicioSemanaActual();
-  const domingo = finSemanaActual();
+  const inicio = inicioMesActual();
+  const fin = finPeriodoMesActual();
 
   return registrosPreventivos
     .filter(registro => {
@@ -2360,8 +2392,8 @@ function preventivosSemana(){
 
       return (
         fecha &&
-        fecha >= lunes &&
-        fecha <= domingo
+        fecha >= inicio &&
+        fecha <= fin
       );
 
     });
@@ -2370,34 +2402,34 @@ function preventivosSemana(){
 
 function estadisticasPreventivos(){
 
-  const semana =
-    preventivosSemana();
+  const mes =
+  preventivosMesActual();
 
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
 
-  const ejecutados =
-    semana.filter(
+    const ejecutados =
+  mes.filter(
       esEjecutadoPreventivo
     ).length;
 
   const cancelados =
-    semana.filter(
+    mes.filter(
       esCanceladoPreventivo
     ).length;
 
   const iniciados =
-    semana.filter(
+    mes.filter(
       esIniciadoPreventivo
     ).length;
 
   const asignados =
-    semana.filter(
+    mes.filter(
       esAsignadoPreventivo
     ).length;
 
   const pendientes =
-    semana.filter(registro => {
+    mes.filter(registro => {
 
       return (
         !esEjecutadoPreventivo(registro) &&
@@ -2438,7 +2470,7 @@ function estadisticasPreventivos(){
       }).length;
 
   const baseCumplimiento =
-    semana.length - cancelados;
+    mes.length - cancelados;
 
   const cumplimiento =
     baseCumplimiento > 0
@@ -2450,7 +2482,7 @@ function estadisticasPreventivos(){
       : 0;
 
   return{
-    total:semana.length,
+    total:mes.length,
     ejecutados,
     cancelados,
     iniciados,
@@ -2516,8 +2548,8 @@ function renderizarPreventivosResumen(slide){
           </h2>
 
           <p>
-            Estado de la programación correspondiente
-            a la semana actual
+            Estado de la programación acumulada
+            del mes actual
           </p>
 
         </div>
@@ -2533,7 +2565,7 @@ function renderizarPreventivosResumen(slide){
         <div class="cumplimiento-card">
 
           <div class="cumplimiento-titulo">
-            Cumplimiento semanal
+            Cumplimiento mensual
           </div>
 
           <div
@@ -2570,7 +2602,7 @@ function renderizarPreventivosResumen(slide){
               ${datos.total}
             </div>
             <div class="texto">
-              Programados semana
+              Programados mes
             </div>
           </div>
 
@@ -2661,7 +2693,7 @@ function renderizarPreventivosResumen(slide){
               }
             </div>
             <div class="texto">
-              Por completar semana
+              Por completar mes
             </div>
           </div>
 
@@ -2690,12 +2722,12 @@ function areaPreventivo(registro){
 
 function cumplimientoPreventivoPorArea(){
 
-  const semana =
-    preventivosSemana();
+  const mes =
+  preventivosMesActual();
 
   const agrupado = {};
 
-  semana.forEach(registro => {
+  mes.forEach(registro => {
 
     const area =
       areaPreventivo(registro);
@@ -2815,7 +2847,7 @@ function renderizarPreventivosArea(slide){
       : `
         <div class="mensaje-central">
           No existen preventivos programados
-          para la semana actual.
+          para el mes actual.
         </div>
       `;
 
@@ -2832,7 +2864,7 @@ function renderizarPreventivosArea(slide){
           </h2>
 
           <p>
-            Porcentaje de ejecución de la programación semanal
+            Porcentaje de ejecución de la programación mensual
           </p>
 
         </div>
@@ -3039,13 +3071,13 @@ function fechaCierreCorrectivo(registro){
 
 }
 
-function correctivosSemana(){
+function correctivosMesActual(){
 
-  const lunes =
-    inicioSemanaActual();
+  const inicio =
+    inicioMesActual();
 
-  const ahora =
-    new Date();
+  const fin =
+    finPeriodoMesActual();
 
   return registrosNotificaciones
     .filter(esCorrectivo)
@@ -3059,14 +3091,13 @@ function correctivosSemana(){
       return (
         fecha &&
         fecha.getTime() > 0 &&
-        fecha >= lunes &&
-        fecha <= ahora
+        fecha >= inicio &&
+        fecha <= fin
       );
 
     });
 
 }
-
 function correctivosAbiertos(){
 
   return registrosNotificaciones
@@ -3080,14 +3111,14 @@ function correctivosAbiertos(){
 
 function estadisticasCorrectivos(){
 
-  const semana =
-    correctivosSemana();
+  const mes =
+   correctivosMesActual();
 
   const abiertos =
     correctivosAbiertos();
 
-  const cerradosSemana =
-    semana.filter(
+  const cerradosMes =
+    mes.filter(
       esCorrectivoCerrado
     );
 
@@ -3113,7 +3144,7 @@ function estadisticasCorrectivos(){
 
   const tiempos = [];
 
-  cerradosSemana.forEach(registro => {
+  cerradosMes.forEach(registro => {
 
     let tiempo =
       numero(
@@ -3164,17 +3195,17 @@ function estadisticasCorrectivos(){
       : 0;
 
   const tasaCierre =
-    semana.length
+    mes.length
       ? redondear(
-          cerradosSemana.length /
-          semana.length *
+          cerradosmes.length /
+          mes.length *
           100
         )
       : 0;
 
   return{
-    reportados:semana.length,
-    cerrados:cerradosSemana.length,
+    reportados:mes.length,
+    cerrados:cerradosmes.length,
     abiertos:abiertos.length,
     pendientes,
     criticos,
@@ -3233,7 +3264,7 @@ function renderizarCorrectivosResumen(slide){
 
         <div class="kpi">
           <div class="kpi-label">
-            Reportados semana
+            Reportados mes
           </div>
           <div class="kpi-value">
             ${datos.reportados}
@@ -3242,7 +3273,7 @@ function renderizarCorrectivosResumen(slide){
 
         <div class="kpi">
           <div class="kpi-label">
-            Cerrados semana
+            Cerrados mes
           </div>
           <div
             class="kpi-value"
@@ -3290,7 +3321,7 @@ function renderizarCorrectivosResumen(slide){
 
         <div class="kpi">
           <div class="kpi-label">
-            Tasa de cierre semanal
+            Tasa de cierre mensual
           </div>
           <div class="kpi-value">
             ${datos.tasaCierre}%
@@ -3320,7 +3351,7 @@ function renderizarCorrectivosResumen(slide){
         <div class="cumplimiento-card">
 
           <div class="cumplimiento-titulo">
-            Balance semanal
+            Balance mensual
           </div>
 
           <div
@@ -3386,7 +3417,7 @@ function conteoCorrectivosPorLinea(){
 
   const agrupado = {};
 
-  correctivosSemana()
+ correctivosMesActual()
     .forEach(registro => {
 
       const linea =
@@ -3464,7 +3495,7 @@ function renderizarCorrectivosLineas(slide){
       : `
         <div class="mensaje-central">
           No existen correctivos registrados
-          durante la semana actual.
+          durante el mes actual
         </div>
       `;
 
@@ -3482,7 +3513,7 @@ function renderizarCorrectivosLineas(slide){
 
           <p>
             Cantidad de reportes correctivos registrados
-            durante la semana actual
+            durante el mes actual
           </p>
 
         </div>
