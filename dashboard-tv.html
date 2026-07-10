@@ -43,7 +43,7 @@ body{
 
 .header{
   height:11vh;
-  min-height:82px;
+  min-height:84px;
   padding:14px 28px;
   display:flex;
   align-items:center;
@@ -61,7 +61,7 @@ body{
 }
 
 .logo{
-  font-size:clamp(30px,3vw,52px);
+  font-size:clamp(34px,3.2vw,58px);
   font-weight:900;
   letter-spacing:1px;
   white-space:nowrap;
@@ -74,7 +74,7 @@ body{
 }
 
 .header-title h1{
-  font-size:clamp(20px,2vw,34px);
+  font-size:clamp(22px,2.1vw,37px);
   line-height:1.05;
 }
 
@@ -90,7 +90,7 @@ body{
 }
 
 .reloj{
-  font-size:clamp(25px,2.5vw,44px);
+  font-size:clamp(28px,2.8vw,48px);
   font-weight:900;
 }
 
@@ -141,7 +141,7 @@ body{
 }
 
 /* =========================================================
-   TÍTULO DE CADA INDICADOR
+   ENCABEZADO DE CADA PANTALLA
 ========================================================= */
 
 .panel-header{
@@ -157,7 +157,7 @@ body{
 }
 
 .nombre-indicador h2{
-  font-size:clamp(27px,2.8vw,48px);
+  font-size:clamp(28px,2.8vw,48px);
   line-height:1;
 }
 
@@ -168,7 +168,7 @@ body{
 }
 
 .estado{
-  min-width:170px;
+  min-width:180px;
   padding:12px 18px;
   border-radius:16px;
   font-size:clamp(14px,1.3vw,21px);
@@ -212,12 +212,16 @@ body{
   margin-bottom:14px;
 }
 
+.kpis.seis{
+  grid-template-columns:repeat(6,1fr);
+}
+
 .kpi{
   background:white;
   color:#001f5b;
   border-radius:17px;
   padding:11px 14px;
-  min-height:76px;
+  min-height:78px;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -233,14 +237,18 @@ body{
 }
 
 .kpi-value{
-  margin-top:4px;
+  margin-top:5px;
   font-size:clamp(22px,2.2vw,38px);
   font-weight:900;
   line-height:1;
 }
 
+.kpi-value.pequeno{
+  font-size:clamp(17px,1.7vw,29px);
+}
+
 /* =========================================================
-   ÁREA DE LA GRÁFICA
+   GRÁFICAS
 ========================================================= */
 
 .chart-card{
@@ -266,10 +274,6 @@ body{
   display:block;
 }
 
-/* =========================================================
-   LEYENDA INFERIOR
-========================================================= */
-
 .chart-footer{
   display:flex;
   justify-content:space-between;
@@ -294,84 +298,226 @@ body{
   color:#087a23;
 }
 
+.leyenda-advertencia{
+  color:#b67900;
+}
+
+.leyenda-critico{
+  color:#d60000;
+}
+
 .ultimo-registro{
   text-align:right;
   color:#44516b;
 }
 
 /* =========================================================
-   PIE DE PÁGINA
+   PREVENTIVOS
 ========================================================= */
 
-.footer{
-  height:7vh;
-  min-height:52px;
-  padding:9px 26px 10px;
+.preventivo-layout{
+  flex:1;
+  min-height:0;
   display:grid;
-  grid-template-columns:1fr auto 1fr;
-  align-items:center;
-  gap:20px;
-  border-top:1px solid rgba(255,255,255,.17);
-  background:#001f5b;
+  grid-template-columns:1.05fr 1.95fr;
+  gap:18px;
 }
 
-.footer-left{
-  font-size:clamp(11px,1vw,15px);
-  opacity:.82;
-}
-
-.footer-center{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.control{
-  width:40px;
-  height:36px;
-  border:none;
-  border-radius:11px;
+.cumplimiento-card{
   background:white;
   color:#001f5b;
-  font-size:20px;
-  font-weight:900;
-  cursor:pointer;
-}
-
-.control:hover{
-  background:#dbe4f5;
-}
-
-.contador{
-  min-width:78px;
+  border-radius:22px;
+  padding:22px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
   text-align:center;
-  font-size:15px;
+}
+
+.cumplimiento-titulo{
+  font-size:clamp(15px,1.4vw,23px);
+  font-weight:bold;
+  opacity:.75;
+  text-transform:uppercase;
+}
+
+.cumplimiento-valor{
+  margin-top:12px;
+  font-size:clamp(70px,8vw,135px);
+  font-weight:900;
+  line-height:.9;
+}
+
+.cumplimiento-estado{
+  margin-top:16px;
+  padding:10px 18px;
+  border-radius:14px;
+  font-size:clamp(15px,1.4vw,23px);
   font-weight:900;
 }
 
-.footer-right{
-  text-align:right;
-  font-size:clamp(11px,1vw,15px);
-  opacity:.82;
+.barra-cumplimiento{
+  width:100%;
+  height:28px;
+  border-radius:20px;
+  background:#dce3ef;
+  overflow:hidden;
+  margin-top:22px;
+}
+
+.barra-cumplimiento div{
+  height:100%;
+  border-radius:20px;
+  transition:width .8s ease;
+}
+
+.preventivos-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.preventivo-kpi{
+  background:white;
+  color:#001f5b;
+  border-radius:18px;
+  padding:15px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+.preventivo-kpi .numero{
+  font-size:clamp(32px,3.8vw,65px);
+  font-weight:900;
+  line-height:1;
+}
+
+.preventivo-kpi .texto{
+  margin-top:8px;
+  font-size:clamp(12px,1.1vw,18px);
+  font-weight:bold;
+  opacity:.75;
 }
 
 /* =========================================================
-   BARRA DE PROGRESO
+   BARRAS POR ÁREA Y LÍNEA
 ========================================================= */
 
-.progress-wrap{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:0;
-  height:5px;
-  background:rgba(255,255,255,.16);
+.barras-card{
+  flex:1;
+  min-height:0;
+  background:white;
+  color:#001f5b;
+  border-radius:20px;
+  padding:18px 24px;
+  overflow:hidden;
 }
 
-.progress{
-  width:0%;
+.lista-barras{
   height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:13px;
+}
+
+.fila-barra{
+  display:grid;
+  grid-template-columns:minmax(180px,28%) 1fr 90px;
+  align-items:center;
+  gap:15px;
+}
+
+.nombre-barra{
+  font-size:clamp(13px,1.2vw,20px);
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.fondo-barra{
+  height:30px;
+  background:#e3e8f1;
+  border-radius:16px;
+  overflow:hidden;
+}
+
+.relleno-barra{
+  height:100%;
+  border-radius:16px;
+  min-width:4px;
+}
+
+.valor-barra{
+  font-size:clamp(15px,1.4vw,23px);
+  font-weight:900;
+  text-align:right;
+}
+
+/* =========================================================
+   TABLA DE CORRECTIVOS
+========================================================= */
+
+.tabla-card{
+  flex:1;
+  min-height:0;
   background:white;
+  color:#001f5b;
+  border-radius:20px;
+  padding:10px 18px;
+  overflow:hidden;
+}
+
+.tabla-tv{
+  width:100%;
+  height:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+
+.tabla-tv th{
+  padding:10px 8px;
+  font-size:clamp(12px,1vw,17px);
+  text-align:left;
+  color:#486080;
+  border-bottom:2px solid #cfd8e8;
+  text-transform:uppercase;
+}
+
+.tabla-tv td{
+  padding:10px 8px;
+  font-size:clamp(13px,1.1vw,19px);
+  font-weight:bold;
+  border-bottom:1px solid #e0e5ee;
+  vertical-align:middle;
+}
+
+.prioridad{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:10px;
+  font-size:clamp(11px,.9vw,15px);
+  font-weight:900;
+}
+
+.prioridad-alta{
+  background:#ffe0e0;
+  color:#b00000;
+}
+
+.prioridad-media{
+  background:#fff1c8;
+  color:#966000;
+}
+
+.prioridad-baja{
+  background:#e3f3e8;
+  color:#087a23;
 }
 
 /* =========================================================
@@ -407,31 +553,92 @@ body{
 }
 
 /* =========================================================
-   ADAPTACIÓN A PANTALLAS PEQUEÑAS
+   PIE DE PÁGINA
 ========================================================= */
 
-@media(max-width:850px){
+.footer{
+  height:7vh;
+  min-height:54px;
+  padding:9px 26px 10px;
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:20px;
+  border-top:1px solid rgba(255,255,255,.17);
+  background:#001f5b;
+}
+
+.footer-left{
+  font-size:clamp(11px,1vw,15px);
+  opacity:.82;
+}
+
+.footer-center{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.control{
+  width:42px;
+  height:38px;
+  border:none;
+  border-radius:11px;
+  background:white;
+  color:#001f5b;
+  font-size:20px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.control:hover{
+  background:#dbe4f5;
+}
+
+.contador{
+  min-width:82px;
+  text-align:center;
+  font-size:16px;
+  font-weight:900;
+}
+
+.footer-right{
+  text-align:right;
+  font-size:clamp(11px,1vw,15px);
+  opacity:.82;
+}
+
+.progress-wrap{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:5px;
+  background:rgba(255,255,255,.16);
+}
+
+.progress{
+  width:0%;
+  height:100%;
+  background:white;
+}
+
+/* =========================================================
+   RESPONSIVO
+========================================================= */
+
+@media(max-width:1000px){
 
   .header-title{
     display:none;
   }
 
-  .kpis{
-    grid-template-columns:repeat(2,1fr);
+  .kpis.seis{
+    grid-template-columns:repeat(3,1fr);
   }
 
-  .panel{
-    padding:14px;
-  }
-
-  .chart-footer{
-    align-items:flex-start;
-    flex-direction:column;
-    gap:5px;
-  }
-
-  .ultimo-registro{
-    text-align:left;
+  .preventivo-layout{
+    grid-template-columns:1fr 2fr;
   }
 
 }
@@ -451,7 +658,7 @@ body{
 
     <div class="header-title">
       <h1>Centro Visual de Mantenimiento</h1>
-      <p>Monitoreo operacional de Servicios Industriales</p>
+      <p>Monitoreo operacional de mantenimiento y servicios industriales</p>
     </div>
 
   </div>
@@ -465,15 +672,66 @@ body{
 
 <main id="contenedorSlides" class="main">
 
-  <section class="slide activo" data-campo="Presion_Aire_SAM"></section>
+  <!-- SERVICIOS INDUSTRIALES -->
 
-  <section class="slide" data-campo="Caudal_Aire"></section>
+  <section
+    class="slide activo"
+    data-tipo="servicio"
+    data-campo="Presion_Aire_SAM"
+  ></section>
 
-  <section class="slide" data-campo="Temperatura_Chiller"></section>
+  <section
+    class="slide"
+    data-tipo="servicio"
+    data-campo="Caudal_Aire"
+  ></section>
 
-  <section class="slide" data-campo="Carga_Compresores"></section>
+  <section
+    class="slide"
+    data-tipo="servicio"
+    data-campo="Temperatura_Chiller"
+  ></section>
 
-  <section class="slide" data-campo="Presion_Bombas"></section>
+  <section
+    class="slide"
+    data-tipo="servicio"
+    data-campo="Carga_Compresores"
+  ></section>
+
+  <section
+    class="slide"
+    data-tipo="servicio"
+    data-campo="Presion_Bombas"
+  ></section>
+
+  <!-- PREVENTIVOS -->
+
+  <section
+    class="slide"
+    data-tipo="preventivos-resumen"
+  ></section>
+
+  <section
+    class="slide"
+    data-tipo="preventivos-area"
+  ></section>
+
+  <!-- CORRECTIVOS -->
+
+  <section
+    class="slide"
+    data-tipo="correctivos-resumen"
+  ></section>
+
+  <section
+    class="slide"
+    data-tipo="correctivos-lineas"
+  ></section>
+
+  <section
+    class="slide"
+    data-tipo="correctivos-pendientes"
+  ></section>
 
 </main>
 
@@ -502,7 +760,7 @@ body{
       ❚❚
     </button>
 
-    <div id="contador" class="contador">1 / 5</div>
+    <div id="contador" class="contador">1 / 10</div>
 
     <button
       class="control"
@@ -542,27 +800,31 @@ body{
 const URL_API =
   "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
 
+/*
+  Confirma que estos nombres coincidan exactamente
+  con los nombres de las pestañas de Google Sheets.
+*/
+
 const HOJA_SERVICIOS = "Rutas_Servicios";
+const HOJA_PREVENTIVOS = "Preventivos";
+const HOJA_NOTIFICACIONES = "Notificaciones";
 
 /* =========================================================
-   TIEMPOS DE FUNCIONAMIENTO
+   TIEMPOS
 ========================================================= */
 
-/* Cada indicador permanece 20 segundos. */
 const DURACION_SLIDE = 20000;
-
-/* Los datos se vuelven a consultar cada 5 minutos. */
 const ACTUALIZACION_DATOS = 5 * 60 * 1000;
 
 /* =========================================================
-   CONFIGURACIÓN DE INDICADORES
+   CONFIGURACIÓN DE SERVICIOS
 ========================================================= */
 
 const CONFIG_INDICADORES = {
 
   Presion_Aire_SAM:{
     titulo:"Presión de aire comprimido SAM",
-    subtitulo:"Últimos 10 registros y comportamiento semanal",
+    subtitulo:"Presión principal del sistema de aire comprimido",
     unidad:"PSI",
     meta:100,
     min:95,
@@ -584,13 +846,13 @@ const CONFIG_INDICADORES = {
 
   Temperatura_Chiller:{
     titulo:"Temperatura de salida del chiller",
-    subtitulo:"Control de temperatura del sistema de agua fría",
+    subtitulo:"Temperatura de suministro del sistema de agua fría",
     unidad:"°F",
     meta:60,
     min:58,
     max:64,
-    criticoMin:56,
-    criticoMax:66
+    criticoMin:55,
+    criticoMax:67
   },
 
   Carga_Compresores:{
@@ -606,7 +868,7 @@ const CONFIG_INDICADORES = {
 
   Presion_Bombas:{
     titulo:"Presión de bombas de agua fría",
-    subtitulo:"Presión de suministro de agua hacia la planta",
+    subtitulo:"Presión de suministro del sistema de agua hacia planta",
     unidad:"PSI",
     meta:60,
     min:35,
@@ -618,25 +880,109 @@ const CONFIG_INDICADORES = {
 };
 
 /* =========================================================
-   VARIABLES GLOBALES
+   VARIABLES
 ========================================================= */
 
 let registrosServicios = [];
+let registrosPreventivos = [];
+let registrosNotificaciones = [];
 
 let indiceActual = 0;
-
 let pausado = false;
 
 let temporizadorSlide = null;
-
 let temporizadorProgreso = null;
-
 let inicioSlide = Date.now();
 
-const slides = Array.from(document.querySelectorAll(".slide"));
+const slides = Array.from(
+  document.querySelectorAll(".slide")
+);
 
 /* =========================================================
-   FUNCIONES DE FECHA Y HORA
+   UTILIDADES DE TEXTO
+========================================================= */
+
+function textoSeguro(valor){
+
+  if(
+    valor === undefined ||
+    valor === null
+  ){
+    return "";
+  }
+
+  return String(valor).trim();
+
+}
+
+function textoNormalizado(valor){
+
+  return textoSeguro(valor)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase()
+    .trim();
+
+}
+
+function primerValor(objeto,campos){
+
+  for(const campo of campos){
+
+    if(
+      objeto[campo] !== undefined &&
+      objeto[campo] !== null &&
+      String(objeto[campo]).trim() !== ""
+    ){
+      return objeto[campo];
+    }
+
+  }
+
+  return "";
+
+}
+
+function numero(valor){
+
+  if(
+    valor === undefined ||
+    valor === null ||
+    valor === ""
+  ){
+    return null;
+  }
+
+  let texto = String(valor)
+    .trim()
+    .replace(/\s/g,"")
+    .replace("%","");
+
+  if(texto.includes(",") && !texto.includes(".")){
+    texto = texto.replace(",",".");
+  }
+
+  const n = Number(texto);
+
+  return isNaN(n) ? null : n;
+
+}
+
+function redondear(valor){
+
+  if(
+    valor === null ||
+    valor === undefined ||
+    isNaN(valor)
+  ){
+    return "-";
+  }
+
+  return Number(Number(valor).toFixed(1));
+}
+
+/* =========================================================
+   FECHAS
 ========================================================= */
 
 function fechaISO(fechaTexto){
@@ -657,13 +1003,24 @@ function fechaISO(fechaTexto){
 
     if(partes.length === 3){
 
-      const dia = Number(partes[0]);
-      const mes = Number(partes[1]) - 1;
-      const anio = Number(partes[2]);
+      const parte1 = Number(partes[0]);
+      const parte2 = Number(partes[1]);
+      const parte3 = Number(partes[2]);
 
-      const fecha = new Date(anio, mes, dia);
+      /*
+        Se interpreta inicialmente como:
+        día / mes / año
+      */
 
-      return isNaN(fecha.getTime()) ? null : fecha;
+      const fecha = new Date(
+        parte3,
+        parte2 - 1,
+        parte1
+      );
+
+      if(!isNaN(fecha.getTime())){
+        return fecha;
+      }
 
     }
 
@@ -697,7 +1054,8 @@ function horaA24(horaTexto){
     .replace("am","")
     .replace("pm","");
 
-  const coincidencia = texto.match(/(\d{1,2})(?::(\d{1,2}))?/);
+  const coincidencia =
+    texto.match(/(\d{1,2})(?::(\d{1,2}))?/);
 
   if(!coincidencia) return "00:00";
 
@@ -705,7 +1063,6 @@ function horaA24(horaTexto){
   let minutos = Number(coincidencia[2] || 0);
 
   if(esPM && horas < 12) horas += 12;
-
   if(esAM && horas === 12) horas = 0;
 
   return (
@@ -716,7 +1073,7 @@ function horaA24(horaTexto){
 
 }
 
-function fechaHoraObj(fechaTexto, horaTexto){
+function fechaHoraObj(fechaTexto,horaTexto){
 
   const fecha = fechaISO(fechaTexto);
 
@@ -735,6 +1092,28 @@ function fechaHoraObj(fechaTexto, horaTexto){
 
 }
 
+function fechaRegistroGenerica(registro){
+
+  const fecha = primerValor(registro,[
+    "Fecha",
+    "FechaReporte",
+    "FechaProgramada",
+    "Fe.inic.extrema",
+    "FechaAsignacion",
+    "FechaInicio",
+    "FechaEjecucion",
+    "FechaCierre"
+  ]);
+
+  const hora = primerValor(registro,[
+    "Hora",
+    "HoraReporte"
+  ]);
+
+  return fechaHoraObj(fecha,hora);
+
+}
+
 function inicioSemanaActual(){
 
   const hoy = new Date();
@@ -743,11 +1122,14 @@ function inicioSemanaActual(){
 
   const dia = hoy.getDay();
 
-  const diferencia = dia === 0 ? -6 : 1 - dia;
+  const diferencia =
+    dia === 0 ? -6 : 1 - dia;
 
   const lunes = new Date(hoy);
 
-  lunes.setDate(hoy.getDate() + diferencia);
+  lunes.setDate(
+    hoy.getDate() + diferencia
+  );
 
   lunes.setHours(0,0,0,0);
 
@@ -755,9 +1137,27 @@ function inicioSemanaActual(){
 
 }
 
+function finSemanaActual(){
+
+  const lunes = inicioSemanaActual();
+  const domingo = new Date(lunes);
+
+  domingo.setDate(lunes.getDate() + 6);
+  domingo.setHours(23,59,59,999);
+
+  return domingo;
+
+}
+
 function formatearFechaHora(fecha){
 
-  if(!fecha || isNaN(fecha.getTime())) return "Sin fecha";
+  if(
+    !fecha ||
+    isNaN(fecha.getTime()) ||
+    fecha.getTime() === 0
+  ){
+    return "Sin fecha";
+  }
 
   return fecha.toLocaleString("es-CO",{
     day:"2-digit",
@@ -766,6 +1166,26 @@ function formatearFechaHora(fecha){
     minute:"2-digit",
     hour12:true
   });
+
+}
+
+function diferenciaMinutos(fechaInicio,fechaFin){
+
+  if(
+    !fechaInicio ||
+    !fechaFin ||
+    fechaInicio.getTime() === 0 ||
+    fechaFin.getTime() === 0
+  ){
+    return null;
+  }
+
+  return Math.max(
+    0,
+    Math.round(
+      (fechaFin - fechaInicio) / 60000
+    )
+  );
 
 }
 
@@ -792,48 +1212,7 @@ function actualizarReloj(){
 }
 
 /* =========================================================
-   CONVERSIÓN DE DATOS
-========================================================= */
-
-function numero(valor){
-
-  if(
-    valor === undefined ||
-    valor === null ||
-    valor === ""
-  ){
-    return null;
-  }
-
-  let texto = String(valor)
-    .trim()
-    .replace(/\s/g,"")
-    .replace("%","");
-
-  /*
-    Si el valor usa coma decimal:
-    98,5 → 98.5
-  */
-  if(texto.includes(",") && !texto.includes(".")){
-    texto = texto.replace(",",".");
-  }
-
-  const n = Number(texto);
-
-  return isNaN(n) ? null : n;
-
-}
-
-function redondear(valor){
-
-  if(valor === null || valor === undefined) return "-";
-
-  return Number(valor.toFixed(1));
-
-}
-
-/* =========================================================
-   CONSULTA A LA HOJA
+   CONSULTA API
 ========================================================= */
 
 async function cargarHoja(nombreHoja){
@@ -851,9 +1230,12 @@ async function cargarHoja(nombreHoja){
   });
 
   if(!respuesta.ok){
+
     throw new Error(
-      "La API respondió con estado " + respuesta.status
+      "La API respondió con estado " +
+      respuesta.status
     );
+
   }
 
   const data = await respuesta.json();
@@ -862,7 +1244,9 @@ async function cargarHoja(nombreHoja){
     throw new Error(data.error);
   }
 
-  return Array.isArray(data.datos) ? data.datos : [];
+  return Array.isArray(data.datos)
+    ? data.datos
+    : [];
 
 }
 
@@ -873,48 +1257,100 @@ async function cargarDatos(){
   document.getElementById("estadoCarga").textContent =
     "Actualizando datos...";
 
-  try{
+  const resultados = await Promise.allSettled([
 
-    const datos = await cargarHoja(HOJA_SERVICIOS);
+    cargarHoja(HOJA_SERVICIOS),
 
-    registrosServicios = datos;
+    cargarHoja(HOJA_PREVENTIVOS),
 
-    renderizarTodosLosIndicadores();
+    cargarHoja(HOJA_NOTIFICACIONES)
 
-    const ahora = new Date();
+  ]);
 
-    document.getElementById("ultimaActualizacion").textContent =
-      ahora.toLocaleTimeString("es-CO",{
-        hour:"2-digit",
-        minute:"2-digit",
-        hour12:true
-      });
+  const errores = [];
 
-    document.getElementById("estadoCarga").textContent =
-      datos.length +
-      " registros disponibles · Actualización automática cada 5 minutos";
+  if(resultados[0].status === "fulfilled"){
 
-  }catch(error){
+    registrosServicios =
+      resultados[0].value;
 
-    console.error(error);
+  }else{
 
-    mostrarError(
-      "No fue posible actualizar los datos: " + error.message
+    errores.push(
+      "Servicios Industriales"
     );
 
-    document.getElementById("estadoCarga").textContent =
-      "Error de conexión. Se conservarán los datos anteriores.";
+    console.error(
+      resultados[0].reason
+    );
 
-    if(registrosServicios.length === 0){
-      renderizarErrorEnSlides(error.message);
-    }
+  }
+
+  if(resultados[1].status === "fulfilled"){
+
+    registrosPreventivos =
+      resultados[1].value;
+
+  }else{
+
+    errores.push("Preventivos");
+
+    console.error(
+      resultados[1].reason
+    );
+
+  }
+
+  if(resultados[2].status === "fulfilled"){
+
+    registrosNotificaciones =
+      resultados[2].value;
+
+  }else{
+
+    errores.push("Correctivos");
+
+    console.error(
+      resultados[2].reason
+    );
+
+  }
+
+  renderizarTodosLosSlides();
+
+  const ahora = new Date();
+
+  document.getElementById(
+    "ultimaActualizacion"
+  ).textContent =
+    ahora.toLocaleTimeString("es-CO",{
+      hour:"2-digit",
+      minute:"2-digit",
+      hour12:true
+    });
+
+  const total =
+    registrosServicios.length +
+    registrosPreventivos.length +
+    registrosNotificaciones.length;
+
+  document.getElementById("estadoCarga").textContent =
+    total +
+    " registros disponibles · Actualización automática cada 5 minutos";
+
+  if(errores.length){
+
+    mostrarError(
+      "No se pudieron consultar: " +
+      errores.join(", ")
+    );
 
   }
 
 }
 
 /* =========================================================
-   PREPARACIÓN DE SERIES
+   SERVICIOS INDUSTRIALES
 ========================================================= */
 
 function obtenerSerieCompleta(campo){
@@ -924,13 +1360,25 @@ function obtenerSerieCompleta(campo){
 
       valor:numero(registro[campo]),
 
-      fecha:registro.Fecha || "",
+      fecha:primerValor(registro,[
+        "Fecha",
+        "FechaRegistro"
+      ]),
 
-      hora:registro.Hora || "",
+      hora:primerValor(registro,[
+        "Hora",
+        "HoraRegistro"
+      ]),
 
       fechaObj:fechaHoraObj(
-        registro.Fecha,
-        registro.Hora
+        primerValor(registro,[
+          "Fecha",
+          "FechaRegistro"
+        ]),
+        primerValor(registro,[
+          "Hora",
+          "HoraRegistro"
+        ])
       )
 
     }))
@@ -938,20 +1386,23 @@ function obtenerSerieCompleta(campo){
       item.valor !== null &&
       item.fechaObj.getTime() > 0
     )
-    .sort((a,b) => a.fechaObj - b.fechaObj);
+    .sort(
+      (a,b) =>
+      a.fechaObj - b.fechaObj
+    );
 
 }
 
 function obtenerUltimos10(campo){
 
-  return obtenerSerieCompleta(campo).slice(-10);
+  return obtenerSerieCompleta(campo)
+    .slice(-10);
 
 }
 
-function obtenerDatosSemana(campo){
+function obtenerDatosSemanaServicio(campo){
 
   const lunes = inicioSemanaActual();
-
   const ahora = new Date();
 
   return obtenerSerieCompleta(campo)
@@ -974,28 +1425,36 @@ function calcularEstadisticas(datos){
 
   }
 
-  const valores = datos.map(item => item.valor);
+  const valores =
+    datos.map(item => item.valor);
 
-  const suma = valores.reduce(
-    (acumulado,valor) => acumulado + valor,
-    0
-  );
+  const suma =
+    valores.reduce(
+      (acumulado,valor) =>
+      acumulado + valor,
+      0
+    );
 
   return{
-    promedio:redondear(suma / valores.length),
-    minimo:redondear(Math.min(...valores)),
-    maximo:redondear(Math.max(...valores))
+    promedio:redondear(
+      suma / valores.length
+    ),
+    minimo:redondear(
+      Math.min(...valores)
+    ),
+    maximo:redondear(
+      Math.max(...valores)
+    )
   };
 
 }
 
-/* =========================================================
-   ESTADOS DEL INDICADOR
-========================================================= */
+function obtenerEstadoServicio(valor,config){
 
-function obtenerEstado(valor,config){
-
-  if(valor === null || valor === undefined){
+  if(
+    valor === null ||
+    valor === undefined
+  ){
 
     return{
       texto:"SIN INFORMACIÓN",
@@ -1013,7 +1472,7 @@ function obtenerEstado(valor,config){
 
     return{
       texto:"CRÍTICO",
-      icono:"🔴",
+      icono:"●",
       clase:"estado-critico",
       color:"#e00000"
     };
@@ -1027,7 +1486,7 @@ function obtenerEstado(valor,config){
 
     return{
       texto:"ADVERTENCIA",
-      icono:"🟡",
+      icono:"●",
       clase:"estado-advertencia",
       color:"#e1a000"
     };
@@ -1036,18 +1495,33 @@ function obtenerEstado(valor,config){
 
   return{
     texto:"NORMAL",
-    icono:"🟢",
+    icono:"●",
     clase:"estado-normal",
     color:"#0a8a24"
   };
 
 }
 
+function mostrarValor(valor,unidad){
+
+  if(
+    valor === null ||
+    valor === undefined
+  ){
+    return "-";
+  }
+
+  return redondear(valor) +
+    " " +
+    unidad;
+
+}
+
 /* =========================================================
-   GENERACIÓN DE LA GRÁFICA SVG
+   SVG SERVICIOS CON ZONAS ROJA, AMARILLA Y VERDE
 ========================================================= */
 
-function crearGrafica(datos,config){
+function crearGraficaServicio(datos,config){
 
   if(!datos.length){
 
@@ -1068,32 +1542,39 @@ function crearGrafica(datos,config){
   const margenInferior = 72;
 
   const anchoGrafica =
-    ancho - margenIzquierdo - margenDerecho;
+    ancho -
+    margenIzquierdo -
+    margenDerecho;
 
   const altoGrafica =
-    alto - margenSuperior - margenInferior;
+    alto -
+    margenSuperior -
+    margenInferior;
 
-  const valores = datos.map(item => item.valor);
+  const valores =
+    datos.map(item => item.valor);
 
   let minimoGrafica = Math.min(
     ...valores,
+    config.criticoMin,
     config.min,
-    config.meta,
-    config.criticoMin
+    config.meta
   );
 
   let maximoGrafica = Math.max(
     ...valores,
+    config.criticoMax,
     config.max,
-    config.meta,
-    config.criticoMax
+    config.meta
   );
 
-  const distancia = maximoGrafica - minimoGrafica;
+  const distancia =
+    maximoGrafica - minimoGrafica;
 
-  const margenExtra = distancia > 0
-    ? distancia * .12
-    : 5;
+  const margenExtra =
+    distancia > 0
+      ? distancia * .12
+      : 5;
 
   minimoGrafica -= margenExtra;
   maximoGrafica += margenExtra;
@@ -1112,7 +1593,10 @@ function crearGrafica(datos,config){
   const escalaX = indice => {
 
     if(datos.length === 1){
-      return margenIzquierdo + anchoGrafica / 2;
+
+      return margenIzquierdo +
+        anchoGrafica / 2;
+
     }
 
     return margenIzquierdo +
@@ -1124,97 +1608,133 @@ function crearGrafica(datos,config){
 
   };
 
-  const yNormalSuperior = escalaY(config.max);
-  const yNormalInferior = escalaY(config.min);
-  const yMeta = escalaY(config.meta);
+  const yCriticoMax =
+    escalaY(config.criticoMax);
 
-  const puntos = datos.map((item,indice) => {
+  const yMaxNormal =
+    escalaY(config.max);
 
-    const estado = obtenerEstado(
-      item.valor,
-      config
-    );
+  const yMeta =
+    escalaY(config.meta);
 
-    return{
-      x:escalaX(indice),
-      y:escalaY(item.valor),
-      valor:item.valor,
-      fecha:item.fechaObj,
-      color:estado.color
-    };
+  const yMinNormal =
+    escalaY(config.min);
 
-  });
+  const yCriticoMin =
+    escalaY(config.criticoMin);
 
-  const linea = puntos
-    .map(punto => punto.x + "," + punto.y)
-    .join(" ");
+  const finGrafica =
+    margenSuperior +
+    altoGrafica;
 
-  const elementosPuntos = puntos
-    .map((punto,indice) => {
+  const puntos =
+    datos.map((item,indice) => {
 
-      const etiquetaFecha =
-        punto.fecha.toLocaleString("es-CO",{
-          day:"2-digit",
-          month:"2-digit",
-          hour:"2-digit",
-          minute:"2-digit",
-          hour12:false
-        });
+      const estado =
+        obtenerEstadoServicio(
+          item.valor,
+          config
+        );
 
-      const yTexto = Math.max(
-        margenSuperior + 16,
-        punto.y - 16
-      );
+      return{
+        x:escalaX(indice),
+        y:escalaY(item.valor),
+        valor:item.valor,
+        fecha:item.fechaObj,
+        color:estado.color
+      };
 
-      return `
-        <circle
-          cx="${punto.x}"
-          cy="${punto.y}"
-          r="9"
-          fill="${punto.color}"
-          stroke="#001f5b"
-          stroke-width="4"
-        ></circle>
+    });
 
-        <text
-          x="${punto.x}"
-          y="${yTexto}"
-          text-anchor="middle"
-          font-size="22"
-          font-weight="900"
-          fill="#001f5b"
-        >
-          ${redondear(punto.valor)}
-        </text>
+  const linea =
+    puntos
+      .map(
+        punto =>
+        punto.x + "," + punto.y
+      )
+      .join(" ");
 
-        <text
-          x="${punto.x}"
-          y="${alto - 30}"
-          text-anchor="middle"
-          font-size="15"
-          font-weight="700"
-          fill="#42506b"
-        >
-          ${etiquetaFecha}
-        </text>
-      `;
+  const elementosPuntos =
+    puntos
+      .map(punto => {
 
-    })
-    .join("");
+        const etiquetaFecha =
+          punto.fecha.toLocaleString(
+            "es-CO",
+            {
+              day:"2-digit",
+              month:"2-digit",
+              hour:"2-digit",
+              minute:"2-digit",
+              hour12:false
+            }
+          );
+
+        const yTexto =
+          Math.max(
+            margenSuperior + 17,
+            punto.y - 16
+          );
+
+        return `
+
+          <circle
+            cx="${punto.x}"
+            cy="${punto.y}"
+            r="9"
+            fill="${punto.color}"
+            stroke="#001f5b"
+            stroke-width="4"
+          ></circle>
+
+          <text
+            x="${punto.x}"
+            y="${yTexto}"
+            text-anchor="middle"
+            font-size="22"
+            font-weight="900"
+            fill="#001f5b"
+          >
+            ${redondear(punto.valor)}
+          </text>
+
+          <text
+            x="${punto.x}"
+            y="${alto - 30}"
+            text-anchor="middle"
+            font-size="15"
+            font-weight="700"
+            fill="#42506b"
+          >
+            ${etiquetaFecha}
+          </text>
+
+        `;
+
+      })
+      .join("");
 
   const cantidadLineasEje = 5;
 
   let lineasEje = "";
 
-  for(let i = 0; i < cantidadLineasEje; i++){
+  for(
+    let i = 0;
+    i < cantidadLineasEje;
+    i++
+  ){
 
     const proporcion =
-      i / (cantidadLineasEje - 1);
+      i /
+      (cantidadLineasEje - 1);
 
     const valor =
       maximoGrafica -
       proporcion *
-      (maximoGrafica - minimoGrafica);
+      (
+        maximoGrafica -
+        minimoGrafica
+      );
 
     const y = escalaY(valor);
 
@@ -1253,23 +1773,130 @@ function crearGrafica(datos,config){
       aria-label="Gráfica del indicador"
     >
 
+      <!-- ZONA CRÍTICA SUPERIOR -->
+
       <rect
         x="${margenIzquierdo}"
-        y="${yNormalSuperior}"
+        y="${margenSuperior}"
         width="${anchoGrafica}"
-        height="${yNormalInferior - yNormalSuperior}"
+        height="${Math.max(
+          0,
+          yCriticoMax - margenSuperior
+        )}"
+        fill="#ffdada"
+        opacity=".92"
+      ></rect>
+
+      <!-- ADVERTENCIA SUPERIOR -->
+
+      <rect
+        x="${margenIzquierdo}"
+        y="${yCriticoMax}"
+        width="${anchoGrafica}"
+        height="${Math.max(
+          0,
+          yMaxNormal - yCriticoMax
+        )}"
+        fill="#fff1c2"
+        opacity=".92"
+      ></rect>
+
+      <!-- ZONA NORMAL -->
+
+      <rect
+        x="${margenIzquierdo}"
+        y="${yMaxNormal}"
+        width="${anchoGrafica}"
+        height="${Math.max(
+          0,
+          yMinNormal - yMaxNormal
+        )}"
         fill="#dff5e7"
-        opacity=".85"
+        opacity=".95"
+      ></rect>
+
+      <!-- ADVERTENCIA INFERIOR -->
+
+      <rect
+        x="${margenIzquierdo}"
+        y="${yMinNormal}"
+        width="${anchoGrafica}"
+        height="${Math.max(
+          0,
+          yCriticoMin - yMinNormal
+        )}"
+        fill="#fff1c2"
+        opacity=".92"
+      ></rect>
+
+      <!-- ZONA CRÍTICA INFERIOR -->
+
+      <rect
+        x="${margenIzquierdo}"
+        y="${yCriticoMin}"
+        width="${anchoGrafica}"
+        height="${Math.max(
+          0,
+          finGrafica - yCriticoMin
+        )}"
+        fill="#ffdada"
+        opacity=".92"
       ></rect>
 
       ${lineasEje}
+
+      <!-- LÍMITES CRÍTICOS -->
+
+      <line
+        x1="${margenIzquierdo}"
+        y1="${yCriticoMax}"
+        x2="${ancho - margenDerecho}"
+        y2="${yCriticoMax}"
+        stroke="#e00000"
+        stroke-width="3"
+        stroke-dasharray="10,8"
+      ></line>
+
+      <line
+        x1="${margenIzquierdo}"
+        y1="${yCriticoMin}"
+        x2="${ancho - margenDerecho}"
+        y2="${yCriticoMin}"
+        stroke="#e00000"
+        stroke-width="3"
+        stroke-dasharray="10,8"
+      ></line>
+
+      <!-- LÍMITES NORMALES -->
+
+      <line
+        x1="${margenIzquierdo}"
+        y1="${yMaxNormal}"
+        x2="${ancho - margenDerecho}"
+        y2="${yMaxNormal}"
+        stroke="#0a8a24"
+        stroke-width="2"
+        stroke-dasharray="8,7"
+      ></line>
+
+      <line
+        x1="${margenIzquierdo}"
+        y1="${yMinNormal}"
+        x2="${ancho - margenDerecho}"
+        y2="${yMinNormal}"
+        stroke="#0a8a24"
+        stroke-width="2"
+        stroke-dasharray="8,7"
+      ></line>
+
+      <!-- META -->
 
       <line
         x1="${margenIzquierdo}"
         y1="${yMeta}"
         x2="${ancho - margenDerecho}"
         y2="${yMeta}"
-        stroke="#0a8a24"
+        stroke="#078f22"
         stroke-width="4"
         stroke-dasharray="12,9"
       ></line>
@@ -1280,10 +1907,12 @@ function crearGrafica(datos,config){
         text-anchor="end"
         font-size="17"
         font-weight="900"
-        fill="#0a8a24"
+        fill="#078f22"
       >
         Meta ${config.meta} ${config.unidad}
       </text>
+
+      <!-- TENDENCIA -->
 
       <polyline
         points="${linea}"
@@ -1302,42 +1931,39 @@ function crearGrafica(datos,config){
 
 }
 
-/* =========================================================
-   RENDERIZADO DE CADA PANTALLA
-========================================================= */
+function renderizarServicio(slide,campo){
 
-function mostrarValor(valor,unidad){
+  const config =
+    CONFIG_INDICADORES[campo];
 
-  if(valor === null || valor === undefined){
-    return "-";
-  }
+  const ultimos10 =
+    obtenerUltimos10(campo);
 
-  return redondear(valor) + " " + unidad;
+  const datosSemana =
+    obtenerDatosSemanaServicio(campo);
 
-}
+  const estadisticas =
+    calcularEstadisticas(datosSemana);
 
-function renderizarIndicador(slide,campo){
+  const ultimo =
+    ultimos10.length
+      ? ultimos10[
+          ultimos10.length - 1
+        ]
+      : null;
 
-  const config = CONFIG_INDICADORES[campo];
+  const estado =
+    obtenerEstadoServicio(
+      ultimo ? ultimo.valor : null,
+      config
+    );
 
-  const ultimos10 = obtenerUltimos10(campo);
-
-  const datosSemana = obtenerDatosSemana(campo);
-
-  const estadisticas = calcularEstadisticas(datosSemana);
-
-  const ultimo = ultimos10.length
-    ? ultimos10[ultimos10.length - 1]
-    : null;
-
-  const estado = obtenerEstado(
-    ultimo ? ultimo.valor : null,
-    config
-  );
-
-  const fechaUltimoRegistro = ultimo
-    ? formatearFechaHora(ultimo.fechaObj)
-    : "Sin registro";
+  const fechaUltimoRegistro =
+    ultimo
+      ? formatearFechaHora(
+          ultimo.fechaObj
+        )
+      : "Sin registro";
 
   slide.innerHTML = `
 
@@ -1366,28 +1992,25 @@ function renderizarIndicador(slide,campo){
       <div class="kpis">
 
         <div class="kpi">
-
           <div class="kpi-label">
             Valor actual
           </div>
-
           <div class="kpi-value">
             ${
               mostrarValor(
-                ultimo ? ultimo.valor : null,
+                ultimo
+                  ? ultimo.valor
+                  : null,
                 config.unidad
               )
             }
           </div>
-
         </div>
 
         <div class="kpi">
-
           <div class="kpi-label">
             Promedio semanal
           </div>
-
           <div class="kpi-value">
             ${
               mostrarValor(
@@ -1396,15 +2019,12 @@ function renderizarIndicador(slide,campo){
               )
             }
           </div>
-
         </div>
 
         <div class="kpi">
-
           <div class="kpi-label">
             Mínimo semanal
           </div>
-
           <div class="kpi-value">
             ${
               mostrarValor(
@@ -1413,15 +2033,12 @@ function renderizarIndicador(slide,campo){
               )
             }
           </div>
-
         </div>
 
         <div class="kpi">
-
           <div class="kpi-label">
             Máximo semanal
           </div>
-
           <div class="kpi-value">
             ${
               mostrarValor(
@@ -1430,7 +2047,6 @@ function renderizarIndicador(slide,campo){
               )
             }
           </div>
-
         </div>
 
       </div>
@@ -1438,7 +2054,12 @@ function renderizarIndicador(slide,campo){
       <div class="chart-card">
 
         <div class="chart-container">
-          ${crearGrafica(ultimos10,config)}
+          ${
+            crearGraficaServicio(
+              ultimos10,
+              config
+            )
+          }
         </div>
 
         <div class="chart-footer">
@@ -1446,12 +2067,25 @@ function renderizarIndicador(slide,campo){
           <div class="leyenda">
 
             <span class="leyenda-meta">
-              ━ Meta: ${config.meta} ${config.unidad}
+              ━ Meta:
+              ${config.meta}
+              ${config.unidad}
             </span>
 
             <span class="leyenda-normal">
-              ▰ Rango normal:
+              ■ Normal:
               ${config.min}–${config.max}
+              ${config.unidad}
+            </span>
+
+            <span class="leyenda-advertencia">
+              ■ Advertencia
+            </span>
+
+            <span class="leyenda-critico">
+              ■ Crítico:
+              &lt; ${config.criticoMin}
+              o &gt; ${config.criticoMax}
               ${config.unidad}
             </span>
 
@@ -1459,7 +2093,9 @@ function renderizarIndicador(slide,campo){
 
           <div class="ultimo-registro">
             Último registro:
-            <strong>${fechaUltimoRegistro}</strong>
+            <strong>
+              ${fechaUltimoRegistro}
+            </strong>
           </div>
 
         </div>
@@ -1472,37 +2108,1483 @@ function renderizarIndicador(slide,campo){
 
 }
 
-function renderizarTodosLosIndicadores(){
+/* =========================================================
+   PREVENTIVOS
+========================================================= */
 
-  slides.forEach(slide => {
+function estadoPreventivo(registro){
 
-    const campo = slide.dataset.campo;
-
-    renderizarIndicador(slide,campo);
-
-  });
+  return textoNormalizado(
+    primerValor(registro,[
+      "Estado",
+      "Status",
+      "Estatus"
+    ])
+  );
 
 }
 
-function renderizarErrorEnSlides(mensaje){
+function fechaProgramadaPreventivo(registro){
 
-  slides.forEach(slide => {
+  return fechaISO(
+    primerValor(registro,[
+      "Fe.inic.extrema",
+      "FechaProgramada",
+      "Fecha",
+      "Fe.fin extrema"
+    ])
+  );
 
-    slide.innerHTML = `
+}
 
-      <div class="panel">
+function esEjecutadoPreventivo(registro){
 
-        <div class="mensaje-central">
+  const estado =
+    estadoPreventivo(registro);
 
-          No fue posible consultar los datos.<br><br>
+  return (
+    estado.includes("ejecutado") ||
+    estado.includes("terminado") ||
+    estado.includes("cerrado")
+  );
 
-          ${mensaje}
+}
+
+function esCanceladoPreventivo(registro){
+
+  const estado =
+    estadoPreventivo(registro);
+
+  return (
+    estado.includes("cancelado") ||
+    estado.includes("no realizado")
+  );
+
+}
+
+function esIniciadoPreventivo(registro){
+
+  const estado =
+    estadoPreventivo(registro);
+
+  return (
+    estado.includes("iniciado") ||
+    estado.includes("ejecucion")
+  );
+
+}
+
+function esAsignadoPreventivo(registro){
+
+  const estado =
+    estadoPreventivo(registro);
+
+  return estado.includes("asignado");
+}
+
+function preventivosSemana(){
+
+  const lunes = inicioSemanaActual();
+  const domingo = finSemanaActual();
+
+  return registrosPreventivos
+    .filter(registro => {
+
+      const fecha =
+        fechaProgramadaPreventivo(
+          registro
+        );
+
+      return (
+        fecha &&
+        fecha >= lunes &&
+        fecha <= domingo
+      );
+
+    });
+
+}
+
+function estadisticasPreventivos(){
+
+  const semana =
+    preventivosSemana();
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  const ejecutados =
+    semana.filter(
+      esEjecutadoPreventivo
+    ).length;
+
+  const cancelados =
+    semana.filter(
+      esCanceladoPreventivo
+    ).length;
+
+  const iniciados =
+    semana.filter(
+      esIniciadoPreventivo
+    ).length;
+
+  const asignados =
+    semana.filter(
+      esAsignadoPreventivo
+    ).length;
+
+  const pendientes =
+    semana.filter(registro => {
+
+      return (
+        !esEjecutadoPreventivo(registro) &&
+        !esCanceladoPreventivo(registro) &&
+        !esIniciadoPreventivo(registro) &&
+        !esAsignadoPreventivo(registro)
+      );
+
+    }).length;
+
+  const vencidos =
+    registrosPreventivos
+      .filter(registro => {
+
+        const fecha =
+          fechaProgramadaPreventivo(
+            registro
+          );
+
+        return (
+          fecha &&
+          fecha < hoy &&
+          !esEjecutadoPreventivo(registro) &&
+          !esCanceladoPreventivo(registro)
+        );
+
+      }).length;
+
+  const backlog =
+    registrosPreventivos
+      .filter(registro => {
+
+        return (
+          !esEjecutadoPreventivo(registro) &&
+          !esCanceladoPreventivo(registro)
+        );
+
+      }).length;
+
+  const baseCumplimiento =
+    semana.length - cancelados;
+
+  const cumplimiento =
+    baseCumplimiento > 0
+      ? redondear(
+          ejecutados /
+          baseCumplimiento *
+          100
+        )
+      : 0;
+
+  return{
+    total:semana.length,
+    ejecutados,
+    cancelados,
+    iniciados,
+    asignados,
+    pendientes,
+    vencidos,
+    backlog,
+    cumplimiento
+  };
+
+}
+
+function estadoCumplimiento(valor){
+
+  if(valor >= 90){
+
+    return{
+      texto:"CUMPLIMIENTO EN META",
+      clase:"estado-normal",
+      color:"#15972e"
+    };
+
+  }
+
+  if(valor >= 80){
+
+    return{
+      texto:"CUMPLIMIENTO EN ADVERTENCIA",
+      clase:"estado-advertencia",
+      color:"#e1a000"
+    };
+
+  }
+
+  return{
+    texto:"CUMPLIMIENTO CRÍTICO",
+    clase:"estado-critico",
+    color:"#dd2020"
+  };
+
+}
+
+function renderizarPreventivosResumen(slide){
+
+  const datos =
+    estadisticasPreventivos();
+
+  const estado =
+    estadoCumplimiento(
+      datos.cumplimiento
+    );
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>
+            Cumplimiento de mantenimiento preventivo
+          </h2>
+
+          <p>
+            Estado de la programación correspondiente
+            a la semana actual
+          </p>
+
+        </div>
+
+        <div class="estado ${estado.clase}">
+          ● ${estado.texto}
+        </div>
+
+      </div>
+
+      <div class="preventivo-layout">
+
+        <div class="cumplimiento-card">
+
+          <div class="cumplimiento-titulo">
+            Cumplimiento semanal
+          </div>
+
+          <div
+            class="cumplimiento-valor"
+            style="color:${estado.color}"
+          >
+            ${datos.cumplimiento}%
+          </div>
+
+          <div
+            class="cumplimiento-estado ${estado.clase}"
+          >
+            Meta mínima: 90%
+          </div>
+
+          <div class="barra-cumplimiento">
+
+            <div style="
+              width:${Math.min(
+                100,
+                datos.cumplimiento
+              )}%;
+              background:${estado.color};
+            "></div>
+
+          </div>
+
+        </div>
+
+        <div class="preventivos-grid">
+
+          <div class="preventivo-kpi">
+            <div class="numero">
+              ${datos.total}
+            </div>
+            <div class="texto">
+              Programados semana
+            </div>
+          </div>
+
+          <div class="preventivo-kpi">
+            <div
+              class="numero"
+              style="color:#15972e"
+            >
+              ${datos.ejecutados}
+            </div>
+            <div class="texto">
+              Ejecutados
+            </div>
+          </div>
+
+          <div class="preventivo-kpi">
+            <div
+              class="numero"
+              style="color:#d18a00"
+            >
+              ${datos.asignados}
+            </div>
+            <div class="texto">
+              Asignados
+            </div>
+          </div>
+
+          <div class="preventivo-kpi">
+            <div
+              class="numero"
+              style="color:#176fc2"
+            >
+              ${datos.iniciados}
+            </div>
+            <div class="texto">
+              En ejecución
+            </div>
+          </div>
+
+          <div class="preventivo-kpi">
+            <div
+              class="numero"
+              style="color:#d18a00"
+            >
+              ${datos.pendientes}
+            </div>
+            <div class="texto">
+              Pendientes de asignación
+            </div>
+          </div>
+
+          <div class="preventivo-kpi">
+            <div
+              class="numero"
+              style="color:#d92020"
+            >
+              ${datos.vencidos}
+            </div>
+            <div class="texto">
+              Vencidos
+            </div>
+          </div>
+
+          <div class="preventivo-kpi">
+            <div class="numero">
+              ${datos.backlog}
+            </div>
+            <div class="texto">
+              Backlog activo
+            </div>
+          </div>
+
+          <div class="preventivo-kpi">
+            <div class="numero">
+              ${datos.cancelados}
+            </div>
+            <div class="texto">
+              Cancelados / no realizados
+            </div>
+          </div>
+
+          <div class="preventivo-kpi">
+            <div class="numero">
+              ${
+                datos.total -
+                datos.ejecutados -
+                datos.cancelados
+              }
+            </div>
+            <div class="texto">
+              Por completar semana
+            </div>
+          </div>
 
         </div>
 
       </div>
 
-    `;
+    </div>
+
+  `;
+
+}
+
+function areaPreventivo(registro){
+
+  return textoSeguro(
+    primerValor(registro,[
+      "Área",
+      "Area",
+      "DenominaciónTecnica",
+      "DenominacionTecnica"
+    ])
+  ) || "Sin área";
+
+}
+
+function cumplimientoPreventivoPorArea(){
+
+  const semana =
+    preventivosSemana();
+
+  const agrupado = {};
+
+  semana.forEach(registro => {
+
+    const area =
+      areaPreventivo(registro);
+
+    if(!agrupado[area]){
+
+      agrupado[area] = {
+        total:0,
+        ejecutados:0,
+        cancelados:0
+      };
+
+    }
+
+    agrupado[area].total++;
+
+    if(esEjecutadoPreventivo(registro)){
+      agrupado[area].ejecutados++;
+    }
+
+    if(esCanceladoPreventivo(registro)){
+      agrupado[area].cancelados++;
+    }
+
+  });
+
+  return Object.entries(agrupado)
+    .map(([area,dato]) => {
+
+      const base =
+        dato.total -
+        dato.cancelados;
+
+      const cumplimiento =
+        base > 0
+          ? redondear(
+              dato.ejecutados /
+              base *
+              100
+            )
+          : 0;
+
+      return{
+        area,
+        total:dato.total,
+        ejecutados:dato.ejecutados,
+        cumplimiento
+      };
+
+    })
+    .sort(
+      (a,b) =>
+      b.cumplimiento -
+      a.cumplimiento
+    )
+    .slice(0,8);
+
+}
+
+function colorCumplimiento(valor){
+
+  if(valor >= 90){
+    return "#15972e";
+  }
+
+  if(valor >= 80){
+    return "#e1a000";
+  }
+
+  return "#dd2020";
+}
+
+function renderizarPreventivosArea(slide){
+
+  const datos =
+    cumplimientoPreventivoPorArea();
+
+  const contenido =
+    datos.length
+      ? datos.map(item => `
+
+        <div class="fila-barra">
+
+          <div class="nombre-barra">
+            ${item.area}
+          </div>
+
+          <div class="fondo-barra">
+
+            <div
+              class="relleno-barra"
+              style="
+                width:${Math.max(
+                  2,
+                  Math.min(
+                    100,
+                    item.cumplimiento
+                  )
+                )}%;
+                background:${
+                  colorCumplimiento(
+                    item.cumplimiento
+                  )
+                };
+              "
+            ></div>
+
+          </div>
+
+          <div class="valor-barra">
+            ${item.cumplimiento}%
+          </div>
+
+        </div>
+
+      `).join("")
+      : `
+        <div class="mensaje-central">
+          No existen preventivos programados
+          para la semana actual.
+        </div>
+      `;
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>
+            Cumplimiento preventivo por área
+          </h2>
+
+          <p>
+            Porcentaje de ejecución de la programación semanal
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="barras-card">
+
+        <div class="lista-barras">
+          ${contenido}
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+/* =========================================================
+   CORRECTIVOS
+========================================================= */
+
+function esCorrectivo(registro){
+
+  const clase =
+    textoNormalizado(
+      primerValor(registro,[
+        "ClaseTrabajo",
+        "Clase de trabajo",
+        "TipoTrabajo",
+        "Tipo"
+      ])
+    );
+
+  if(!clase){
+    return true;
+  }
+
+  return (
+    clase.includes("correctivo") ||
+    clase.includes("zpm1")
+  );
+
+}
+
+function estadoCorrectivo(registro){
+
+  return textoNormalizado(
+    primerValor(registro,[
+      "Estado",
+      "ActividadTerminada",
+      "EstadoNotificacion"
+    ])
+  );
+
+}
+
+function esCorrectivoCerrado(registro){
+
+  const estado =
+    estadoCorrectivo(registro);
+
+  const actividadTerminada =
+    textoNormalizado(
+      registro.ActividadTerminada
+    );
+
+  return (
+    estado.includes("cerrado") ||
+    estado.includes("terminado") ||
+    estado.includes("ejecutado") ||
+    actividadTerminada === "si"
+  );
+
+}
+
+function prioridadCorrectivo(registro){
+
+  return textoSeguro(
+    primerValor(registro,[
+      "Prioridad",
+      "Criticidad"
+    ])
+  ) || "Sin prioridad";
+
+}
+
+function esPrioridadCritica(registro){
+
+  const prioridad =
+    textoNormalizado(
+      prioridadCorrectivo(registro)
+    );
+
+  return (
+    prioridad.includes("crit") ||
+    prioridad.includes("alta") ||
+    prioridad === "1"
+  );
+
+}
+
+function fechaReporteCorrectivo(registro){
+
+  return fechaHoraObj(
+    primerValor(registro,[
+      "FechaReporte",
+      "Fecha"
+    ]),
+    primerValor(registro,[
+      "HoraReporte",
+      "Hora"
+    ])
+  );
+
+}
+
+function fechaCierreCorrectivo(registro){
+
+  return fechaHoraObj(
+    primerValor(registro,[
+      "FechaCierre",
+      "FechaEjecucion"
+    ]),
+    primerValor(registro,[
+      "HoraCierre"
+    ])
+  );
+
+}
+
+function correctivosSemana(){
+
+  const lunes =
+    inicioSemanaActual();
+
+  const ahora =
+    new Date();
+
+  return registrosNotificaciones
+    .filter(esCorrectivo)
+    .filter(registro => {
+
+      const fecha =
+        fechaReporteCorrectivo(
+          registro
+        );
+
+      return (
+        fecha &&
+        fecha.getTime() > 0 &&
+        fecha >= lunes &&
+        fecha <= ahora
+      );
+
+    });
+
+}
+
+function correctivosAbiertos(){
+
+  return registrosNotificaciones
+    .filter(esCorrectivo)
+    .filter(
+      registro =>
+      !esCorrectivoCerrado(registro)
+    );
+
+}
+
+function estadisticasCorrectivos(){
+
+  const semana =
+    correctivosSemana();
+
+  const abiertos =
+    correctivosAbiertos();
+
+  const cerradosSemana =
+    semana.filter(
+      esCorrectivoCerrado
+    );
+
+  const pendientes =
+    abiertos.filter(registro => {
+
+      const quedaPendiente =
+        textoNormalizado(
+          primerValor(registro,[
+            "QuedaPendiente",
+            "Pendiente"
+          ])
+        );
+
+      return quedaPendiente === "si";
+
+    }).length;
+
+  const criticos =
+    abiertos.filter(
+      esPrioridadCritica
+    ).length;
+
+  const tiempos = [];
+
+  cerradosSemana.forEach(registro => {
+
+    let tiempo =
+      numero(
+        primerValor(registro,[
+          "TiempoTotalIntervencion",
+          "TiempoIntervencion",
+          "TiempoCierrePendiente"
+        ])
+      );
+
+    if(tiempo === null){
+
+      const inicio =
+        fechaReporteCorrectivo(
+          registro
+        );
+
+      const fin =
+        fechaCierreCorrectivo(
+          registro
+        );
+
+      tiempo =
+        diferenciaMinutos(
+          inicio,
+          fin
+        );
+
+    }
+
+    if(
+      tiempo !== null &&
+      tiempo >= 0
+    ){
+      tiempos.push(tiempo);
+    }
+
+  });
+
+  const tiempoPromedio =
+    tiempos.length
+      ? redondear(
+          tiempos.reduce(
+            (a,b) => a + b,
+            0
+          ) / tiempos.length
+        )
+      : 0;
+
+  const tasaCierre =
+    semana.length
+      ? redondear(
+          cerradosSemana.length /
+          semana.length *
+          100
+        )
+      : 0;
+
+  return{
+    reportados:semana.length,
+    cerrados:cerradosSemana.length,
+    abiertos:abiertos.length,
+    pendientes,
+    criticos,
+    tiempoPromedio,
+    tasaCierre
+  };
+
+}
+
+function renderizarCorrectivosResumen(slide){
+
+  const datos =
+    estadisticasCorrectivos();
+
+  const estado =
+    datos.criticos > 0
+      ? {
+          texto:"ATENCIÓN REQUERIDA",
+          clase:"estado-critico"
+        }
+      : datos.abiertos > 5
+        ? {
+            texto:"SEGUIMIENTO REQUERIDO",
+            clase:"estado-advertencia"
+          }
+        : {
+            texto:"CONDICIÓN CONTROLADA",
+            clase:"estado-normal"
+          };
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>
+            Gestión de mantenimiento correctivo
+          </h2>
+
+          <p>
+            Resumen de avisos y actividades correctivas
+          </p>
+
+        </div>
+
+        <div class="estado ${estado.clase}">
+          ● ${estado.texto}
+        </div>
+
+      </div>
+
+      <div class="kpis seis">
+
+        <div class="kpi">
+          <div class="kpi-label">
+            Reportados semana
+          </div>
+          <div class="kpi-value">
+            ${datos.reportados}
+          </div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">
+            Cerrados semana
+          </div>
+          <div
+            class="kpi-value"
+            style="color:#15972e"
+          >
+            ${datos.cerrados}
+          </div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">
+            Abiertos actuales
+          </div>
+          <div
+            class="kpi-value"
+            style="color:#d18a00"
+          >
+            ${datos.abiertos}
+          </div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">
+            Pendientes de cierre
+          </div>
+          <div
+            class="kpi-value"
+            style="color:#d18a00"
+          >
+            ${datos.pendientes}
+          </div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">
+            Prioridad crítica
+          </div>
+          <div
+            class="kpi-value"
+            style="color:#d92020"
+          >
+            ${datos.criticos}
+          </div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi-label">
+            Tasa de cierre semanal
+          </div>
+          <div class="kpi-value">
+            ${datos.tasaCierre}%
+          </div>
+        </div>
+
+      </div>
+
+      <div class="preventivo-layout">
+
+        <div class="cumplimiento-card">
+
+          <div class="cumplimiento-titulo">
+            Tiempo promedio de intervención
+          </div>
+
+          <div class="cumplimiento-valor">
+            ${datos.tiempoPromedio}
+          </div>
+
+          <div class="cumplimiento-estado estado-sindato">
+            Minutos
+          </div>
+
+        </div>
+
+        <div class="cumplimiento-card">
+
+          <div class="cumplimiento-titulo">
+            Balance semanal
+          </div>
+
+          <div
+            class="cumplimiento-valor"
+            style="
+              color:${
+                datos.tasaCierre >= 80
+                  ? "#15972e"
+                  : datos.tasaCierre >= 60
+                    ? "#e1a000"
+                    : "#dd2020"
+              };
+            "
+          >
+            ${datos.tasaCierre}%
+          </div>
+
+          <div
+            class="barra-cumplimiento"
+            style="max-width:80%"
+          >
+
+            <div style="
+              width:${Math.min(
+                100,
+                datos.tasaCierre
+              )}%;
+              background:${
+                datos.tasaCierre >= 80
+                  ? "#15972e"
+                  : datos.tasaCierre >= 60
+                    ? "#e1a000"
+                    : "#dd2020"
+              };
+            "></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+function lineaCorrectivo(registro){
+
+  return textoSeguro(
+    primerValor(registro,[
+      "Línea",
+      "Linea",
+      "Ubicac.técnica",
+      "UbicacionTecnica"
+    ])
+  ) || "Sin línea";
+
+}
+
+function conteoCorrectivosPorLinea(){
+
+  const agrupado = {};
+
+  correctivosSemana()
+    .forEach(registro => {
+
+      const linea =
+        lineaCorrectivo(registro);
+
+      agrupado[linea] =
+        (agrupado[linea] || 0) + 1;
+
+    });
+
+  return Object.entries(agrupado)
+    .map(([linea,total]) => ({
+      linea,
+      total
+    }))
+    .sort(
+      (a,b) => b.total - a.total
+    )
+    .slice(0,8);
+
+}
+
+function renderizarCorrectivosLineas(slide){
+
+  const datos =
+    conteoCorrectivosPorLinea();
+
+  const maximo =
+    datos.length
+      ? Math.max(
+          ...datos.map(
+            item => item.total
+          )
+        )
+      : 1;
+
+  const contenido =
+    datos.length
+      ? datos.map(item => {
+
+        const porcentaje =
+          item.total /
+          maximo *
+          100;
+
+        return `
+
+          <div class="fila-barra">
+
+            <div class="nombre-barra">
+              ${item.linea}
+            </div>
+
+            <div class="fondo-barra">
+
+              <div
+                class="relleno-barra"
+                style="
+                  width:${porcentaje}%;
+                  background:#176fc2;
+                "
+              ></div>
+
+            </div>
+
+            <div class="valor-barra">
+              ${item.total}
+            </div>
+
+          </div>
+
+        `;
+
+      }).join("")
+      : `
+        <div class="mensaje-central">
+          No existen correctivos registrados
+          durante la semana actual.
+        </div>
+      `;
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>
+            Líneas con más correctivos
+          </h2>
+
+          <p>
+            Cantidad de reportes correctivos registrados
+            durante la semana actual
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="barras-card">
+
+        <div class="lista-barras">
+          ${contenido}
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+function clasePrioridad(valor){
+
+  const prioridad =
+    textoNormalizado(valor);
+
+  if(
+    prioridad.includes("crit") ||
+    prioridad.includes("alta") ||
+    prioridad === "1"
+  ){
+    return "prioridad-alta";
+  }
+
+  if(
+    prioridad.includes("media") ||
+    prioridad === "2"
+  ){
+    return "prioridad-media";
+  }
+
+  return "prioridad-baja";
+}
+
+function correctivosPendientesOrdenados(){
+
+  return correctivosAbiertos()
+    .map(registro => ({
+
+      linea:lineaCorrectivo(registro),
+
+      equipo:textoSeguro(
+        primerValor(registro,[
+          "Equipo",
+          "ID_Equipo",
+          "DenominaciónEquipo",
+          "DenominacionEquipo"
+        ])
+      ) || "Sin equipo",
+
+      descripcion:textoSeguro(
+        primerValor(registro,[
+          "DescripciónFalla",
+          "DescripcionFalla",
+          "Descripción",
+          "Descripcion"
+        ])
+      ) || "Sin descripción",
+
+      prioridad:
+        prioridadCorrectivo(registro),
+
+      tecnico:textoSeguro(
+        primerValor(registro,[
+          "NombreTecnicoRecibe",
+          "TécnicoRecibe",
+          "TecnicoRecibe",
+          "NombreTecnicoCierre"
+        ])
+      ) || "Sin asignar",
+
+      fecha:
+        fechaReporteCorrectivo(
+          registro
+        )
+
+    }))
+    .sort((a,b) => {
+
+      const aCrit =
+        textoNormalizado(a.prioridad)
+          .includes("crit") ||
+        textoNormalizado(a.prioridad)
+          .includes("alta")
+          ? 0
+          : 1;
+
+      const bCrit =
+        textoNormalizado(b.prioridad)
+          .includes("crit") ||
+        textoNormalizado(b.prioridad)
+          .includes("alta")
+          ? 0
+          : 1;
+
+      if(aCrit !== bCrit){
+        return aCrit - bCrit;
+      }
+
+      return a.fecha - b.fecha;
+
+    })
+    .slice(0,6);
+
+}
+
+function resumirTexto(texto,maximo){
+
+  const valor =
+    textoSeguro(texto);
+
+  if(valor.length <= maximo){
+    return valor;
+  }
+
+  return valor.slice(
+    0,
+    maximo - 3
+  ) + "...";
+
+}
+
+function renderizarCorrectivosPendientes(slide){
+
+  const datos =
+    correctivosPendientesOrdenados();
+
+  const filas =
+    datos.length
+      ? datos.map(item => `
+
+        <tr>
+
+          <td style="width:11%">
+            ${item.linea}
+          </td>
+
+          <td style="width:17%">
+            ${resumirTexto(
+              item.equipo,
+              25
+            )}
+          </td>
+
+          <td style="width:38%">
+            ${resumirTexto(
+              item.descripcion,
+              75
+            )}
+          </td>
+
+          <td style="width:13%">
+            <span
+              class="
+                prioridad
+                ${clasePrioridad(
+                  item.prioridad
+                )}
+              "
+            >
+              ${item.prioridad}
+            </span>
+          </td>
+
+          <td style="width:21%">
+            ${resumirTexto(
+              item.tecnico,
+              28
+            )}
+          </td>
+
+        </tr>
+
+      `).join("")
+      : `
+
+        <tr>
+
+          <td
+            colspan="5"
+            style="
+              text-align:center;
+              font-size:28px;
+              padding:50px;
+            "
+          >
+            No existen correctivos abiertos.
+          </td>
+
+        </tr>
+
+      `;
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>
+            Correctivos abiertos y pendientes
+          </h2>
+
+          <p>
+            Actividades que requieren seguimiento
+            o cierre técnico
+          </p>
+
+        </div>
+
+        <div class="estado ${
+          datos.length
+            ? "estado-advertencia"
+            : "estado-normal"
+        }">
+          ● ${datos.length} MOSTRADOS
+        </div>
+
+      </div>
+
+      <div class="tabla-card">
+
+        <table class="tabla-tv">
+
+          <thead>
+            <tr>
+              <th>Línea</th>
+              <th>Equipo</th>
+              <th>Descripción de falla</th>
+              <th>Prioridad</th>
+              <th>Técnico</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            ${filas}
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+/* =========================================================
+   RENDERIZADO GENERAL
+========================================================= */
+
+function renderizarTodosLosSlides(){
+
+  slides.forEach(slide => {
+
+    const tipo =
+      slide.dataset.tipo;
+
+    if(tipo === "servicio"){
+
+      renderizarServicio(
+        slide,
+        slide.dataset.campo
+      );
+
+      return;
+    }
+
+    if(
+      tipo ===
+      "preventivos-resumen"
+    ){
+
+      renderizarPreventivosResumen(
+        slide
+      );
+
+      return;
+    }
+
+    if(
+      tipo ===
+      "preventivos-area"
+    ){
+
+      renderizarPreventivosArea(
+        slide
+      );
+
+      return;
+    }
+
+    if(
+      tipo ===
+      "correctivos-resumen"
+    ){
+
+      renderizarCorrectivosResumen(
+        slide
+      );
+
+      return;
+    }
+
+    if(
+      tipo ===
+      "correctivos-lineas"
+    ){
+
+      renderizarCorrectivosLineas(
+        slide
+      );
+
+      return;
+    }
+
+    if(
+      tipo ===
+      "correctivos-pendientes"
+    ){
+
+      renderizarCorrectivosPendientes(
+        slide
+      );
+
+    }
 
   });
 
@@ -1528,10 +3610,16 @@ function mostrarSlide(indice){
 
   indiceActual = indice;
 
-  slides[indiceActual].classList.add("activo");
+  slides[
+    indiceActual
+  ].classList.add("activo");
 
-  document.getElementById("contador").textContent =
-    (indiceActual + 1) + " / " + slides.length;
+  document.getElementById(
+    "contador"
+  ).textContent =
+    (indiceActual + 1) +
+    " / " +
+    slides.length;
 
   reiniciarProgreso();
 
@@ -1539,9 +3627,14 @@ function mostrarSlide(indice){
 
 function siguienteSlide(manual = false){
 
-  mostrarSlide(indiceActual + 1);
+  mostrarSlide(
+    indiceActual + 1
+  );
 
-  if(manual && !pausado){
+  if(
+    manual &&
+    !pausado
+  ){
     reiniciarTemporizadorSlide();
   }
 
@@ -1549,7 +3642,9 @@ function siguienteSlide(manual = false){
 
 function anteriorSlide(){
 
-  mostrarSlide(indiceActual - 1);
+  mostrarSlide(
+    indiceActual - 1
+  );
 
   if(!pausado){
     reiniciarTemporizadorSlide();
@@ -1559,13 +3654,18 @@ function anteriorSlide(){
 
 function reiniciarTemporizadorSlide(){
 
-  clearInterval(temporizadorSlide);
+  clearInterval(
+    temporizadorSlide
+  );
 
   if(pausado) return;
 
-  temporizadorSlide = setInterval(() => {
-    siguienteSlide(false);
-  },DURACION_SLIDE);
+  temporizadorSlide =
+    setInterval(() => {
+
+      siguienteSlide(false);
+
+    },DURACION_SLIDE);
 
 }
 
@@ -1573,15 +3673,22 @@ function alternarPausa(){
 
   pausado = !pausado;
 
-  const boton = document.getElementById("btnPausa");
+  const boton =
+    document.getElementById(
+      "btnPausa"
+    );
 
   if(pausado){
 
     boton.textContent = "▶";
 
-    clearInterval(temporizadorSlide);
+    clearInterval(
+      temporizadorSlide
+    );
 
-    clearInterval(temporizadorProgreso);
+    clearInterval(
+      temporizadorProgreso
+    );
 
   }else{
 
@@ -1601,32 +3708,48 @@ function alternarPausa(){
 
 function reiniciarProgreso(){
 
-  clearInterval(temporizadorProgreso);
+  clearInterval(
+    temporizadorProgreso
+  );
 
   inicioSlide = Date.now();
 
-  const barra = document.getElementById("progress");
+  const barra =
+    document.getElementById(
+      "progress"
+    );
 
   barra.style.width = "0%";
 
   if(pausado) return;
 
-  temporizadorProgreso = setInterval(() => {
+  temporizadorProgreso =
+    setInterval(() => {
 
-    const transcurrido = Date.now() - inicioSlide;
+      const transcurrido =
+        Date.now() -
+        inicioSlide;
 
-    const porcentaje = Math.min(
-      100,
-      transcurrido / DURACION_SLIDE * 100
-    );
+      const porcentaje =
+        Math.min(
+          100,
+          transcurrido /
+          DURACION_SLIDE *
+          100
+        );
 
-    barra.style.width = porcentaje + "%";
+      barra.style.width =
+        porcentaje + "%";
 
-    if(porcentaje >= 100){
-      clearInterval(temporizadorProgreso);
-    }
+      if(porcentaje >= 100){
 
-  },100);
+        clearInterval(
+          temporizadorProgreso
+        );
+
+      }
+
+    },100);
 
 }
 
@@ -1640,11 +3763,14 @@ async function alternarPantallaCompleta(){
 
     if(!document.fullscreenElement){
 
-      await document.documentElement.requestFullscreen();
+      await document
+        .documentElement
+        .requestFullscreen();
 
     }else{
 
-      await document.exitFullscreen();
+      await document
+        .exitFullscreen();
 
     }
 
@@ -1659,59 +3785,110 @@ async function alternarPantallaCompleta(){
 }
 
 /* =========================================================
-   MENSAJES DE ERROR
+   ERRORES
 ========================================================= */
 
 function mostrarError(mensaje){
 
-  const caja = document.getElementById("errorGlobal");
+  const caja =
+    document.getElementById(
+      "errorGlobal"
+    );
 
   caja.textContent = mensaje;
 
   caja.style.display = "block";
 
   setTimeout(() => {
+
     caja.style.display = "none";
+
   },10000);
 
 }
 
 function ocultarError(){
 
-  document.getElementById("errorGlobal").style.display =
-    "none";
+  document.getElementById(
+    "errorGlobal"
+  ).style.display = "none";
 
 }
 
 /* =========================================================
-   CONTROLES DEL TECLADO
+   TECLADO
 ========================================================= */
 
-document.addEventListener("keydown",evento => {
+document.addEventListener(
+  "keydown",
+  evento => {
 
-  if(evento.key === "ArrowRight"){
-    siguienteSlide(true);
+    if(
+      evento.key ===
+      "ArrowRight"
+    ){
+      siguienteSlide(true);
+    }
+
+    if(
+      evento.key ===
+      "ArrowLeft"
+    ){
+      anteriorSlide();
+    }
+
+    if(evento.key === " "){
+
+      evento.preventDefault();
+
+      alternarPausa();
+
+    }
+
+    if(
+      evento.key === "f" ||
+      evento.key === "F"
+    ){
+      alternarPantallaCompleta();
+    }
+
   }
-
-  if(evento.key === "ArrowLeft"){
-    anteriorSlide();
-  }
-
-  if(evento.key === " "){
-    evento.preventDefault();
-    alternarPausa();
-  }
-
-  if(
-    evento.key === "f" ||
-    evento.key === "F"
-  ){
-    alternarPantallaCompleta();
-  }
-
-});
+);
 
 /* =========================================================
+   INICIO
+========================================================= */
+
+function iniciarPantallaTV(){
+
+  actualizarReloj();
+
+  setInterval(
+    actualizarReloj,
+    1000
+  );
+
+  renderizarTodosLosSlides();
+
+  mostrarSlide(0);
+
+  reiniciarTemporizadorSlide();
+
+  cargarDatos();
+
+  setInterval(
+    cargarDatos,
+    ACTUALIZACION_DATOS
+  );
+
+}
+
+iniciarPantallaTV();
+
+</script>
+
+</body>
+</html>
    INICIO DEL SISTEMA
 ========================================================= */
 
