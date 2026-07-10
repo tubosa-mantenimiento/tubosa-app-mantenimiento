@@ -1328,6 +1328,32 @@ function finPeriodoMesActual(){
 
 }
 
+function textoPeriodoMesActual(){
+
+  const inicio = inicioMesActual();
+  const fin = new Date();
+
+  const inicioTexto = inicio.toLocaleDateString(
+    "es-CO",
+    {
+      day:"2-digit",
+      month:"2-digit",
+      year:"numeric"
+    }
+  );
+
+  const finTexto = fin.toLocaleDateString(
+    "es-CO",
+    {
+      day:"2-digit",
+      month:"2-digit",
+      year:"numeric"
+    }
+  );
+
+  return inicioTexto + " al " + finTexto;
+
+}
 function formatearFechaHora(fecha){
 
   if(
@@ -1433,101 +1459,165 @@ async function cargarDatos(){
 
   ocultarError();
 
-  document.getElementById("estadoCarga").textContent =
+  document.getElementById(
+    "estadoCarga"
+  ).textContent =
     "Actualizando datos...";
 
-  const resultados = await Promise.allSettled([
+  try{
 
-    cargarHoja(HOJA_SERVICIOS),
+    const resultados =
+      await Promise.allSettled([
 
-    cargarHoja(HOJA_PREVENTIVOS),
+        cargarHoja(HOJA_SERVICIOS),
 
-    cargarHoja(HOJA_NOTIFICACIONES)
+        cargarHoja(HOJA_PREVENTIVOS),
 
-  ]);
+        cargarHoja(HOJA_NOTIFICACIONES)
 
-  const errores = [];
+      ]);
 
-  if(resultados[0].status === "fulfilled"){
+    const errores = [];
 
-    registrosServicios =
-      resultados[0].value;
+    if(
+      resultados[0].status ===
+      "fulfilled"
+    ){
 
-  }else{
+      registrosServicios =
+        resultados[0].value;
 
-    errores.push(
-      "Servicios Industriales"
-    );
+    }else{
+
+      errores.push(
+        "Servicios Industriales"
+      );
+
+      console.error(
+        "Error Servicios:",
+        resultados[0].reason
+      );
+
+    }
+
+    if(
+      resultados[1].status ===
+      "fulfilled"
+    ){
+
+      registrosPreventivos =
+        resultados[1].value;
+
+    }else{
+
+      errores.push(
+        "Preventivos"
+      );
+
+      console.error(
+        "Error Preventivos:",
+        resultados[1].reason
+      );
+
+    }
+
+    if(
+      resultados[2].status ===
+      "fulfilled"
+    ){
+
+      registrosNotificaciones =
+        resultados[2].value;
+
+    }else{
+
+      errores.push(
+        "Correctivos"
+      );
+
+      console.error(
+        "Error Correctivos:",
+        resultados[2].reason
+      );
+
+    }
+
+    /*
+      Renderizado protegido.
+    */
+    try{
+
+      renderizarTodosLosSlides();
+
+    }catch(errorRender){
+
+      console.error(
+        "Error al renderizar:",
+        errorRender
+      );
+
+      mostrarError(
+        "Error al dibujar los indicadores: " +
+        errorRender.message
+      );
+
+    }
+
+    const ahora = new Date();
+
+    document.getElementById(
+      "ultimaActualizacion"
+    ).textContent =
+      ahora.toLocaleTimeString(
+        "es-CO",
+        {
+          hour:"2-digit",
+          minute:"2-digit",
+          hour12:true
+        }
+      );
+
+    const total =
+      registrosServicios.length +
+      registrosPreventivos.length +
+      registrosNotificaciones.length;
+
+    document.getElementById(
+      "estadoCarga"
+    ).textContent =
+      total +
+      " registros disponibles · " +
+      "Actualización automática cada 5 minutos";
+
+    if(errores.length > 0){
+
+      mostrarError(
+        "No se pudieron consultar: " +
+        errores.join(", ")
+      );
+
+    }
+
+  }catch(error){
 
     console.error(
-      resultados[0].reason
+      "Error general de carga:",
+      error
     );
 
-  }
-
-  if(resultados[1].status === "fulfilled"){
-
-    registrosPreventivos =
-      resultados[1].value;
-
-  }else{
-
-    errores.push("Preventivos");
-
-    console.error(
-      resultados[1].reason
-    );
-
-  }
-
-  if(resultados[2].status === "fulfilled"){
-
-    registrosNotificaciones =
-      resultados[2].value;
-
-  }else{
-
-    errores.push("Correctivos");
-
-    console.error(
-      resultados[2].reason
-    );
-
-  }
-
-  renderizarTodosLosSlides();
-
-  const ahora = new Date();
-
-  document.getElementById(
-    "ultimaActualizacion"
-  ).textContent =
-    ahora.toLocaleTimeString("es-CO",{
-      hour:"2-digit",
-      minute:"2-digit",
-      hour12:true
-    });
-
-  const total =
-    registrosServicios.length +
-    registrosPreventivos.length +
-    registrosNotificaciones.length;
-
-  document.getElementById("estadoCarga").textContent =
-    total +
-    " registros disponibles · Actualización automática cada 5 minutos";
-
-  if(errores.length){
+    document.getElementById(
+      "estadoCarga"
+    ).textContent =
+      "Error al actualizar los datos";
 
     mostrarError(
-      "No se pudieron consultar: " +
-      errores.join(", ")
+      "Error general: " +
+      error.message
     );
 
   }
 
 }
-
 /* =========================================================
    SERVICIOS INDUSTRIALES
 ========================================================= */
@@ -2382,54 +2472,52 @@ function preventivosMesActual(){
   const inicio = inicioMesActual();
   const fin = finPeriodoMesActual();
 
-  return registrosPreventivos
-    .filter(registro => {
+  return registrosPreventivos.filter(registro => {
 
-      const fecha =
-        fechaProgramadaPreventivo(
-          registro
-        );
+    const fecha =
+      fechaProgramadaPreventivo(registro);
 
-      return (
-        fecha &&
-        fecha >= inicio &&
-        fecha <= fin
-      );
+    return (
+      fecha &&
+      !isNaN(fecha.getTime()) &&
+      fecha >= inicio &&
+      fecha <= fin
+    );
 
-    });
+  });
 
 }
 
 function estadisticasPreventivos(){
 
-  const mes =
-  preventivosMesActual();
+  const registrosMes =
+    preventivosMesActual();
 
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
 
-    const ejecutados =
-  mes.filter(
+  const ejecutados =
+    registrosMes.filter(
       esEjecutadoPreventivo
     ).length;
 
   const cancelados =
-    mes.filter(
+    registrosMes.filter(
       esCanceladoPreventivo
     ).length;
 
   const iniciados =
-    mes.filter(
+    registrosMes.filter(
       esIniciadoPreventivo
     ).length;
 
   const asignados =
-    mes.filter(
+    registrosMes.filter(
       esAsignadoPreventivo
     ).length;
 
   const pendientes =
-    mes.filter(registro => {
+    registrosMes.filter(registro => {
 
       return (
         !esEjecutadoPreventivo(registro) &&
@@ -2440,37 +2528,44 @@ function estadisticasPreventivos(){
 
     }).length;
 
+  /*
+    Vencidos históricos:
+    preventivos con fecha anterior a hoy
+    que aún no han sido ejecutados ni cancelados.
+  */
   const vencidos =
-    registrosPreventivos
-      .filter(registro => {
+    registrosPreventivos.filter(registro => {
 
-        const fecha =
-          fechaProgramadaPreventivo(
-            registro
-          );
+      const fecha =
+        fechaProgramadaPreventivo(registro);
 
-        return (
-          fecha &&
-          fecha < hoy &&
-          !esEjecutadoPreventivo(registro) &&
-          !esCanceladoPreventivo(registro)
-        );
+      return (
+        fecha &&
+        !isNaN(fecha.getTime()) &&
+        fecha < hoy &&
+        !esEjecutadoPreventivo(registro) &&
+        !esCanceladoPreventivo(registro)
+      );
 
-      }).length;
+    }).length;
 
+  /*
+    Backlog total activo:
+    todos los preventivos abiertos,
+    aunque sean de meses anteriores.
+  */
   const backlog =
-    registrosPreventivos
-      .filter(registro => {
+    registrosPreventivos.filter(registro => {
 
-        return (
-          !esEjecutadoPreventivo(registro) &&
-          !esCanceladoPreventivo(registro)
-        );
+      return (
+        !esEjecutadoPreventivo(registro) &&
+        !esCanceladoPreventivo(registro)
+      );
 
-      }).length;
+    }).length;
 
   const baseCumplimiento =
-    mes.length - cancelados;
+    registrosMes.length - cancelados;
 
   const cumplimiento =
     baseCumplimiento > 0
@@ -2481,20 +2576,19 @@ function estadisticasPreventivos(){
         )
       : 0;
 
-  return{
-    total:mes.length,
-    ejecutados,
-    cancelados,
-    iniciados,
-    asignados,
-    pendientes,
-    vencidos,
-    backlog,
-    cumplimiento
+  return {
+    total: registrosMes.length,
+    ejecutados: ejecutados,
+    cancelados: cancelados,
+    iniciados: iniciados,
+    asignados: asignados,
+    pendientes: pendientes,
+    vencidos: vencidos,
+    backlog: backlog,
+    cumplimiento: cumplimiento
   };
 
 }
-
 function estadoCumplimiento(valor){
 
   if(valor >= 90){
@@ -2722,12 +2816,12 @@ function areaPreventivo(registro){
 
 function cumplimientoPreventivoPorArea(){
 
-  const mes =
-  preventivosMesActual();
+  const registrosMes =
+    preventivosMesActual();
 
   const agrupado = {};
 
-  mes.forEach(registro => {
+  registrosMes.forEach(registro => {
 
     const area =
       areaPreventivo(registro);
@@ -2770,11 +2864,11 @@ function cumplimientoPreventivoPorArea(){
             )
           : 0;
 
-      return{
-        area,
-        total:dato.total,
-        ejecutados:dato.ejecutados,
-        cumplimiento
+      return {
+        area: area,
+        total: dato.total,
+        ejecutados: dato.ejecutados,
+        cumplimiento: cumplimiento
       };
 
     })
@@ -2786,7 +2880,6 @@ function cumplimientoPreventivoPorArea(){
     .slice(0,8);
 
 }
-
 function colorCumplimiento(valor){
 
   if(valor >= 90){
@@ -3073,23 +3166,19 @@ function fechaCierreCorrectivo(registro){
 
 function correctivosMesActual(){
 
-  const inicio =
-    inicioMesActual();
-
-  const fin =
-    finPeriodoMesActual();
+  const inicio = inicioMesActual();
+  const fin = finPeriodoMesActual();
 
   return registrosNotificaciones
     .filter(esCorrectivo)
     .filter(registro => {
 
       const fecha =
-        fechaReporteCorrectivo(
-          registro
-        );
+        fechaReporteCorrectivo(registro);
 
       return (
         fecha &&
+        !isNaN(fecha.getTime()) &&
         fecha.getTime() > 0 &&
         fecha >= inicio &&
         fecha <= fin
@@ -3098,27 +3187,29 @@ function correctivosMesActual(){
     });
 
 }
+
 function correctivosAbiertos(){
 
   return registrosNotificaciones
     .filter(esCorrectivo)
-    .filter(
-      registro =>
-      !esCorrectivoCerrado(registro)
-    );
+    .filter(registro => {
+
+      return !esCorrectivoCerrado(registro);
+
+    });
 
 }
 
 function estadisticasCorrectivos(){
 
-  const mes =
-   correctivosMesActual();
+  const registrosMes =
+    correctivosMesActual();
 
   const abiertos =
     correctivosAbiertos();
 
   const cerradosMes =
-    mes.filter(
+    registrosMes.filter(
       esCorrectivoCerrado
     );
 
@@ -3129,11 +3220,15 @@ function estadisticasCorrectivos(){
         textoNormalizado(
           primerValor(registro,[
             "QuedaPendiente",
+            "Queda pendiente",
             "Pendiente"
           ])
         );
 
-      return quedaPendiente === "si";
+      return (
+        quedaPendiente === "si" ||
+        quedaPendiente === "sí"
+      );
 
     }).length;
 
@@ -3150,6 +3245,7 @@ function estadisticasCorrectivos(){
       numero(
         primerValor(registro,[
           "TiempoTotalIntervencion",
+          "Tiempo total intervención",
           "TiempoIntervencion",
           "TiempoCierrePendiente"
         ])
@@ -3158,14 +3254,10 @@ function estadisticasCorrectivos(){
     if(tiempo === null){
 
       const inicio =
-        fechaReporteCorrectivo(
-          registro
-        );
+        fechaReporteCorrectivo(registro);
 
       const fin =
-        fechaCierreCorrectivo(
-          registro
-        );
+        fechaCierreCorrectivo(registro);
 
       tiempo =
         diferenciaMinutos(
@@ -3177,6 +3269,7 @@ function estadisticasCorrectivos(){
 
     if(
       tiempo !== null &&
+      !isNaN(tiempo) &&
       tiempo >= 0
     ){
       tiempos.push(tiempo);
@@ -3185,36 +3278,36 @@ function estadisticasCorrectivos(){
   });
 
   const tiempoPromedio =
-    tiempos.length
+    tiempos.length > 0
       ? redondear(
           tiempos.reduce(
-            (a,b) => a + b,
+            (acumulado,valor) =>
+              acumulado + valor,
             0
           ) / tiempos.length
         )
       : 0;
 
   const tasaCierre =
-    mes.length
+    registrosMes.length > 0
       ? redondear(
-          cerradosmes.length /
-          mes.length *
+          cerradosMes.length /
+          registrosMes.length *
           100
         )
       : 0;
 
-  return{
-    reportados:mes.length,
-    cerrados:cerradosmes.length,
-    abiertos:abiertos.length,
-    pendientes,
-    criticos,
-    tiempoPromedio,
-    tasaCierre
+  return {
+    reportados: registrosMes.length,
+    cerrados: cerradosMes.length,
+    abiertos: abiertos.length,
+    pendientes: pendientes,
+    criticos: criticos,
+    tiempoPromedio: tiempoPromedio,
+    tasaCierre: tasaCierre
   };
 
 }
-
 function renderizarCorrectivosResumen(slide){
 
   const datos =
@@ -3417,7 +3510,7 @@ function conteoCorrectivosPorLinea(){
 
   const agrupado = {};
 
- correctivosMesActual()
+  correctivosMesActual()
     .forEach(registro => {
 
       const linea =
@@ -3430,8 +3523,8 @@ function conteoCorrectivosPorLinea(){
 
   return Object.entries(agrupado)
     .map(([linea,total]) => ({
-      linea,
-      total
+      linea:linea,
+      total:total
     }))
     .sort(
       (a,b) => b.total - a.total
@@ -3439,7 +3532,6 @@ function conteoCorrectivosPorLinea(){
     .slice(0,8);
 
 }
-
 function renderizarCorrectivosLineas(slide){
 
   const datos =
