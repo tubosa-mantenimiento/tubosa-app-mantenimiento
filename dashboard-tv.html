@@ -925,16 +925,73 @@ function textoNormalizado(valor){
 
 }
 
+function normalizarNombreCampo(texto){
+
+  return String(texto || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-zA-Z0-9]/g,"")
+    .toLowerCase()
+    .trim();
+
+}
+
 function primerValor(objeto,campos){
 
+  if(!objeto || typeof objeto !== "object"){
+    return "";
+  }
+
+  /*
+    Primera búsqueda:
+    intenta encontrar el encabezado exacto.
+  */
   for(const campo of campos){
 
     if(
+      Object.prototype.hasOwnProperty.call(objeto,campo) &&
       objeto[campo] !== undefined &&
       objeto[campo] !== null &&
       String(objeto[campo]).trim() !== ""
     ){
       return objeto[campo];
+    }
+
+  }
+
+  /*
+    Segunda búsqueda:
+    compara encabezados ignorando:
+    - tildes
+    - espacios
+    - puntos
+    - guiones
+    - mayúsculas
+  */
+  const clavesObjeto = Object.keys(objeto);
+
+  for(const campoBuscado of campos){
+
+    const campoNormalizado =
+      normalizarNombreCampo(campoBuscado);
+
+    const claveEncontrada =
+      clavesObjeto.find(clave => {
+
+        return (
+          normalizarNombreCampo(clave) ===
+          campoNormalizado
+        );
+
+      });
+
+    if(
+      claveEncontrada !== undefined &&
+      objeto[claveEncontrada] !== undefined &&
+      objeto[claveEncontrada] !== null &&
+      String(objeto[claveEncontrada]).trim() !== ""
+    ){
+      return objeto[claveEncontrada];
     }
 
   }
@@ -985,53 +1042,143 @@ function redondear(valor){
    FECHAS
 ========================================================= */
 
-function fechaISO(fechaTexto){
+function fechaISO(valor){
 
-  if(!fechaTexto) return null;
-
-  if(fechaTexto instanceof Date){
-    return new Date(fechaTexto);
+  if(
+    valor === undefined ||
+    valor === null ||
+    valor === ""
+  ){
+    return null;
   }
 
-  const texto = String(fechaTexto).trim();
+  /*
+    Si ya viene como fecha.
+  */
+  if(valor instanceof Date){
 
-  if(!texto) return null;
+    const copia = new Date(valor);
 
-  if(texto.includes("/")){
+    return isNaN(copia.getTime())
+      ? null
+      : copia;
 
-    const partes = texto.split("/");
+  }
 
-    if(partes.length === 3){
+  /*
+    Fechas seriales de Google Sheets o Excel.
+    Ejemplo: 46209
+  */
+  if(
+    typeof valor === "number" &&
+    valor > 20000 &&
+    valor < 80000
+  ){
 
-      const parte1 = Number(partes[0]);
-      const parte2 = Number(partes[1]);
-      const parte3 = Number(partes[2]);
+    const fechaSerial = new Date(
+      Math.round(
+        (valor - 25569) * 86400 * 1000
+      )
+    );
 
-      /*
-        Se interpreta inicialmente como:
-        día / mes / año
-      */
+    /*
+      Compensación para evitar desplazamiento
+      por zona horaria.
+    */
+    return new Date(
+      fechaSerial.getUTCFullYear(),
+      fechaSerial.getUTCMonth(),
+      fechaSerial.getUTCDate()
+    );
 
-      const fecha = new Date(
-        parte3,
-        parte2 - 1,
-        parte1
-      );
+  }
 
-      if(!isNaN(fecha.getTime())){
-        return fecha;
-      }
+  let texto = String(valor).trim();
 
+  if(!texto){
+    return null;
+  }
+
+  /*
+    Elimina hora si viene:
+    10/07/2026 00:00:00
+  */
+  texto = texto
+    .replace(/\s+/g," ")
+    .trim();
+
+  /*
+    Formato ISO:
+    2026-07-10
+    2026-07-10T05:00:00.000Z
+  */
+  const formatoISO =
+    texto.match(
+      /^(\d{4})-(\d{1,2})-(\d{1,2})/
+    );
+
+  if(formatoISO){
+
+    const anio = Number(formatoISO[1]);
+    const mes = Number(formatoISO[2]) - 1;
+    const dia = Number(formatoISO[3]);
+
+    const fecha = new Date(
+      anio,
+      mes,
+      dia
+    );
+
+    return isNaN(fecha.getTime())
+      ? null
+      : fecha;
+
+  }
+
+  /*
+    Formatos colombianos:
+    10/07/2026
+    10-07-2026
+    10.07.2026
+  */
+  const formatoColombia =
+    texto.match(
+      /^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})/
+    );
+
+  if(formatoColombia){
+
+    const dia = Number(formatoColombia[1]);
+    const mes = Number(formatoColombia[2]) - 1;
+
+    let anio = Number(formatoColombia[3]);
+
+    if(anio < 100){
+      anio += 2000;
     }
 
+    const fecha = new Date(
+      anio,
+      mes,
+      dia
+    );
+
+    return isNaN(fecha.getTime())
+      ? null
+      : fecha;
+
   }
 
-  const fecha = new Date(texto);
+  /*
+    Último intento con el navegador.
+  */
+  const fechaGenerica = new Date(texto);
 
-  return isNaN(fecha.getTime()) ? null : fecha;
+  return isNaN(fechaGenerica.getTime())
+    ? null
+    : fechaGenerica;
 
 }
-
 function horaA24(horaTexto){
 
   if(!horaTexto) return "00:00";
@@ -2126,14 +2273,24 @@ function estadoPreventivo(registro){
 
 function fechaProgramadaPreventivo(registro){
 
-  return fechaISO(
+  const valorFecha =
     primerValor(registro,[
+
       "Fe.inic.extrema",
+      "Fe. inic. extrema",
+      "FechaInicioExtrema",
+      "Fecha inicio extrema",
       "FechaProgramada",
+      "Fecha programada",
+      "FechaProgramacion",
+      "Fecha programación",
       "Fecha",
-      "Fe.fin extrema"
-    ])
-  );
+      "Fe.fin extrema",
+      "FechaFinExtrema"
+
+    ]);
+
+  return fechaISO(valorFecha);
 
 }
 
@@ -2145,7 +2302,8 @@ function esEjecutadoPreventivo(registro){
   return (
     estado.includes("ejecutado") ||
     estado.includes("terminado") ||
-    estado.includes("cerrado")
+    estado.includes("cerrado") ||
+    estado.includes("finalizado")
   );
 
 }
@@ -2157,7 +2315,8 @@ function esCanceladoPreventivo(registro){
 
   return (
     estado.includes("cancelado") ||
-    estado.includes("no realizado")
+    estado.includes("no realizado") ||
+    estado.includes("no ejecutado")
   );
 
 }
@@ -2169,7 +2328,8 @@ function esIniciadoPreventivo(registro){
 
   return (
     estado.includes("iniciado") ||
-    estado.includes("ejecucion")
+    estado.includes("ejecucion") ||
+    estado.includes("en proceso")
   );
 
 }
@@ -2179,9 +2339,12 @@ function esAsignadoPreventivo(registro){
   const estado =
     estadoPreventivo(registro);
 
-  return estado.includes("asignado");
-}
+  return (
+    estado.includes("asignado") ||
+    estado.includes("programado")
+  );
 
+}
 function preventivosSemana(){
 
   const lunes = inicioSemanaActual();
@@ -2699,24 +2862,41 @@ function esCorrectivo(registro){
   const clase =
     textoNormalizado(
       primerValor(registro,[
+
         "ClaseTrabajo",
+        "Clase trabajo",
         "Clase de trabajo",
+        "Clase_Trabajo",
         "TipoTrabajo",
-        "Tipo"
+        "Tipo trabajo",
+        "Tipo",
+        "OrigenReporte"
+
       ])
     );
 
+  /*
+    La hoja Notificaciones corresponde principalmente
+    a correctivos. Si el campo está vacío, se acepta.
+  */
   if(!clase){
     return true;
   }
 
-  return (
-    clase.includes("correctivo") ||
-    clase.includes("zpm1")
-  );
+  /*
+    Excluye solamente registros que indiquen
+    claramente que son preventivos.
+  */
+  if(
+    clase.includes("preventivo") ||
+    clase.includes("zpm2")
+  ){
+    return false;
+  }
+
+  return true;
 
 }
-
 function estadoCorrectivo(registro){
 
   return textoNormalizado(
@@ -2732,22 +2912,42 @@ function estadoCorrectivo(registro){
 function esCorrectivoCerrado(registro){
 
   const estado =
-    estadoCorrectivo(registro);
+    textoNormalizado(
+      primerValor(registro,[
+
+        "Estado",
+        "EstadoNotificacion",
+        "Estado notificación",
+        "ActividadTerminada",
+        "Actividad terminada",
+        "Terminado"
+
+      ])
+    );
 
   const actividadTerminada =
     textoNormalizado(
-      registro.ActividadTerminada
+      primerValor(registro,[
+
+        "ActividadTerminada",
+        "Actividad terminada",
+        "TrabajoTerminado",
+        "Trabajo terminado"
+
+      ])
     );
 
   return (
     estado.includes("cerrado") ||
     estado.includes("terminado") ||
     estado.includes("ejecutado") ||
-    actividadTerminada === "si"
+    estado.includes("finalizado") ||
+    actividadTerminada === "si" ||
+    actividadTerminada === "sí" ||
+    actividadTerminada === "true"
   );
 
 }
-
 function prioridadCorrectivo(registro){
 
   return textoSeguro(
@@ -2776,29 +2976,65 @@ function esPrioridadCritica(registro){
 
 function fechaReporteCorrectivo(registro){
 
-  return fechaHoraObj(
+  const fecha =
     primerValor(registro,[
+
       "FechaReporte",
-      "Fecha"
-    ]),
+      "Fecha reporte",
+      "Fecha_Reporte",
+      "Fecha de reporte",
+      "Fecha",
+      "FechaRegistro"
+
+    ]);
+
+  const hora =
     primerValor(registro,[
+
       "HoraReporte",
-      "Hora"
-    ])
+      "Hora reporte",
+      "Hora_Reporte",
+      "Hora de reporte",
+      "Hora",
+      "HoraRegistro"
+
+    ]);
+
+  return fechaHoraObj(
+    fecha,
+    hora
   );
 
 }
-
 function fechaCierreCorrectivo(registro){
 
-  return fechaHoraObj(
+  const fecha =
     primerValor(registro,[
+
       "FechaCierre",
-      "FechaEjecucion"
-    ]),
+      "Fecha cierre",
+      "Fecha_Cierre",
+      "FechaEjecucion",
+      "Fecha ejecución",
+      "FechaTerminacion",
+      "Fecha terminación"
+
+    ]);
+
+  const hora =
     primerValor(registro,[
-      "HoraCierre"
-    ])
+
+      "HoraCierre",
+      "Hora cierre",
+      "Hora_Cierre",
+      "HoraTerminacion",
+      "Hora terminación"
+
+    ]);
+
+  return fechaHoraObj(
+    fecha,
+    hora
   );
 
 }
