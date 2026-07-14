@@ -1800,56 +1800,65 @@ function renderizarIndicadoresTecnicos(data){
   const metas =
     data.metas || {};
 
-  const fallas =
-    Number(
-      resumen.cantidadEventos || 0
-    );
+  const eventosTotal =
+  Number(
+    resumen.cantidadEventosTotal || 0
+  );
 
-  const horasProgramadas =
-    Number(
-      resumen.horasProgramadas || 0
-    );
+const eventosMtto =
+  Number(
+    resumen.cantidadEventosMantenimiento || 0
+  );
 
-  const tiempoMuerto =
-    Number(
-      resumen.tiempoMuerto || 0
-    );
+const horasProgramadas =
+  Number(
+    resumen.horasProgramadas || 0
+  );
 
-  const horasOperativas =
-    Number(
-      resumen.horasOperativas || 0
-    );
+const tiempoMuertoTotal =
+  Number(
+    resumen.tiempoMuerto || 0
+  );
 
+const tiempoMuertoMtto =
+  Number(
+    resumen.tiempoMuertoMantenimiento || 0
+  );
 
-  const mtbf =
-    fallas > 0
-      ? horasOperativas / fallas
-      : 0;
-
-
-  const mttr =
-    fallas > 0
-      ? tiempoMuerto / fallas
-      : 0;
+const horasOperativas =
+  Number(
+    resumen.horasOperativas || 0
+  );
 
 
-  const ff =
-    horasProgramadas > 0
-      ? fallas / horasProgramadas
-      : 0;
+const mtbf =
+  eventosMtto > 0
+    ? horasOperativas / eventosMtto
+    : 0;
 
 
-  const tpo =
-    fallas > 0
-      ? horasOperativas / fallas
-      : 0;
+const mttr =
+  eventosMtto > 0
+    ? tiempoMuertoMtto / eventosMtto
+    : 0;
 
 
-  const tpfs =
-    fallas > 0
-      ? tiempoMuerto / fallas
-      : 0;
+const ff =
+  horasOperativas > 0
+    ? eventosMtto / horasOperativas
+    : 0;
 
+
+const tpo =
+  eventosTotal > 0
+    ? horasOperativas / eventosTotal
+    : 0;
+
+
+const tpfs =
+  eventosTotal > 0
+    ? tiempoMuertoTotal / eventosTotal
+    : 0;
 
   setTexto(
     "kpiMTBF",
