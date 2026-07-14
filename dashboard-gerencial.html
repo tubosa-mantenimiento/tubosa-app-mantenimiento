@@ -1189,8 +1189,8 @@ body{
         <div class="technical-card">
 
           <div class="technical-label">
-            Eventos registrados
-          </div>
+  Eventos de mantenimiento
+</div>
 
           <div
             class="technical-value"
@@ -1199,9 +1199,12 @@ body{
             —
           </div>
 
-          <div class="technical-meta">
-            Avisos encontrados en el periodo
-          </div>
+          <div
+  class="technical-meta"
+  id="detalleEventos"
+>
+  Eventos totales: —
+</div>
 
         </div>
 
@@ -1861,47 +1864,49 @@ const tpfs =
     : 0;
 
   setTexto(
-    "kpiMTBF",
-    fallas > 0
-      ? formatoHoras(mtbf)
-      : "—"
-  );
+  "kpiMTBF",
+  eventosMtto > 0
+    ? formatoHoras(mtbf)
+    : "—"
+);
 
+setTexto(
+  "kpiMTTR",
+  eventosMtto > 0
+    ? formatoHoras(mttr)
+    : "—"
+);
+
+setTexto(
+  "kpiFF",
+  eventosMtto > 0 && horasOperativas > 0
+    ? formatoDecimal(ff, 4) + " fallas/h"
+    : "—"
+);
+
+setTexto(
+  "kpiTPO",
+  eventosTotal > 0
+    ? formatoHoras(tpo)
+    : "—"
+);
+
+setTexto(
+  "kpiTPFS",
+  eventosTotal > 0
+    ? formatoHoras(tpfs)
+    : "—"
+);
+
+setTexto(
+  "kpiEventos",
+  formatoNumero(eventosMtto, 0)
+);
   setTexto(
-    "kpiMTTR",
-    fallas > 0
-      ? formatoHoras(mttr)
-      : "—"
-  );
-
-  setTexto(
-    "kpiFF",
-    fallas > 0
-      ? formatoDecimal(ff,4) +
-        " fallas/h"
-      : "—"
-  );
-
-  setTexto(
-    "kpiTPO",
-    fallas > 0
-      ? formatoHoras(tpo)
-      : "—"
-  );
-
-  setTexto(
-    "kpiTPFS",
-    fallas > 0
-      ? formatoHoras(tpfs)
-      : "—"
-  );
-
-  setTexto(
-    "kpiEventos",
-    formatoNumero(fallas,0)
-  );
-
-
+  "detalleEventos",
+  "Eventos totales: " +
+  formatoNumero(eventosTotal, 0)
+);
   setTexto(
     "metaMTBF",
     "Meta: " +
@@ -1929,12 +1934,9 @@ const tpfs =
   );
 
   setTexto(
-    "metaTPO",
-    "Meta: " +
-    formatoHoras(
-      metas.mtbf
-    )
-  );
+  "metaTPO",
+  "Promedio general entre eventos"
+);
 
   setTexto(
     "metaTPFS",
@@ -2373,11 +2375,11 @@ function renderizarLineas(data){
           </td>
 
           <td>
-            ${formatoNumero(
-              item.fallas,
-              0
-            )}
-          </td>
+  ${formatoNumero(
+    item.eventosTotales,
+    0
+  )}
+</td>
 
           <td>
             ${formatoToneladas(
