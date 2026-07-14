@@ -1,1 +1,2868 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
 
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>Tarjeta Gerencial - TUBOSA</title>
+
+<style>
+
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+========================================================= */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+:root{
+  --azul-fondo:#001f5b;
+  --azul-tarjeta:#0b3475;
+  --azul-tarjeta-claro:#104087;
+  --azul-acento:#16a9e0;
+  --azul-suave:#d9f1fb;
+
+  --verde:#20b26b;
+  --amarillo:#f2c94c;
+  --rojo:#e74c3c;
+
+  --blanco:#ffffff;
+  --texto-secundario:rgba(255,255,255,.78);
+  --borde:rgba(255,255,255,.17);
+}
+
+body{
+  min-height:100vh;
+  padding:22px;
+  background:var(--azul-fondo);
+  color:var(--blanco);
+}
+
+.container{
+  width:100%;
+  max-width:1400px;
+  margin:auto;
+}
+
+
+/* =========================================================
+   ENCABEZADO
+========================================================= */
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:22px;
+}
+
+.back{
+  color:white;
+  text-decoration:none;
+  font-size:42px;
+  font-weight:bold;
+  line-height:1;
+}
+
+.logo{
+  font-size:44px;
+  font-weight:900;
+}
+
+.header-space{
+  width:42px;
+}
+
+
+/* =========================================================
+   TARJETAS GENERALES
+========================================================= */
+
+.card{
+  background:var(--azul-tarjeta);
+  border:1px solid var(--borde);
+  border-radius:24px;
+  padding:24px;
+}
+
+.page-title{
+  margin-bottom:18px;
+}
+
+.page-title h1{
+  font-size:32px;
+  margin-bottom:8px;
+}
+
+.subtitle{
+  color:var(--texto-secundario);
+  font-size:16px;
+  line-height:1.4;
+}
+
+
+/* =========================================================
+   FILTROS
+========================================================= */
+
+.filters{
+  display:grid;
+  grid-template-columns:
+    minmax(190px,1fr)
+    minmax(190px,1fr)
+    minmax(190px,1fr)
+    auto;
+  gap:14px;
+  align-items:end;
+  margin-bottom:18px;
+}
+
+.filter-group{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.filter-group label{
+  font-size:14px;
+  font-weight:bold;
+  color:var(--texto-secundario);
+}
+
+.filter-group input,
+.filter-group select{
+  width:100%;
+  min-height:48px;
+  border:none;
+  border-radius:14px;
+  padding:0 14px;
+  background:white;
+  color:#152238;
+  font-size:16px;
+  outline:none;
+}
+
+.filter-group select:disabled{
+  background:#d7dce5;
+  color:#6c7480;
+}
+
+.btn-actualizar{
+  min-height:48px;
+  padding:0 22px;
+  border:none;
+  border-radius:14px;
+  background:var(--azul-acento);
+  color:white;
+  font-size:16px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.btn-actualizar:hover{
+  filter:brightness(1.08);
+}
+
+
+/* =========================================================
+   ESTADO DE CARGA
+========================================================= */
+
+.status{
+  display:none;
+  align-items:center;
+  gap:12px;
+  margin-bottom:18px;
+  border-radius:16px;
+  padding:15px 18px;
+  font-size:15px;
+  line-height:1.4;
+}
+
+.status.visible{
+  display:flex;
+}
+
+.status.loading{
+  background:rgba(22,169,224,.16);
+  border:1px solid rgba(22,169,224,.4);
+}
+
+.status.error{
+  background:rgba(231,76,60,.16);
+  border:1px solid rgba(231,76,60,.45);
+}
+
+.spinner{
+  width:22px;
+  height:22px;
+  border:3px solid rgba(255,255,255,.25);
+  border-top-color:white;
+  border-radius:50%;
+  animation:girar .8s linear infinite;
+  flex:0 0 auto;
+}
+
+@keyframes girar{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+
+/* =========================================================
+   KPI PRINCIPALES
+========================================================= */
+
+.kpi-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(160px,1fr));
+  gap:14px;
+  margin-bottom:18px;
+}
+
+.kpi-card{
+  position:relative;
+  overflow:hidden;
+  min-height:140px;
+  background:var(--azul-tarjeta);
+  border:1px solid var(--borde);
+  border-radius:22px;
+  padding:20px;
+}
+
+.kpi-label{
+  color:var(--texto-secundario);
+  font-size:14px;
+  font-weight:bold;
+  line-height:1.3;
+}
+
+.kpi-value{
+  margin-top:15px;
+  font-size:30px;
+  font-weight:900;
+  line-height:1;
+}
+
+.kpi-detail{
+  margin-top:10px;
+  color:var(--texto-secundario);
+  font-size:13px;
+  line-height:1.3;
+}
+
+.status-dot{
+  position:absolute;
+  top:18px;
+  right:18px;
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:#9fa8b7;
+}
+
+.status-dot.verde{
+  background:var(--verde);
+}
+
+.status-dot.amarillo{
+  background:var(--amarillo);
+}
+
+.status-dot.rojo{
+  background:var(--rojo);
+}
+
+
+/* =========================================================
+   BLOQUE DISPONIBILIDAD
+========================================================= */
+
+.main-grid{
+  display:grid;
+  grid-template-columns:minmax(420px,1.1fr) minmax(420px,.9fr);
+  gap:18px;
+  margin-bottom:18px;
+}
+
+.section-title{
+  font-size:22px;
+  margin-bottom:6px;
+}
+
+.section-subtitle{
+  color:var(--texto-secundario);
+  font-size:14px;
+  line-height:1.4;
+  margin-bottom:20px;
+}
+
+.pie-layout{
+  display:grid;
+  grid-template-columns:minmax(260px,370px) 1fr;
+  align-items:center;
+  gap:26px;
+}
+
+.pie-wrapper{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.pie-chart{
+  position:relative;
+  width:100%;
+  max-width:340px;
+  aspect-ratio:1;
+  border-radius:50%;
+  background:#295486;
+  border:2px solid rgba(255,255,255,.16);
+}
+
+.pie-center{
+  position:absolute;
+  inset:27%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:var(--azul-tarjeta);
+  border:1px solid var(--borde);
+  text-align:center;
+}
+
+.pie-center-label{
+  color:var(--texto-secundario);
+  font-size:13px;
+}
+
+.pie-center-value{
+  margin-top:7px;
+  font-size:31px;
+  font-weight:900;
+}
+
+.legend{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+
+.legend-item{
+  display:grid;
+  grid-template-columns:14px 1fr auto;
+  gap:9px;
+  align-items:center;
+  padding-bottom:8px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.legend-color{
+  width:13px;
+  height:13px;
+  border-radius:4px;
+}
+
+.legend-name{
+  font-size:14px;
+}
+
+.legend-value{
+  font-size:14px;
+  font-weight:bold;
+}
+
+
+/* =========================================================
+   INDICADORES TÉCNICOS
+========================================================= */
+
+.technical-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:13px;
+}
+
+.technical-card{
+  min-height:112px;
+  padding:18px;
+  border-radius:18px;
+  background:rgba(0,31,91,.44);
+  border:1px solid rgba(255,255,255,.13);
+}
+
+.technical-label{
+  color:var(--texto-secundario);
+  font-size:14px;
+  font-weight:bold;
+}
+
+.technical-value{
+  margin-top:13px;
+  font-size:27px;
+  font-weight:900;
+}
+
+.technical-meta{
+  margin-top:7px;
+  color:var(--texto-secundario);
+  font-size:12px;
+}
+
+
+/* =========================================================
+   GRUPOS
+========================================================= */
+
+.groups-section{
+  margin-bottom:18px;
+}
+
+.group-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+}
+
+.group-card{
+  color:white;
+  text-align:left;
+  cursor:pointer;
+  background:var(--azul-tarjeta);
+  border:1px solid var(--borde);
+  border-radius:22px;
+  padding:21px;
+  transition:.18s ease;
+}
+
+.group-card:hover{
+  transform:translateY(-2px);
+  background:var(--azul-tarjeta-claro);
+}
+
+.group-card.active{
+  border:2px solid var(--azul-acento);
+  background:var(--azul-tarjeta-claro);
+}
+
+.group-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.group-name{
+  font-size:21px;
+  font-weight:900;
+}
+
+.group-badge{
+  border-radius:999px;
+  padding:6px 10px;
+  background:rgba(22,169,224,.2);
+  color:#bfeeff;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.group-value{
+  margin-top:19px;
+  font-size:34px;
+  font-weight:900;
+}
+
+.group-label{
+  margin-top:5px;
+  color:var(--texto-secundario);
+  font-size:14px;
+}
+
+.group-details{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:18px;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.11);
+}
+
+.group-detail-label{
+  color:var(--texto-secundario);
+  font-size:12px;
+}
+
+.group-detail-value{
+  margin-top:4px;
+  font-size:15px;
+  font-weight:bold;
+}
+
+
+/* =========================================================
+   TABLA DE LÍNEAS
+========================================================= */
+
+.lines-section{
+  margin-bottom:18px;
+}
+
+.table-wrapper{
+  width:100%;
+  overflow-x:auto;
+}
+
+.data-table{
+  width:100%;
+  min-width:900px;
+  border-collapse:collapse;
+}
+
+.data-table th{
+  padding:13px 12px;
+  background:#082d69;
+  color:#ccecff;
+  font-size:13px;
+  text-align:left;
+  white-space:nowrap;
+}
+
+.data-table td{
+  padding:13px 12px;
+  border-bottom:1px solid rgba(255,255,255,.09);
+  font-size:14px;
+  white-space:nowrap;
+}
+
+.data-table tbody tr{
+  cursor:pointer;
+  transition:.15s;
+}
+
+.data-table tbody tr:hover{
+  background:rgba(255,255,255,.07);
+}
+
+.line-name{
+  font-weight:bold;
+}
+
+.badge-disponibilidad{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:72px;
+  padding:6px 9px;
+  border-radius:999px;
+  color:white;
+  font-weight:bold;
+}
+
+.badge-disponibilidad.verde{
+  background:rgba(32,178,107,.8);
+}
+
+.badge-disponibilidad.amarillo{
+  background:rgba(242,201,76,.8);
+  color:#232323;
+}
+
+.badge-disponibilidad.rojo{
+  background:rgba(231,76,60,.85);
+}
+
+
+/* =========================================================
+   RESPONSABLES
+========================================================= */
+
+.responsibles-section{
+  margin-bottom:18px;
+}
+
+.responsibles-list{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.responsible-row{
+  display:grid;
+  grid-template-columns:minmax(150px,220px) 1fr 95px 95px;
+  align-items:center;
+  gap:14px;
+}
+
+.responsible-name{
+  font-size:14px;
+  font-weight:bold;
+}
+
+.progress-track{
+  height:12px;
+  overflow:hidden;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+}
+
+.progress-fill{
+  height:100%;
+  min-width:2px;
+  border-radius:999px;
+  background:var(--azul-acento);
+}
+
+.responsible-hours,
+.responsible-impact{
+  text-align:right;
+  font-size:13px;
+}
+
+.empty-message{
+  padding:24px;
+  color:var(--texto-secundario);
+  text-align:center;
+  border:1px dashed rgba(255,255,255,.2);
+  border-radius:18px;
+}
+
+
+/* =========================================================
+   PIE DE PÁGINA
+========================================================= */
+
+.footer{
+  padding:10px 0 4px;
+  text-align:center;
+  color:rgba(255,255,255,.6);
+  font-size:12px;
+  line-height:1.5;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1100px){
+
+  .kpi-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .main-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:850px){
+
+  body{
+    padding:16px;
+  }
+
+  .filters{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .kpi-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .group-grid{
+    grid-template-columns:1fr;
+  }
+
+  .pie-layout{
+    grid-template-columns:1fr;
+  }
+
+  .responsible-row{
+    grid-template-columns:130px 1fr 80px;
+  }
+
+  .responsible-impact{
+    display:none;
+  }
+}
+
+@media(max-width:540px){
+
+  .logo{
+    font-size:34px;
+  }
+
+  .filters{
+    grid-template-columns:1fr;
+  }
+
+  .kpi-grid{
+    grid-template-columns:1fr;
+  }
+
+  .technical-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .card{
+    padding:19px;
+  }
+
+  .page-title h1{
+    font-size:27px;
+  }
+
+  .responsible-row{
+    grid-template-columns:105px 1fr 70px;
+    gap:8px;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- =====================================================
+       ENCABEZADO
+  ====================================================== -->
+
+  <div class="header">
+
+    <a
+      class="back"
+      href="dashboard.html"
+      aria-label="Volver al dashboard"
+    >
+      ‹
+    </a>
+
+    <div class="logo">
+      TUBOSA
+    </div>
+
+    <div class="header-space"></div>
+
+  </div>
+
+
+  <!-- =====================================================
+       TÍTULO
+  ====================================================== -->
+
+  <div class="card page-title">
+
+    <h1>
+      Tarjeta Gerencial
+    </h1>
+
+    <div class="subtitle">
+      Disponibilidad, confiabilidad, mantenibilidad
+      e impacto productivo de las líneas de extrusión
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       FILTROS
+  ====================================================== -->
+
+  <div class="card filters">
+
+    <div class="filter-group">
+
+      <label for="periodo">
+        Periodo
+      </label>
+
+      <input
+        type="month"
+        id="periodo"
+      >
+
+    </div>
+
+
+    <div class="filter-group">
+
+      <label for="vista">
+        Vista
+      </label>
+
+      <select id="vista">
+
+        <option value="general">
+          General Planta
+        </option>
+
+        <option value="corrugado">
+          Corrugado
+        </option>
+
+        <option value="grupo1">
+          Grupo 1
+        </option>
+
+        <option value="grupo2">
+          Grupo 2
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="filter-group">
+
+      <label for="linea">
+        Línea
+      </label>
+
+      <select
+        id="linea"
+        disabled
+      >
+
+        <option value="">
+          Todas
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="btn-actualizar"
+      id="btnActualizar"
+    >
+      Actualizar
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       CARGA / ERROR
+  ====================================================== -->
+
+  <div
+    class="status"
+    id="status"
+  >
+  </div>
+
+
+  <!-- =====================================================
+       KPI PRINCIPALES
+  ====================================================== -->
+
+  <div class="kpi-grid">
+
+    <div class="kpi-card">
+
+      <span
+        class="status-dot"
+        id="dotDisponibilidad"
+      ></span>
+
+      <div class="kpi-label">
+        Disponibilidad
+      </div>
+
+      <div
+        class="kpi-value"
+        id="kpiDisponibilidad"
+      >
+        —
+      </div>
+
+      <div
+        class="kpi-detail"
+        id="detalleDisponibilidad"
+      >
+        Meta: —
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-label">
+        Horas programadas
+      </div>
+
+      <div
+        class="kpi-value"
+        id="kpiHorasProgramadas"
+      >
+        —
+      </div>
+
+      <div class="kpi-detail">
+        Alcance seleccionado
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-label">
+        Tiempo muerto
+      </div>
+
+      <div
+        class="kpi-value"
+        id="kpiTiempoMuerto"
+      >
+        —
+      </div>
+
+      <div class="kpi-detail">
+        Todas las causas registradas
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-label">
+        Horas operativas
+      </div>
+
+      <div
+        class="kpi-value"
+        id="kpiHorasOperativas"
+      >
+        —
+      </div>
+
+      <div class="kpi-detail">
+        Horas programadas menos paradas
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-label">
+        Toneladas potenciales perdidas
+      </div>
+
+      <div
+        class="kpi-value"
+        id="kpiToneladas"
+      >
+        —
+      </div>
+
+      <div
+        class="kpi-detail"
+        id="detalleToneladas"
+      >
+        Requiere capacidades en kg/h
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       DISPONIBILIDAD E INDICADORES
+  ====================================================== -->
+
+  <div class="main-grid">
+
+    <!-- GRÁFICO TORTA -->
+
+    <div class="card">
+
+      <h2
+        class="section-title"
+        id="tituloDisponibilidad"
+      >
+        Disponibilidad general de planta
+      </h2>
+
+      <div class="section-subtitle">
+        Distribución porcentual de las horas programadas
+        entre disponibilidad y responsables del tiempo muerto.
+      </div>
+
+
+      <div class="pie-layout">
+
+        <div class="pie-wrapper">
+
+          <div
+            class="pie-chart"
+            id="pieChart"
+          >
+
+            <div class="pie-center">
+
+              <div class="pie-center-label">
+                Disponibilidad
+              </div>
+
+              <div
+                class="pie-center-value"
+                id="pieValue"
+              >
+                —
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="legend"
+          id="pieLegend"
+        >
+
+          <div class="empty-message">
+            Cargando distribución...
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- INDICADORES TÉCNICOS -->
+
+    <div class="card">
+
+      <h2 class="section-title">
+        Indicadores técnicos
+      </h2>
+
+      <div class="section-subtitle">
+        Cálculo conforme a las fórmulas definidas
+        en MAESTRO_INDICADORES.
+      </div>
+
+
+      <div class="technical-grid">
+
+        <div class="technical-card">
+
+          <div class="technical-label">
+            MTBF
+          </div>
+
+          <div
+            class="technical-value"
+            id="kpiMTBF"
+          >
+            —
+          </div>
+
+          <div
+            class="technical-meta"
+            id="metaMTBF"
+          >
+            Meta: —
+          </div>
+
+        </div>
+
+
+        <div class="technical-card">
+
+          <div class="technical-label">
+            MTTR
+          </div>
+
+          <div
+            class="technical-value"
+            id="kpiMTTR"
+          >
+            —
+          </div>
+
+          <div
+            class="technical-meta"
+            id="metaMTTR"
+          >
+            Meta: —
+          </div>
+
+        </div>
+
+
+        <div class="technical-card">
+
+          <div class="technical-label">
+            Frecuencia de fallas
+          </div>
+
+          <div
+            class="technical-value"
+            id="kpiFF"
+          >
+            —
+          </div>
+
+          <div
+            class="technical-meta"
+            id="metaFF"
+          >
+            Meta: —
+          </div>
+
+        </div>
+
+
+        <div class="technical-card">
+
+          <div class="technical-label">
+            TPO
+          </div>
+
+          <div
+            class="technical-value"
+            id="kpiTPO"
+          >
+            —
+          </div>
+
+          <div
+            class="technical-meta"
+            id="metaTPO"
+          >
+            Tiempo promedio operativo
+          </div>
+
+        </div>
+
+
+        <div class="technical-card">
+
+          <div class="technical-label">
+            TPFS
+          </div>
+
+          <div
+            class="technical-value"
+            id="kpiTPFS"
+          >
+            —
+          </div>
+
+          <div
+            class="technical-meta"
+            id="metaTPFS"
+          >
+            Meta: —
+          </div>
+
+        </div>
+
+
+        <div class="technical-card">
+
+          <div class="technical-label">
+            Eventos registrados
+          </div>
+
+          <div
+            class="technical-value"
+            id="kpiEventos"
+          >
+            —
+          </div>
+
+          <div class="technical-meta">
+            Avisos encontrados en el periodo
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       COMPARATIVO DE GRUPOS
+  ====================================================== -->
+
+  <div class="card groups-section">
+
+    <h2 class="section-title">
+      Comparativo por grupos
+    </h2>
+
+    <div class="section-subtitle">
+      El General Planta consolida Corrugado,
+      Grupo 1 y Grupo 2.
+    </div>
+
+
+    <div
+      class="group-grid"
+      id="groupGrid"
+    >
+
+      <div class="empty-message">
+        Cargando grupos...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       COMPARATIVO DE LÍNEAS
+  ====================================================== -->
+
+  <div class="card lines-section">
+
+    <h2
+      class="section-title"
+      id="tituloLineas"
+    >
+      Comparativo por líneas
+    </h2>
+
+    <div class="section-subtitle">
+      Selecciona una línea para consultar su detalle individual.
+    </div>
+
+
+    <div class="table-wrapper">
+
+      <table class="data-table">
+
+        <thead>
+
+          <tr>
+            <th>Línea</th>
+            <th>Grupo</th>
+            <th>Horas programadas</th>
+            <th>Tiempo muerto</th>
+            <th>Horas operativas</th>
+            <th>Disponibilidad</th>
+            <th>Eventos</th>
+            <th>Ton perdidas</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="lineasBody">
+
+          <tr>
+            <td colspan="8">
+              Cargando líneas...
+            </td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       RESPONSABLES
+  ====================================================== -->
+
+  <div class="card responsibles-section">
+
+    <h2 class="section-title">
+      Impacto por responsable
+    </h2>
+
+    <div class="section-subtitle">
+      Horas perdidas, participación dentro del tiempo muerto
+      e impacto sobre la disponibilidad.
+    </div>
+
+
+    <div
+      class="responsibles-list"
+      id="responsablesList"
+    >
+
+      <div class="empty-message">
+        Cargando responsables...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       PIE
+  ====================================================== -->
+
+  <div class="footer">
+
+    TUBOSA - Sistema de Mantenimiento<br>
+
+    Tarjeta Gerencial de Indicadores
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   CONFIGURACIÓN
+========================================================= */
+
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
+
+
+const COLORES_TORTA = [
+  "#123f55",
+  "#1f6c8b",
+  "#ef742d",
+  "#1b8c43",
+  "#8c2e96",
+  "#4dac2f",
+  "#d6aa28",
+  "#ba4b4b",
+  "#7b90aa",
+  "#18a7dc"
+];
+
+
+let datosActuales = null;
+
+
+/* =========================================================
+   ELEMENTOS
+========================================================= */
+
+const periodo =
+  document.getElementById("periodo");
+
+const vista =
+  document.getElementById("vista");
+
+const linea =
+  document.getElementById("linea");
+
+const btnActualizar =
+  document.getElementById("btnActualizar");
+
+const statusBox =
+  document.getElementById("status");
+
+
+/* =========================================================
+   INICIO
+========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  iniciarDashboard
+);
+
+
+function iniciarDashboard(){
+
+  establecerPeriodoActual();
+
+  vista.addEventListener(
+    "change",
+    cambiarVista
+  );
+
+  linea.addEventListener(
+    "change",
+    cargarDashboard
+  );
+
+  periodo.addEventListener(
+    "change",
+    cargarDashboard
+  );
+
+  btnActualizar.addEventListener(
+    "click",
+    cargarDashboard
+  );
+
+  cargarDashboard();
+}
+
+
+/* =========================================================
+   PERIODO
+========================================================= */
+
+function establecerPeriodoActual(){
+
+  const hoy = new Date();
+
+  const anio =
+    hoy.getFullYear();
+
+  const mes =
+    String(
+      hoy.getMonth() + 1
+    ).padStart(2,"0");
+
+  periodo.value =
+    anio + "-" + mes;
+}
+
+
+function obtenerRangoMes(){
+
+  const valor =
+    periodo.value;
+
+  if(!valor){
+    throw new Error(
+      "Seleccione un periodo."
+    );
+  }
+
+  const partes =
+    valor.split("-");
+
+  const anio =
+    Number(partes[0]);
+
+  const mes =
+    Number(partes[1]);
+
+  const ultimoDia =
+    new Date(
+      anio,
+      mes,
+      0
+    ).getDate();
+
+  return {
+    fechaInicio:
+      `${anio}-${String(mes).padStart(2,"0")}-01`,
+
+    fechaFin:
+      `${anio}-${String(mes).padStart(2,"0")}-${String(ultimoDia).padStart(2,"0")}`
+  };
+}
+
+
+/* =========================================================
+   CAMBIO DE VISTA
+========================================================= */
+
+function cambiarVista(){
+
+  linea.innerHTML =
+    '<option value="">Todas</option>';
+
+  linea.disabled =
+    vista.value === "general";
+
+  cargarDashboard();
+}
+
+
+/* =========================================================
+   CONSULTA PRINCIPAL
+========================================================= */
+
+async function cargarDashboard(){
+
+  try{
+
+    mostrarCargando(
+      "Consultando indicadores..."
+    );
+
+    btnActualizar.disabled = true;
+
+    const rango =
+      obtenerRangoMes();
+
+    const parametros = {
+      accion:
+        "obtener_tarjeta_gerencial",
+
+      fechaInicio:
+        rango.fechaInicio,
+
+      fechaFin:
+        rango.fechaFin,
+
+      vista:
+        vista.value
+    };
+
+    if(
+      vista.value !== "general" &&
+      linea.value
+    ){
+      parametros.linea =
+        linea.value;
+    }
+
+    const respuesta =
+      await consultarJSONP(
+        parametros
+      );
+
+    if(!respuesta.ok){
+      throw new Error(
+        respuesta.mensaje ||
+        "No fue posible obtener los indicadores."
+      );
+    }
+
+    datosActuales =
+      respuesta;
+
+    renderizarDashboard(
+      respuesta
+    );
+
+    ocultarEstado();
+
+  }catch(error){
+
+    mostrarError(
+      error.message ||
+      String(error)
+    );
+
+  }finally{
+
+    btnActualizar.disabled = false;
+
+  }
+}
+
+
+/* =========================================================
+   JSONP
+========================================================= */
+
+function consultarJSONP(parametros){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      const callback =
+        "callbackGerencial_" +
+        Date.now() +
+        "_" +
+        Math.floor(
+          Math.random() * 100000
+        );
+
+      const script =
+        document.createElement("script");
+
+      const timeout =
+        setTimeout(()=>{
+
+          limpiar();
+
+          reject(
+            new Error(
+              "La consulta tardó demasiado. Verifique la conexión o la implementación de Apps Script."
+            )
+          );
+
+        },30000);
+
+
+      function limpiar(){
+
+        clearTimeout(timeout);
+
+        if(script.parentNode){
+          script.parentNode.removeChild(script);
+        }
+
+        try{
+          delete window[callback];
+        }catch(error){
+          window[callback] = undefined;
+        }
+      }
+
+
+      window[callback] =
+        function(data){
+
+          limpiar();
+
+          resolve(data);
+        };
+
+
+      script.onerror =
+        function(){
+
+          limpiar();
+
+          reject(
+            new Error(
+              "No fue posible conectar con Apps Script."
+            )
+          );
+        };
+
+
+      const query =
+        new URLSearchParams({
+          ...parametros,
+          callback:callback
+        });
+
+
+      script.src =
+        API_URL +
+        "?" +
+        query.toString();
+
+
+      document.body.appendChild(
+        script
+      );
+
+    }
+  );
+}
+
+
+/* =========================================================
+   RENDER PRINCIPAL
+========================================================= */
+
+function renderizarDashboard(data){
+
+  renderizarResumen(
+    data
+  );
+
+  renderizarIndicadoresTecnicos(
+    data
+  );
+
+  renderizarTorta(
+    data
+  );
+
+  renderizarGrupos(
+    data
+  );
+
+  renderizarLineas(
+    data
+  );
+
+  renderizarResponsables(
+    data
+  );
+
+  actualizarSelectorLineas(
+    data
+  );
+
+  actualizarTitulos(
+    data
+  );
+}
+
+
+/* =========================================================
+   RESUMEN
+========================================================= */
+
+function renderizarResumen(data){
+
+  const resumen =
+    data.resumen || {};
+
+  const metas =
+    data.metas || {};
+
+  setTexto(
+    "kpiDisponibilidad",
+    formatoPorcentaje(
+      resumen.disponibilidad
+    )
+  );
+
+  setTexto(
+    "kpiHorasProgramadas",
+    formatoHoras(
+      resumen.horasProgramadas
+    )
+  );
+
+  setTexto(
+    "kpiTiempoMuerto",
+    formatoHoras(
+      resumen.tiempoMuerto
+    )
+  );
+
+  setTexto(
+    "kpiHorasOperativas",
+    formatoHoras(
+      resumen.horasOperativas
+    )
+  );
+
+  setTexto(
+    "kpiToneladas",
+    formatoToneladas(
+      resumen.toneladasPerdidas
+    )
+  );
+
+  setTexto(
+    "detalleDisponibilidad",
+    "Meta: " +
+    formatoPorcentaje(
+      metas.disponibilidad
+    )
+  );
+
+  const capacidadesPendientes =
+    data.alcance &&
+    Array.isArray(data.alcance.lineas) &&
+    data.alcance.lineas.some(
+      item =>
+        Number(
+          item.capacidadKgHora || 0
+        ) <= 0
+    );
+
+  setTexto(
+    "detalleToneladas",
+    capacidadesPendientes
+      ? "Pendiente completar capacidades kg/h"
+      : "Impacto productivo potencial"
+  );
+
+  actualizarSemaforoDisponibilidad(
+    resumen.disponibilidad,
+    metas.disponibilidad
+  );
+}
+
+
+/* =========================================================
+   INDICADORES TÉCNICOS
+========================================================= */
+
+function renderizarIndicadoresTecnicos(data){
+
+  const resumen =
+    data.resumen || {};
+
+  const metas =
+    data.metas || {};
+
+  const fallas =
+    Number(
+      resumen.cantidadEventos || 0
+    );
+
+  const horasProgramadas =
+    Number(
+      resumen.horasProgramadas || 0
+    );
+
+  const tiempoMuerto =
+    Number(
+      resumen.tiempoMuerto || 0
+    );
+
+  const horasOperativas =
+    Number(
+      resumen.horasOperativas || 0
+    );
+
+
+  const mtbf =
+    fallas > 0
+      ? horasOperativas / fallas
+      : 0;
+
+
+  const mttr =
+    fallas > 0
+      ? tiempoMuerto / fallas
+      : 0;
+
+
+  const ff =
+    horasProgramadas > 0
+      ? fallas / horasProgramadas
+      : 0;
+
+
+  const tpo =
+    fallas > 0
+      ? horasOperativas / fallas
+      : 0;
+
+
+  const tpfs =
+    fallas > 0
+      ? tiempoMuerto / fallas
+      : 0;
+
+
+  setTexto(
+    "kpiMTBF",
+    fallas > 0
+      ? formatoHoras(mtbf)
+      : "—"
+  );
+
+  setTexto(
+    "kpiMTTR",
+    fallas > 0
+      ? formatoHoras(mttr)
+      : "—"
+  );
+
+  setTexto(
+    "kpiFF",
+    fallas > 0
+      ? formatoDecimal(ff,4) +
+        " fallas/h"
+      : "—"
+  );
+
+  setTexto(
+    "kpiTPO",
+    fallas > 0
+      ? formatoHoras(tpo)
+      : "—"
+  );
+
+  setTexto(
+    "kpiTPFS",
+    fallas > 0
+      ? formatoHoras(tpfs)
+      : "—"
+  );
+
+  setTexto(
+    "kpiEventos",
+    formatoNumero(fallas,0)
+  );
+
+
+  setTexto(
+    "metaMTBF",
+    "Meta: " +
+    formatoHoras(
+      metas.mtbf
+    )
+  );
+
+  setTexto(
+    "metaMTTR",
+    "Meta: máximo " +
+    formatoHoras(
+      metas.mttr
+    )
+  );
+
+  setTexto(
+    "metaFF",
+    "Meta: máximo " +
+    formatoDecimal(
+      metas.ff,
+      4
+    ) +
+    " fallas/h"
+  );
+
+  setTexto(
+    "metaTPO",
+    "Meta: " +
+    formatoHoras(
+      metas.mtbf
+    )
+  );
+
+  setTexto(
+    "metaTPFS",
+    "Meta: máximo " +
+    formatoHoras(
+      metas.tpfs
+    )
+  );
+}
+
+
+/* =========================================================
+   GRÁFICO TORTA
+========================================================= */
+
+function renderizarTorta(data){
+
+  const resumen =
+    data.resumen || {};
+
+  const responsables =
+    Array.isArray(data.responsables)
+      ? data.responsables
+      : [];
+
+  const segmentos = [];
+
+  segmentos.push({
+    nombre:"% DISPONIBILIDAD",
+    valor:Math.max(
+      Number(
+        resumen.disponibilidad || 0
+      ),
+      0
+    )
+  });
+
+
+  responsables.forEach(item=>{
+
+    const valor =
+      Number(
+        item.impactoDisponibilidad || 0
+      );
+
+    if(valor > 0){
+
+      segmentos.push({
+        nombre:item.nombre,
+        valor:valor
+      });
+
+    }
+
+  });
+
+
+  const totalSegmentos =
+    segmentos.reduce(
+      (total,item)=>
+        total + item.valor,
+      0
+    );
+
+
+  if(totalSegmentos < 100){
+
+    segmentos.push({
+      nombre:"OTROS / AJUSTE",
+      valor:
+        100 - totalSegmentos
+    });
+
+  }
+
+
+  const segmentosNormalizados =
+    normalizarSegmentosTorta(
+      segmentos
+    );
+
+
+  let acumulado = 0;
+
+  const gradientes =
+    segmentosNormalizados.map(
+      (item,index)=>{
+
+        const inicio =
+          acumulado;
+
+        acumulado +=
+          item.valor;
+
+        const color =
+          COLORES_TORTA[
+            index %
+            COLORES_TORTA.length
+          ];
+
+        return (
+          `${color} ${inicio}% ${acumulado}%`
+        );
+      }
+    );
+
+
+  const pie =
+    document.getElementById(
+      "pieChart"
+    );
+
+  pie.style.background =
+    `conic-gradient(${gradientes.join(",")})`;
+
+
+  setTexto(
+    "pieValue",
+    formatoPorcentaje(
+      resumen.disponibilidad
+    )
+  );
+
+
+  const legend =
+    document.getElementById(
+      "pieLegend"
+    );
+
+
+  legend.innerHTML =
+    segmentosNormalizados
+      .map(
+        (item,index)=>{
+
+          const color =
+            COLORES_TORTA[
+              index %
+              COLORES_TORTA.length
+            ];
+
+          return `
+            <div class="legend-item">
+
+              <span
+                class="legend-color"
+                style="background:${color}"
+              ></span>
+
+              <span class="legend-name">
+                ${escaparHTML(item.nombre)}
+              </span>
+
+              <span class="legend-value">
+                ${formatoPorcentaje(item.valor)}
+              </span>
+
+            </div>
+          `;
+        }
+      )
+      .join("");
+}
+
+
+function normalizarSegmentosTorta(
+  segmentos
+){
+
+  const total =
+    segmentos.reduce(
+      (suma,item)=>
+        suma +
+        Math.max(
+          Number(item.valor || 0),
+          0
+        ),
+      0
+    );
+
+  if(total <= 0){
+
+    return [{
+      nombre:"SIN DATOS",
+      valor:100
+    }];
+
+  }
+
+  return segmentos
+    .filter(
+      item =>
+        Number(item.valor || 0) > 0
+    )
+    .map(
+      item => ({
+        nombre:item.nombre,
+        valor:
+          (
+            Number(item.valor || 0) /
+            total
+          ) * 100
+      })
+    );
+}
+
+
+/* =========================================================
+   GRUPOS
+========================================================= */
+
+function renderizarGrupos(data){
+
+  const grupos =
+    Array.isArray(data.grupos)
+      ? data.grupos
+      : [];
+
+  const grid =
+    document.getElementById(
+      "groupGrid"
+    );
+
+
+  if(!grupos.length){
+
+    grid.innerHTML = `
+      <div class="empty-message">
+        El comparativo por grupos no está disponible
+        para esta selección.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  grid.innerHTML =
+    grupos.map(grupo=>{
+
+      const active =
+        vista.value === grupo.clave
+          ? "active"
+          : "";
+
+      return `
+        <button
+          type="button"
+          class="group-card ${active}"
+          data-vista="${grupo.clave}"
+        >
+
+          <div class="group-header">
+
+            <div class="group-name">
+              ${escaparHTML(grupo.grupo)}
+            </div>
+
+            <div class="group-badge">
+              ${formatoNumero(
+                grupo.cantidadLineas,
+                0
+              )}
+              líneas
+            </div>
+
+          </div>
+
+
+          <div class="group-value">
+            ${formatoPorcentaje(
+              grupo.disponibilidad
+            )}
+          </div>
+
+          <div class="group-label">
+            Disponibilidad
+          </div>
+
+
+          <div class="group-details">
+
+            <div>
+
+              <div class="group-detail-label">
+                Tiempo muerto
+              </div>
+
+              <div class="group-detail-value">
+                ${formatoHoras(
+                  grupo.tiempoMuerto
+                )}
+              </div>
+
+            </div>
+
+
+            <div>
+
+              <div class="group-detail-label">
+                Ton perdidas
+              </div>
+
+              <div class="group-detail-value">
+                ${formatoToneladas(
+                  grupo.toneladasPerdidas
+                )}
+              </div>
+
+            </div>
+
+          </div>
+
+        </button>
+      `;
+    }).join("");
+
+
+  document
+    .querySelectorAll(
+      ".group-card"
+    )
+    .forEach(card=>{
+
+      card.addEventListener(
+        "click",
+        ()=>{
+
+          vista.value =
+            card.dataset.vista;
+
+          cambiarVista();
+        }
+      );
+
+    });
+}
+
+
+/* =========================================================
+   LÍNEAS
+========================================================= */
+
+function renderizarLineas(data){
+
+  const lineas =
+    Array.isArray(data.lineas)
+      ? data.lineas
+      : [];
+
+  const tbody =
+    document.getElementById(
+      "lineasBody"
+    );
+
+
+  if(!lineas.length){
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8">
+          No se encontraron líneas
+          para el alcance seleccionado.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+
+  const meta =
+    Number(
+      data.metas &&
+      data.metas.disponibilidad
+        ? data.metas.disponibilidad
+        : 95
+    );
+
+
+  tbody.innerHTML =
+    lineas.map(item=>{
+
+      const clase =
+        claseSemaforoDisponibilidad(
+          item.disponibilidad,
+          meta
+        );
+
+      return `
+        <tr
+          data-codigo="${escaparHTML(
+            item.codigoSAP
+          )}"
+          data-grupo="${claveGrupo(
+            item.grupo
+          )}"
+        >
+
+          <td class="line-name">
+            ${escaparHTML(item.linea)}
+          </td>
+
+          <td>
+            ${escaparHTML(item.grupo)}
+          </td>
+
+          <td>
+            ${formatoHoras(
+              item.horasProgramadas
+            )}
+          </td>
+
+          <td>
+            ${formatoHoras(
+              item.tiempoMuerto
+            )}
+          </td>
+
+          <td>
+            ${formatoHoras(
+              item.horasOperativas
+            )}
+          </td>
+
+          <td>
+
+            <span
+              class="badge-disponibilidad ${clase}"
+            >
+              ${formatoPorcentaje(
+                item.disponibilidad
+              )}
+            </span>
+
+          </td>
+
+          <td>
+            ${formatoNumero(
+              item.fallas,
+              0
+            )}
+          </td>
+
+          <td>
+            ${formatoToneladas(
+              item.toneladasPerdidas
+            )}
+          </td>
+
+        </tr>
+      `;
+    }).join("");
+
+
+  tbody
+    .querySelectorAll("tr")
+    .forEach(fila=>{
+
+      fila.addEventListener(
+        "click",
+        ()=>{
+
+          const codigo =
+            fila.dataset.codigo;
+
+          const grupo =
+            fila.dataset.grupo;
+
+
+          if(
+            vista.value === "general"
+          ){
+
+            vista.value =
+              grupo;
+
+            linea.disabled = false;
+
+          }
+
+
+          actualizarOpcionesLineasDesdeDatos(
+            data,
+            codigo
+          );
+
+
+          linea.value =
+            codigo;
+
+          cargarDashboard();
+        }
+      );
+
+    });
+}
+
+
+/* =========================================================
+   SELECTOR DE LÍNEAS
+========================================================= */
+
+function actualizarSelectorLineas(
+  data
+){
+
+  if(
+    vista.value === "general"
+  ){
+
+    linea.innerHTML =
+      '<option value="">Todas</option>';
+
+    linea.disabled =
+      true;
+
+    return;
+  }
+
+
+  linea.disabled =
+    false;
+
+
+  const valorActual =
+    linea.value;
+
+
+  actualizarOpcionesLineasDesdeDatos(
+    data,
+    valorActual
+  );
+}
+
+
+function actualizarOpcionesLineasDesdeDatos(
+  data,
+  valorSeleccionado
+){
+
+  const lineas =
+    Array.isArray(data.lineas)
+      ? data.lineas
+      : [];
+
+
+  let html =
+    '<option value="">Todas</option>';
+
+
+  lineas.forEach(item=>{
+
+    html += `
+      <option value="${escaparHTML(
+        item.codigoSAP
+      )}">
+        ${escaparHTML(item.linea)}
+      </option>
+    `;
+
+  });
+
+
+  linea.innerHTML =
+    html;
+
+
+  if(
+    valorSeleccionado &&
+    lineas.some(
+      item =>
+        item.codigoSAP ===
+        valorSeleccionado
+    )
+  ){
+    linea.value =
+      valorSeleccionado;
+  }
+}
+
+
+/* =========================================================
+   RESPONSABLES
+========================================================= */
+
+function renderizarResponsables(data){
+
+  const responsables =
+    Array.isArray(data.responsables)
+      ? data.responsables
+      : [];
+
+  const container =
+    document.getElementById(
+      "responsablesList"
+    );
+
+
+  if(!responsables.length){
+
+    container.innerHTML = `
+      <div class="empty-message">
+        No existen tiempos muertos registrados
+        para el periodo seleccionado.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const maxHoras =
+    Math.max(
+      ...responsables.map(
+        item =>
+          Number(item.horas || 0)
+      ),
+      1
+    );
+
+
+  container.innerHTML =
+    responsables.map(item=>{
+
+      const ancho =
+        (
+          Number(item.horas || 0) /
+          maxHoras
+        ) * 100;
+
+      return `
+        <div class="responsible-row">
+
+          <div class="responsible-name">
+            ${escaparHTML(item.nombre)}
+          </div>
+
+          <div class="progress-track">
+
+            <div
+              class="progress-fill"
+              style="width:${ancho}%"
+            ></div>
+
+          </div>
+
+          <div class="responsible-hours">
+            ${formatoHoras(item.horas)}
+          </div>
+
+          <div class="responsible-impact">
+            ${formatoPorcentaje(
+              item.impactoDisponibilidad
+            )}
+          </div>
+
+        </div>
+      `;
+    }).join("");
+}
+
+
+/* =========================================================
+   TÍTULOS
+========================================================= */
+
+function actualizarTitulos(data){
+
+  const nombres = {
+    general:
+      "Disponibilidad general de planta",
+
+    corrugado:
+      "Disponibilidad Corrugado",
+
+    grupo1:
+      "Disponibilidad Grupo 1",
+
+    grupo2:
+      "Disponibilidad Grupo 2"
+  };
+
+
+  let titulo =
+    nombres[vista.value] ||
+    "Disponibilidad";
+
+
+  if(
+    data.filtros &&
+    data.filtros.linea &&
+    data.filtros.linea !== "todas"
+  ){
+
+    const item =
+      data.lineas &&
+      data.lineas[0];
+
+    if(item){
+      titulo =
+        "Disponibilidad " +
+        item.linea;
+    }
+  }
+
+
+  setTexto(
+    "tituloDisponibilidad",
+    titulo
+  );
+
+
+  setTexto(
+    "tituloLineas",
+    vista.value === "general"
+      ? "Comparativo general por líneas"
+      : "Comparativo de líneas - " +
+        (
+          vista.options[
+            vista.selectedIndex
+          ].text
+        )
+  );
+}
+
+
+/* =========================================================
+   SEMÁFOROS
+========================================================= */
+
+function actualizarSemaforoDisponibilidad(
+  valor,
+  meta
+){
+
+  const dot =
+    document.getElementById(
+      "dotDisponibilidad"
+    );
+
+  dot.className =
+    "status-dot " +
+    claseSemaforoDisponibilidad(
+      valor,
+      meta
+    );
+}
+
+
+function claseSemaforoDisponibilidad(
+  valor,
+  meta
+){
+
+  const numero =
+    Number(valor || 0);
+
+  const objetivo =
+    Number(meta || 95);
+
+
+  if(numero >= objetivo){
+    return "verde";
+  }
+
+  if(numero >= 90){
+    return "amarillo";
+  }
+
+  return "rojo";
+}
+
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+function mostrarCargando(mensaje){
+
+  statusBox.className =
+    "status loading visible";
+
+  statusBox.innerHTML = `
+    <div class="spinner"></div>
+    <div>${escaparHTML(mensaje)}</div>
+  `;
+}
+
+
+function mostrarError(mensaje){
+
+  statusBox.className =
+    "status error visible";
+
+  statusBox.innerHTML = `
+    <div>⚠️</div>
+    <div>
+      <strong>Error:</strong>
+      ${escaparHTML(mensaje)}
+    </div>
+  `;
+}
+
+
+function ocultarEstado(){
+
+  statusBox.className =
+    "status";
+
+  statusBox.innerHTML =
+    "";
+}
+
+
+/* =========================================================
+   FORMATO
+========================================================= */
+
+function formatoNumero(
+  valor,
+  decimales = 2
+){
+
+  const numero =
+    Number(valor || 0);
+
+  return numero.toLocaleString(
+    "es-CO",
+    {
+      minimumFractionDigits:
+        decimales,
+
+      maximumFractionDigits:
+        decimales
+    }
+  );
+}
+
+
+function formatoHoras(valor){
+
+  return (
+    formatoNumero(
+      valor,
+      2
+    ) +
+    " h"
+  );
+}
+
+
+function formatoPorcentaje(valor){
+
+  return (
+    formatoNumero(
+      valor,
+      2
+    ) +
+    "%"
+  );
+}
+
+
+function formatoToneladas(valor){
+
+  return (
+    formatoNumero(
+      valor,
+      2
+    ) +
+    " t"
+  );
+}
+
+
+function formatoDecimal(
+  valor,
+  decimales
+){
+
+  return formatoNumero(
+    valor,
+    decimales
+  );
+}
+
+
+function setTexto(
+  id,
+  texto
+){
+
+  const elemento =
+    document.getElementById(id);
+
+  if(elemento){
+    elemento.textContent =
+      texto;
+  }
+}
+
+
+function claveGrupo(grupo){
+
+  const texto =
+    String(grupo || "")
+      .trim()
+      .toLowerCase();
+
+  if(texto === "corrugado"){
+    return "corrugado";
+  }
+
+  if(texto === "grupo 1"){
+    return "grupo1";
+  }
+
+  if(texto === "grupo 2"){
+    return "grupo2";
+  }
+
+  return "general";
+}
+
+
+function escaparHTML(valor){
+
+  return String(valor ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+</script>
+
+</body>
+</html>
