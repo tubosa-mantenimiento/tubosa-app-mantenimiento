@@ -6,22 +6,145 @@
 <title>Dashboard - TUBOSA</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
-body{background:#001f5b;color:white;min-height:100vh;padding:22px;}
-.container{max-width:620px;margin:auto;}
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
-.back{color:white;text-decoration:none;font-size:42px;font-weight:bold;}
-.logo{font-size:46px;font-weight:900;}
-.card,.menu-card{background:#0b3475;border:1px solid rgba(255,255,255,.18);border-radius:24px;padding:26px;margin-bottom:18px;}
-h1{font-size:32px;margin-bottom:8px;}
-.subtitle{font-size:17px;opacity:.85;line-height:1.35;}
-.menu-card{display:flex;align-items:center;justify-content:space-between;color:white;text-decoration:none;}
-.menu-left{display:flex;align-items:center;gap:18px;}
-.icon{font-size:38px;width:44px;text-align:center;}
-.title{font-size:25px;font-weight:900;}
-.desc{font-size:16px;opacity:.85;margin-top:7px;line-height:1.35;}
-.arrow{font-size:42px;font-weight:900;}
-.footer{text-align:center;opacity:.7;font-size:13px;margin-top:26px;}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#001f5b;
+  color:white;
+  min-height:100vh;
+  padding:22px;
+}
+
+.container{
+  max-width:620px;
+  margin:auto;
+}
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:22px;
+}
+
+.back{
+  color:white;
+  text-decoration:none;
+  font-size:42px;
+  font-weight:bold;
+}
+
+.logo{
+  font-size:46px;
+  font-weight:900;
+}
+
+.card,
+.menu-card{
+  background:#0b3475;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:24px;
+  padding:26px;
+  margin-bottom:18px;
+}
+
+h1{
+  font-size:32px;
+  margin-bottom:8px;
+}
+
+.subtitle{
+  font-size:17px;
+  opacity:.85;
+  line-height:1.35;
+}
+
+.menu-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:white;
+  text-decoration:none;
+  transition:
+    transform .18s ease,
+    background .18s ease,
+    border-color .18s ease;
+}
+
+.menu-card:hover{
+  transform:translateY(-2px);
+  background:#104087;
+  border-color:rgba(255,255,255,.35);
+}
+
+.menu-left{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.icon{
+  font-size:38px;
+  width:44px;
+  text-align:center;
+}
+
+.title{
+  font-size:25px;
+  font-weight:900;
+}
+
+.desc{
+  font-size:16px;
+  opacity:.85;
+  margin-top:7px;
+  line-height:1.35;
+}
+
+.arrow{
+  font-size:42px;
+  font-weight:900;
+}
+
+.footer{
+  text-align:center;
+  opacity:.7;
+  font-size:13px;
+  margin-top:26px;
+}
+
+@media(max-width:480px){
+
+  body{
+    padding:16px;
+  }
+
+  .logo{
+    font-size:38px;
+  }
+
+  .card,
+  .menu-card{
+    padding:22px;
+  }
+
+  .title{
+    font-size:22px;
+  }
+
+  .desc{
+    font-size:15px;
+  }
+
+  .icon{
+    font-size:34px;
+  }
+}
 </style>
 </head>
 
@@ -37,48 +160,77 @@ h1{font-size:32px;margin-bottom:8px;}
 
   <div class="card">
     <h1>Dashboard</h1>
-    <div class="subtitle">Centro de control de indicadores de mantenimiento</div>
+    <div class="subtitle">
+      Centro de control de indicadores de mantenimiento
+    </div>
   </div>
 
+  <!-- TARJETA GERENCIAL -->
+  <a class="menu-card" href="dashboard-gerencial.html">
+    <div class="menu-left">
+      <div class="icon">📊</div>
+      <div>
+        <div class="title">Tarjeta Gerencial</div>
+        <div class="desc">
+          Disponibilidad, confiabilidad, mantenibilidad,
+          tiempos muertos y toneladas potenciales perdidas
+        </div>
+      </div>
+    </div>
+    <div class="arrow">›</div>
+  </a>
+
+  <!-- SERVICIOS INDUSTRIALES -->
   <a class="menu-card" href="dashboard-servicios.html">
     <div class="menu-left">
       <div class="icon">🏭</div>
       <div>
         <div class="title">Servicios Industriales</div>
-        <div class="desc">Tendencias de aire, chiller, bombas y PIAB</div>
+        <div class="desc">
+          Tendencias de aire, chiller, bombas y PIAB
+        </div>
       </div>
     </div>
     <div class="arrow">›</div>
   </a>
 
+  <!-- PREVENTIVOS -->
   <a class="menu-card" href="dashboard-preventivos.html">
     <div class="menu-left">
       <div class="icon">🗓</div>
       <div>
         <div class="title">Preventivos</div>
-        <div class="desc">Cumplimiento, asignación, ejecución y backlog</div>
+        <div class="desc">
+          Cumplimiento, asignación, ejecución y backlog
+        </div>
       </div>
     </div>
     <div class="arrow">›</div>
   </a>
 
+  <!-- CORRECTIVOS -->
   <a class="menu-card" href="dashboard-correctivos.html">
     <div class="menu-left">
       <div class="icon">🚨</div>
       <div>
         <div class="title">Correctivos</div>
-        <div class="desc">Novedades, fallas, pendientes y órdenes SAP</div>
+        <div class="desc">
+          Novedades, fallas, pendientes y órdenes SAP
+        </div>
       </div>
     </div>
     <div class="arrow">›</div>
   </a>
 
+  <!-- TÉCNICOS -->
   <a class="menu-card" href="dashboard-tecnicos.html">
     <div class="menu-left">
       <div class="icon">👨‍🔧</div>
       <div>
         <div class="title">Técnicos</div>
-        <div class="desc">Carga de trabajo, ejecución y productividad</div>
+        <div class="desc">
+          Carga de trabajo, ejecución y productividad
+        </div>
       </div>
     </div>
     <div class="arrow">›</div>
