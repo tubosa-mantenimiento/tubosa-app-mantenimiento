@@ -623,6 +623,244 @@ body{
   background:white;
 }
 
+  /* =========================================================
+   INDICADORES GERENCIALES TV
+========================================================= */
+
+.gerencial-periodo{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:9px 15px;
+  border-radius:13px;
+  background:rgba(22,169,224,.18);
+  border:1px solid rgba(22,169,224,.45);
+  color:#c9f1ff;
+  font-size:clamp(12px,1vw,17px);
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.gerencial-disponibilidad-layout{
+  flex:1;
+  min-height:0;
+  display:grid;
+  grid-template-columns:minmax(350px,.95fr) minmax(440px,1.25fr);
+  gap:28px;
+  align-items:center;
+}
+
+.gerencial-torta-wrapper{
+  height:100%;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.gerencial-torta{
+  position:relative;
+  width:min(56vh,520px);
+  max-width:100%;
+  aspect-ratio:1;
+  border-radius:50%;
+  background:#295486;
+  border:2px solid rgba(255,255,255,.18);
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.18),
+    inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+.gerencial-torta-centro{
+  position:absolute;
+  inset:27%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  border-radius:50%;
+  background:#0b3475;
+  border:1px solid rgba(255,255,255,.17);
+}
+
+.gerencial-torta-etiqueta{
+  font-size:clamp(15px,1.25vw,22px);
+  opacity:.82;
+}
+
+.gerencial-torta-valor{
+  margin-top:10px;
+  font-size:clamp(42px,4.5vw,78px);
+  font-weight:900;
+  line-height:1;
+}
+
+.gerencial-leyenda{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:4px;
+  overflow:hidden;
+}
+
+.gerencial-leyenda-fila{
+  display:grid;
+  grid-template-columns:18px 1fr auto;
+  align-items:center;
+  gap:13px;
+  min-height:47px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.10);
+}
+
+.gerencial-leyenda-color{
+  width:16px;
+  height:16px;
+  border-radius:5px;
+}
+
+.gerencial-leyenda-nombre{
+  font-size:clamp(14px,1.2vw,21px);
+  font-weight:800;
+}
+
+.gerencial-leyenda-valor{
+  font-size:clamp(14px,1.2vw,21px);
+  font-weight:900;
+  text-align:right;
+}
+
+.gerencial-tecnicos-grid{
+  flex:1;
+  min-height:0;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:repeat(3,1fr);
+  gap:16px;
+}
+
+.gerencial-tecnico-card{
+  min-height:0;
+  padding:20px 24px;
+  border-radius:21px;
+  background:rgba(0,31,91,.48);
+  border:1px solid rgba(255,255,255,.15);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.gerencial-tecnico-label{
+  font-size:clamp(16px,1.35vw,23px);
+  font-weight:900;
+  opacity:.82;
+}
+
+.gerencial-tecnico-valor{
+  margin-top:16px;
+  font-size:clamp(36px,3.4vw,62px);
+  font-weight:900;
+  line-height:1;
+}
+
+.gerencial-tecnico-meta{
+  margin-top:12px;
+  font-size:clamp(13px,1.05vw,18px);
+  opacity:.78;
+}
+
+.gerencial-grupos-grid{
+  flex:1;
+  min-height:0;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+
+.gerencial-grupo-card{
+  min-height:0;
+  padding:26px;
+  border-radius:23px;
+  background:rgba(0,31,91,.45);
+  border:1px solid rgba(255,255,255,.17);
+  display:flex;
+  flex-direction:column;
+}
+
+.gerencial-grupo-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+}
+
+.gerencial-grupo-nombre{
+  font-size:clamp(24px,2.1vw,38px);
+  font-weight:900;
+}
+
+.gerencial-grupo-badge{
+  padding:8px 13px;
+  border-radius:999px;
+  background:rgba(22,169,224,.20);
+  color:#c8f2ff;
+  font-size:clamp(12px,1vw,17px);
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.gerencial-grupo-valor{
+  margin-top:auto;
+  font-size:clamp(48px,4.4vw,82px);
+  font-weight:900;
+  line-height:1;
+}
+
+.gerencial-grupo-label{
+  margin-top:10px;
+  font-size:clamp(15px,1.25vw,21px);
+  opacity:.82;
+}
+
+.gerencial-grupo-detalles{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+  margin-top:auto;
+  padding-top:22px;
+  border-top:1px solid rgba(255,255,255,.12);
+}
+
+.gerencial-grupo-detalle-label{
+  font-size:clamp(12px,1vw,17px);
+  opacity:.76;
+}
+
+.gerencial-grupo-detalle-valor{
+  margin-top:6px;
+  font-size:clamp(18px,1.55vw,27px);
+  font-weight:900;
+}
+
+@media(max-width:1000px){
+
+  .gerencial-disponibilidad-layout{
+    grid-template-columns:.85fr 1.15fr;
+    gap:16px;
+  }
+
+  .gerencial-grupos-grid{
+    gap:10px;
+  }
+
+  .gerencial-grupo-card{
+    padding:18px;
+  }
+
+}
+  
 /* =========================================================
    RESPONSIVO
 ========================================================= */
@@ -735,6 +973,23 @@ body{
 
 </main>
 
+    <!-- INDICADORES GERENCIALES DEL MES ACTUAL -->
+
+  <section
+    class="slide"
+    data-tipo="gerencial-disponibilidad"
+  ></section>
+
+  <section
+    class="slide"
+    data-tipo="gerencial-tecnicos"
+  ></section>
+
+  <section
+    class="slide"
+    data-tipo="gerencial-grupos"
+  ></section>
+  
 <footer class="footer">
 
   <div class="footer-left">
@@ -760,8 +1015,8 @@ body{
       ❚❚
     </button>
 
-    <div id="contador" class="contador">1 / 10</div>
-
+   <div id="contador" class="contador">1 / 13</div>
+    
     <button
       class="control"
       onclick="siguienteSlide(true)"
@@ -886,6 +1141,8 @@ const CONFIG_INDICADORES = {
 let registrosServicios = [];
 let registrosPreventivos = [];
 let registrosNotificaciones = [];
+
+let datosGerenciales = null;
 
 let indiceActual = 0;
 let pausado = false;
@@ -1455,6 +1712,168 @@ async function cargarHoja(nombreHoja){
 
 }
 
+/* =========================================================
+   CONSULTA GERENCIAL MES EN CURSO
+========================================================= */
+
+function fechaLocalAPI(fecha){
+
+  const anio =
+    fecha.getFullYear();
+
+  const mes =
+    String(
+      fecha.getMonth() + 1
+    ).padStart(2,"0");
+
+  const dia =
+    String(
+      fecha.getDate()
+    ).padStart(2,"0");
+
+  return `${anio}-${mes}-${dia}`;
+}
+
+function rangoGerencialMesActual(){
+
+  const hoy = new Date();
+
+  const inicio =
+    new Date(
+      hoy.getFullYear(),
+      hoy.getMonth(),
+      1
+    );
+
+  return {
+    fechaInicio:
+      fechaLocalAPI(inicio),
+
+    fechaFin:
+      fechaLocalAPI(hoy)
+  };
+}
+
+function cargarTarjetaGerencial(){
+
+  return new Promise(
+    (resolve,reject) => {
+
+      const rango =
+        rangoGerencialMesActual();
+
+      const callback =
+        "callbackTVGerencial_" +
+        Date.now() +
+        "_" +
+        Math.floor(
+          Math.random() * 100000
+        );
+
+      const script =
+        document.createElement("script");
+
+      const timeout =
+        setTimeout(() => {
+
+          limpiar();
+
+          reject(
+            new Error(
+              "La consulta gerencial tardó demasiado."
+            )
+          );
+
+        },30000);
+
+      function limpiar(){
+
+        clearTimeout(timeout);
+
+        if(script.parentNode){
+          script.parentNode.removeChild(script);
+        }
+
+        try{
+          delete window[callback];
+        }catch(error){
+          window[callback] = undefined;
+        }
+      }
+
+      window[callback] =
+        function(data){
+
+          limpiar();
+
+          if(
+            !data ||
+            data.ok === false
+          ){
+
+            reject(
+              new Error(
+                data &&
+                data.mensaje
+                  ? data.mensaje
+                  : "No fue posible obtener los indicadores gerenciales."
+              )
+            );
+
+            return;
+          }
+
+          resolve(data);
+        };
+
+      script.onerror =
+        function(){
+
+          limpiar();
+
+          reject(
+            new Error(
+              "No fue posible conectar con los indicadores gerenciales."
+            )
+          );
+        };
+
+      const parametros =
+        new URLSearchParams({
+
+          accion:
+            "obtener_tarjeta_gerencial",
+
+          fechaInicio:
+            rango.fechaInicio,
+
+          fechaFin:
+            rango.fechaFin,
+
+          vista:
+            "general",
+
+          callback:
+            callback,
+
+          t:
+            Date.now()
+
+        });
+
+      script.src =
+        URL_API +
+        "?" +
+        parametros.toString();
+
+      document.body.appendChild(
+        script
+      );
+
+    }
+  );
+}
+  
 async function cargarDatos(){
 
   ocultarError();
@@ -1467,15 +1886,17 @@ async function cargarDatos(){
   try{
 
     const resultados =
-      await Promise.allSettled([
+  await Promise.allSettled([
 
-        cargarHoja(HOJA_SERVICIOS),
+    cargarHoja(HOJA_SERVICIOS),
 
-        cargarHoja(HOJA_PREVENTIVOS),
+    cargarHoja(HOJA_PREVENTIVOS),
 
-        cargarHoja(HOJA_NOTIFICACIONES)
+    cargarHoja(HOJA_NOTIFICACIONES),
 
-      ]);
+    cargarTarjetaGerencial()
+
+  ]);
 
     const errores = [];
 
@@ -1542,6 +1963,29 @@ async function cargarDatos(){
 
     }
 
+        if(
+      resultados[3].status ===
+      "fulfilled"
+    ){
+
+      datosGerenciales =
+        resultados[3].value;
+
+    }else{
+
+      datosGerenciales = null;
+
+      errores.push(
+        "Indicadores Gerenciales"
+      );
+
+      console.error(
+        "Error Indicadores Gerenciales:",
+        resultados[3].reason
+      );
+
+    }
+    
     /*
       Renderizado protegido.
     */
@@ -3866,6 +4310,755 @@ function renderizarCorrectivosPendientes(slide){
 }
 
 /* =========================================================
+   FORMATO GERENCIAL TV
+========================================================= */
+
+const COLORES_TORTA_TV = [
+  "#123f55",
+  "#1f6c8b",
+  "#ff7a28",
+  "#189544",
+  "#9b2fa6",
+  "#52b92d",
+  "#e1ad1a",
+  "#ba4b4b",
+  "#7b90aa",
+  "#18a7dc"
+];
+
+function formatoNumeroTV(
+  valor,
+  decimales = 2
+){
+
+  const n =
+    Number(valor || 0);
+
+  return n.toLocaleString(
+    "es-CO",
+    {
+      minimumFractionDigits:
+        decimales,
+
+      maximumFractionDigits:
+        decimales
+    }
+  );
+}
+
+function formatoPorcentajeTV(valor){
+
+  return (
+    formatoNumeroTV(
+      valor,
+      2
+    ) +
+    "%"
+  );
+}
+
+function formatoHorasTV(valor){
+
+  return (
+    formatoNumeroTV(
+      valor,
+      2
+    ) +
+    " h"
+  );
+}
+
+function formatoToneladasTV(valor){
+
+  return (
+    formatoNumeroTV(
+      valor,
+      2
+    ) +
+    " t"
+  );
+}
+
+function escaparHTMLTV(valor){
+
+  return String(valor ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function mensajeGerencialSinDatos(
+  slide,
+  titulo
+){
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>${titulo}</h2>
+
+          <p>
+            Periodo mensual:
+            ${textoPeriodoMesActual()}
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="mensaje-central">
+        No fue posible cargar la información gerencial.
+      </div>
+
+    </div>
+
+  `;
+}
+
+  function renderizarGerencialDisponibilidad(
+  slide
+){
+
+  if(!datosGerenciales){
+
+    mensajeGerencialSinDatos(
+      slide,
+      "Disponibilidad general de planta"
+    );
+
+    return;
+  }
+
+  const resumen =
+    datosGerenciales.resumen || {};
+
+  const responsables =
+    Array.isArray(
+      datosGerenciales.responsables
+    )
+      ? datosGerenciales.responsables
+      : [];
+
+  const segmentos = [];
+
+  segmentos.push({
+
+    nombre:
+      "% DISPONIBILIDAD",
+
+    valor:
+      Math.max(
+        Number(
+          resumen.disponibilidad || 0
+        ),
+        0
+      )
+
+  });
+
+  responsables.forEach(item => {
+
+    const valor =
+      Number(
+        item.impactoDisponibilidad || 0
+      );
+
+    if(valor > 0){
+
+      segmentos.push({
+
+        nombre:
+          item.nombre,
+
+        valor:
+          valor
+
+      });
+
+    }
+
+  });
+
+  const suma =
+    segmentos.reduce(
+      (total,item) =>
+        total + item.valor,
+      0
+    );
+
+  if(suma < 100){
+
+    segmentos.push({
+
+      nombre:
+        "OTROS / AJUSTE",
+
+      valor:
+        100 - suma
+
+    });
+
+  }
+
+  const total =
+    segmentos.reduce(
+      (total,item) =>
+        total +
+        Math.max(
+          Number(item.valor || 0),
+          0
+        ),
+      0
+    );
+
+  const normalizados =
+    total > 0
+      ? segmentos
+          .filter(
+            item =>
+              Number(item.valor || 0) > 0
+          )
+          .map(item => ({
+
+            nombre:
+              item.nombre,
+
+            valor:
+              (
+                Number(item.valor || 0) /
+                total
+              ) * 100
+
+          }))
+      : [{
+          nombre:"SIN DATOS",
+          valor:100
+        }];
+
+  let acumulado = 0;
+
+  const gradientes =
+    normalizados.map(
+      (item,index) => {
+
+        const inicio =
+          acumulado;
+
+        acumulado +=
+          item.valor;
+
+        const color =
+          COLORES_TORTA_TV[
+            index %
+            COLORES_TORTA_TV.length
+          ];
+
+        return (
+          `${color} ${inicio}% ${acumulado}%`
+        );
+
+      }
+    );
+
+  const leyenda =
+    normalizados.map(
+      (item,index) => {
+
+        const color =
+          COLORES_TORTA_TV[
+            index %
+            COLORES_TORTA_TV.length
+          ];
+
+        return `
+
+          <div class="gerencial-leyenda-fila">
+
+            <span
+              class="gerencial-leyenda-color"
+              style="background:${color}"
+            ></span>
+
+            <span class="gerencial-leyenda-nombre">
+              ${escaparHTMLTV(item.nombre)}
+            </span>
+
+            <span class="gerencial-leyenda-valor">
+              ${formatoPorcentajeTV(item.valor)}
+            </span>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>
+            Disponibilidad general de planta
+          </h2>
+
+          <p>
+            Distribución porcentual de las horas programadas
+            entre disponibilidad y responsables del tiempo muerto.
+          </p>
+
+        </div>
+
+        <div class="gerencial-periodo">
+          Mes en curso:
+          ${textoPeriodoMesActual()}
+        </div>
+
+      </div>
+
+      <div class="gerencial-disponibilidad-layout">
+
+        <div class="gerencial-torta-wrapper">
+
+          <div
+            class="gerencial-torta"
+            style="
+              background:
+              conic-gradient(
+                ${gradientes.join(",")}
+              );
+            "
+          >
+
+            <div class="gerencial-torta-centro">
+
+              <div class="gerencial-torta-etiqueta">
+                Disponibilidad
+              </div>
+
+              <div class="gerencial-torta-valor">
+                ${
+                  formatoPorcentajeTV(
+                    resumen.disponibilidad
+                  )
+                }
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="gerencial-leyenda">
+          ${leyenda}
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+}
+
+function renderizarGerencialTecnicos(
+  slide
+){
+
+  if(!datosGerenciales){
+
+    mensajeGerencialSinDatos(
+      slide,
+      "Indicadores técnicos"
+    );
+
+    return;
+  }
+
+  const resumen =
+    datosGerenciales.resumen || {};
+
+  const metas =
+    datosGerenciales.metas || {};
+
+  const eventosTotal =
+    Number(
+      resumen.cantidadEventosTotal || 0
+    );
+
+  const eventosMtto =
+    Number(
+      resumen.cantidadEventosMantenimiento || 0
+    );
+
+  const horasOperativas =
+    Number(
+      resumen.horasOperativas || 0
+    );
+
+  const tiempoMuertoTotal =
+    Number(
+      resumen.tiempoMuerto || 0
+    );
+
+  const tiempoMuertoMtto =
+    Number(
+      resumen.tiempoMuertoMantenimiento || 0
+    );
+
+  const mtbf =
+    eventosMtto > 0
+      ? horasOperativas /
+        eventosMtto
+      : 0;
+
+  const mttr =
+    eventosMtto > 0
+      ? tiempoMuertoMtto /
+        eventosMtto
+      : 0;
+
+  const ff =
+    horasOperativas > 0
+      ? eventosMtto /
+        horasOperativas
+      : 0;
+
+  const tpo =
+    eventosTotal > 0
+      ? horasOperativas /
+        eventosTotal
+      : 0;
+
+  const tpfs =
+    eventosTotal > 0
+      ? tiempoMuertoTotal /
+        eventosTotal
+      : 0;
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>
+            Indicadores técnicos
+          </h2>
+
+          <p>
+            Cálculo conforme a las fórmulas definidas
+            en MAESTRO_INDICADORES.
+          </p>
+
+        </div>
+
+        <div class="gerencial-periodo">
+          Mes en curso:
+          ${textoPeriodoMesActual()}
+        </div>
+
+      </div>
+
+      <div class="gerencial-tecnicos-grid">
+
+        <div class="gerencial-tecnico-card">
+
+          <div class="gerencial-tecnico-label">
+            MTBF
+          </div>
+
+          <div class="gerencial-tecnico-valor">
+            ${
+              eventosMtto > 0
+                ? formatoHorasTV(mtbf)
+                : "—"
+            }
+          </div>
+
+          <div class="gerencial-tecnico-meta">
+            Meta:
+            ${formatoHorasTV(metas.mtbf)}
+          </div>
+
+        </div>
+
+        <div class="gerencial-tecnico-card">
+
+          <div class="gerencial-tecnico-label">
+            MTTR
+          </div>
+
+          <div class="gerencial-tecnico-valor">
+            ${
+              eventosMtto > 0
+                ? formatoHorasTV(mttr)
+                : "—"
+            }
+          </div>
+
+          <div class="gerencial-tecnico-meta">
+            Meta: máximo
+            ${formatoHorasTV(metas.mttr)}
+          </div>
+
+        </div>
+
+        <div class="gerencial-tecnico-card">
+
+          <div class="gerencial-tecnico-label">
+            Frecuencia de fallas
+          </div>
+
+          <div class="gerencial-tecnico-valor">
+            ${
+              eventosMtto > 0 &&
+              horasOperativas > 0
+                ? formatoNumeroTV(
+                    ff,
+                    4
+                  ) +
+                  " fallas/h"
+                : "—"
+            }
+          </div>
+
+          <div class="gerencial-tecnico-meta">
+            Meta: máximo
+            ${formatoNumeroTV(
+              metas.ff,
+              4
+            )}
+            fallas/h
+          </div>
+
+        </div>
+
+        <div class="gerencial-tecnico-card">
+
+          <div class="gerencial-tecnico-label">
+            TPO
+          </div>
+
+          <div class="gerencial-tecnico-valor">
+            ${
+              eventosTotal > 0
+                ? formatoHorasTV(tpo)
+                : "—"
+            }
+          </div>
+
+          <div class="gerencial-tecnico-meta">
+            Promedio general entre eventos
+          </div>
+
+        </div>
+
+        <div class="gerencial-tecnico-card">
+
+          <div class="gerencial-tecnico-label">
+            TPFS
+          </div>
+
+          <div class="gerencial-tecnico-valor">
+            ${
+              eventosTotal > 0
+                ? formatoHorasTV(tpfs)
+                : "—"
+            }
+          </div>
+
+          <div class="gerencial-tecnico-meta">
+            Meta: máximo
+            ${formatoHorasTV(metas.tpfs)}
+          </div>
+
+        </div>
+
+        <div class="gerencial-tecnico-card">
+
+          <div class="gerencial-tecnico-label">
+            Eventos de mantenimiento
+          </div>
+
+          <div class="gerencial-tecnico-valor">
+            ${formatoNumeroTV(
+              eventosMtto,
+              0
+            )}
+          </div>
+
+          <div class="gerencial-tecnico-meta">
+            Eventos totales:
+            ${formatoNumeroTV(
+              eventosTotal,
+              0
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+}
+
+  function renderizarGerencialGrupos(
+  slide
+){
+
+  if(!datosGerenciales){
+
+    mensajeGerencialSinDatos(
+      slide,
+      "Comparativo por grupos"
+    );
+
+    return;
+  }
+
+  const grupos =
+    Array.isArray(
+      datosGerenciales.grupos
+    )
+      ? datosGerenciales.grupos
+      : [];
+
+  const contenido =
+    grupos.length
+      ? grupos.map(grupo => `
+
+        <div class="gerencial-grupo-card">
+
+          <div class="gerencial-grupo-header">
+
+            <div class="gerencial-grupo-nombre">
+              ${escaparHTMLTV(grupo.grupo)}
+            </div>
+
+            <div class="gerencial-grupo-badge">
+              ${
+                formatoNumeroTV(
+                  grupo.cantidadLineas,
+                  0
+                )
+              }
+              líneas
+            </div>
+
+          </div>
+
+          <div class="gerencial-grupo-valor">
+            ${
+              formatoPorcentajeTV(
+                grupo.disponibilidad
+              )
+            }
+          </div>
+
+          <div class="gerencial-grupo-label">
+            Disponibilidad
+          </div>
+
+          <div class="gerencial-grupo-detalles">
+
+            <div>
+
+              <div class="gerencial-grupo-detalle-label">
+                Tiempo muerto
+              </div>
+
+              <div class="gerencial-grupo-detalle-valor">
+                ${
+                  formatoHorasTV(
+                    grupo.tiempoMuerto
+                  )
+                }
+              </div>
+
+            </div>
+
+            <div>
+
+              <div class="gerencial-grupo-detalle-label">
+                Ton perdidas
+              </div>
+
+              <div class="gerencial-grupo-detalle-valor">
+                ${
+                  formatoToneladasTV(
+                    grupo.toneladasPerdidas
+                  )
+                }
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      `).join("")
+      : `
+
+        <div class="mensaje-central">
+          No hay información disponible
+          para los grupos del mes actual.
+        </div>
+
+      `;
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>
+            Comparativo por grupos
+          </h2>
+
+          <p>
+            El General Planta consolida Corrugado,
+            Grupo 1 y Grupo 2.
+          </p>
+
+        </div>
+
+        <div class="gerencial-periodo">
+          Mes en curso:
+          ${textoPeriodoMesActual()}
+        </div>
+
+      </div>
+
+      <div class="gerencial-grupos-grid">
+        ${contenido}
+      </div>
+
+    </div>
+
+  `;
+}
+  
+/* =========================================================
    RENDERIZADO GENERAL
 ========================================================= */
 
@@ -3945,6 +5138,42 @@ function renderizarTodosLosSlides(){
 
     }
 
+    if(
+      tipo ===
+      "gerencial-disponibilidad"
+    ){
+
+      renderizarGerencialDisponibilidad(
+        slide
+      );
+
+      return;
+    }
+
+    if(
+      tipo ===
+      "gerencial-tecnicos"
+    ){
+
+      renderizarGerencialTecnicos(
+        slide
+      );
+
+      return;
+    }
+
+    if(
+      tipo ===
+      "gerencial-grupos"
+    ){
+
+      renderizarGerencialGrupos(
+        slide
+      );
+
+      return;
+    }
+    
   });
 
 }
