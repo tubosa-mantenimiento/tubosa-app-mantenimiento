@@ -4459,14 +4459,25 @@ function numeroSAP(valor){
   }
 
   /*
-    Cuando la API entrega un número real,
-    se utiliza directamente.
+    Si Google Sheets entrega el valor
+    directamente como número.
+
+    Algunos registros llegan sin separador:
+    640000 = 640,000 kg = 640 kg
+    21000  = 21,000 kg  = 21 kg
   */
   if(
     typeof valor === "number" &&
     !isNaN(valor)
   ){
-    return valor;
+
+    const numeroDirecto =
+      Number(valor);
+
+    return Math.abs(numeroDirecto) >= 10000
+      ? numeroDirecto / 1000
+      : numeroDirecto;
+
   }
 
   let texto =
@@ -4479,36 +4490,88 @@ function numeroSAP(valor){
     return 0;
   }
 
+  let resultado = 0;
+
   /*
-    Formato SAP colombiano:
+    Formato colombiano completo:
+
     1.436,000 = 1436 kg
-    594,000   = 594 kg
+    2.371,000 = 2371 kg
   */
   if(
     texto.includes(".") &&
     texto.includes(",")
   ){
 
-    texto =
-      texto
-        .replace(/\./g,"")
-        .replace(",",".");
-  }
-  else if(texto.includes(",")){
+    resultado =
+      Number(
+        texto
+          .replace(/\./g,"")
+          .replace(",",".")
+      );
 
-    texto =
-      texto.replace(",",".");
   }
 
-  const resultado =
-    Number(texto);
+  /*
+    Solo coma decimal:
+
+    594,000 = 594 kg
+    24,500  = 24,5 kg
+  */
+  else if(
+    texto.includes(",")
+  ){
+
+    resultado =
+      Number(
+        texto.replace(",",".")
+      );
+
+  }
+
+  /*
+    Solo punto.
+
+    Se interpreta primero como número.
+  */
+  else if(
+    texto.includes(".")
+  ){
+
+    resultado =
+      Number(texto);
+
+  }
+
+  /*
+    Número sin separadores:
+
+    640000 = 640 kg
+    21000  = 21 kg
+    903000 = 903 kg
+  */
+  else{
+
+    resultado =
+      Number(texto);
+
+    if(
+      !isNaN(resultado) &&
+      Math.abs(resultado) >= 10000
+    ){
+
+      resultado =
+        resultado / 1000;
+
+    }
+
+  }
 
   return isNaN(resultado)
     ? 0
     : resultado;
+
 }
-
-
 function fechaHoraProduccion(registro){
 
   const fecha =
