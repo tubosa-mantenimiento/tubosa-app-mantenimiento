@@ -4783,6 +4783,220 @@ function calcularProduccionSAP(){
   };
 }
 
+  function diagnosticarProduccionSAP(){
+
+  const inicio =
+    inicioMesActual();
+
+  const ahora =
+    new Date();
+
+  const resumen = {
+    registrosTotalesHoja:
+      registrosProduccion.length,
+
+    kgTotalesSinFiltros:0,
+
+    registrosFinalizados:0,
+    kgFinalizados:0,
+
+    registrosMesActual:0,
+    kgMesActual:0,
+
+    registrosLineas3a21:0,
+    kgLineas3a21:0,
+
+    registrosBuenos:0,
+    kgBuenos:0,
+
+    registrosScrap:0,
+    kgScrap:0,
+
+    excluidosNoFinalizados:0,
+    excluidosPorFecha:0,
+    excluidosPorLinea:0,
+    excluidosSinPeso:0
+  };
+
+  const detalleLineas = {};
+
+  registrosProduccion.forEach(
+    registro => {
+
+      const peso =
+        numeroSAP(
+          primerValor(
+            registro,
+            [
+              "Peso Neto",
+              "PesoNeto"
+            ]
+          )
+        );
+
+      resumen.kgTotalesSinFiltros +=
+        peso;
+
+      if(peso <= 0){
+
+        resumen.excluidosSinPeso++;
+
+        return;
+      }
+
+      if(
+        !esRegistroFinalizadoProduccion(
+          registro
+        )
+      ){
+
+        resumen.excluidosNoFinalizados++;
+
+        return;
+      }
+
+      resumen.registrosFinalizados++;
+      resumen.kgFinalizados += peso;
+
+      const fechaHora =
+        fechaHoraProduccion(
+          registro
+        );
+
+      if(
+        !fechaHora ||
+        isNaN(fechaHora.getTime()) ||
+        fechaHora < inicio ||
+        fechaHora > ahora
+      ){
+
+        resumen.excluidosPorFecha++;
+
+        return;
+      }
+
+      resumen.registrosMesActual++;
+      resumen.kgMesActual += peso;
+
+      const linea =
+        numeroLineaProduccion(
+          registro
+        );
+
+      if(linea === null){
+
+        resumen.excluidosPorLinea++;
+
+        return;
+      }
+
+      resumen.registrosLineas3a21++;
+      resumen.kgLineas3a21 += peso;
+
+      if(!detalleLineas[linea]){
+
+        detalleLineas[linea] = {
+          linea:"L" + linea,
+          kgBuenos:0,
+          kgScrap:0,
+          kgTotal:0
+        };
+
+      }
+
+      detalleLineas[linea].kgTotal +=
+        peso;
+
+      if(esRegistroScrap(registro)){
+
+        resumen.registrosScrap++;
+        resumen.kgScrap += peso;
+
+        detalleLineas[linea].kgScrap +=
+          peso;
+
+      }else{
+
+        resumen.registrosBuenos++;
+        resumen.kgBuenos += peso;
+
+        detalleLineas[linea].kgBuenos +=
+          peso;
+
+      }
+
+    }
+  );
+
+  const resultado = {
+
+    registrosTotalesHoja:
+      resumen.registrosTotalesHoja,
+
+    toneladasSinFiltros:
+      resumen.kgTotalesSinFiltros / 1000,
+
+    toneladasFinalizadas:
+      resumen.kgFinalizados / 1000,
+
+    toneladasMesActual:
+      resumen.kgMesActual / 1000,
+
+    toneladasLineas3a21:
+      resumen.kgLineas3a21 / 1000,
+
+    toneladasBuenas:
+      resumen.kgBuenos / 1000,
+
+    toneladasScrap:
+      resumen.kgScrap / 1000,
+
+    excluidosNoFinalizados:
+      resumen.excluidosNoFinalizados,
+
+    excluidosPorFecha:
+      resumen.excluidosPorFecha,
+
+    excluidosPorLinea:
+      resumen.excluidosPorLinea,
+
+    excluidosSinPeso:
+      resumen.excluidosSinPeso
+
+  };
+
+  console.log(
+    "DIAGNÓSTICO PRODUCCIÓN SAP"
+  );
+
+  console.table(resultado);
+
+  console.log(
+    "DETALLE POR LÍNEA"
+  );
+
+  console.table(
+    Object.values(
+      detalleLineas
+    ).map(item => ({
+
+      linea:item.linea,
+
+      toneladasBuenas:
+        item.kgBuenos / 1000,
+
+      toneladasScrap:
+        item.kgScrap / 1000,
+
+      toneladasTotales:
+        item.kgTotal / 1000
+
+    }))
+  );
+
+  return resultado;
+
+}
 
 function formatearNumeroProduccion(
   valor,
