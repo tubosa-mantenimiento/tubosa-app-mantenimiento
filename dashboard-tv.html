@@ -966,6 +966,18 @@ body{
     data-tipo="correctivos-lineas"
   ></section>
 
+<!-- PRODUCCIÓN Y SCRAP -->
+
+<section
+  class="slide"
+  data-tipo="produccion-buena"
+></section>
+
+<section
+  class="slide"
+  data-tipo="produccion-scrap"
+></section>
+  
     <!-- INDICADORES GERENCIALES DEL MES ACTUAL -->
 
   <section
@@ -1058,6 +1070,7 @@ const URL_API =
 const HOJA_SERVICIOS = "Rutas_Servicios";
 const HOJA_PREVENTIVOS = "Preventivos";
 const HOJA_NOTIFICACIONES = "Notificaciones";
+const HOJA_PRODUCCION = "Produccion_SAP";
 
 /* =========================================================
    TIEMPOS
@@ -1136,6 +1149,7 @@ const CONFIG_INDICADORES = {
 let registrosServicios = [];
 let registrosPreventivos = [];
 let registrosNotificaciones = [];
+let registrosProduccion = [];
 
 let datosGerenciales = null;
 
@@ -1880,7 +1894,7 @@ async function cargarDatos(){
 
   try{
 
-    const resultados =
+   const resultados =
   await Promise.allSettled([
 
     cargarHoja(HOJA_SERVICIOS),
@@ -1888,6 +1902,8 @@ async function cargarDatos(){
     cargarHoja(HOJA_PREVENTIVOS),
 
     cargarHoja(HOJA_NOTIFICACIONES),
+
+    cargarHoja(HOJA_PRODUCCION),
 
     cargarTarjetaGerencial()
 
@@ -1957,30 +1973,50 @@ async function cargarDatos(){
       );
 
     }
+if(
+  resultados[3].status ===
+  "fulfilled"
+){
 
+  registrosProduccion =
+    resultados[3].value;
+
+}else{
+
+  registrosProduccion = [];
+
+  errores.push(
+    "Producción SAP"
+  );
+
+  console.error(
+    "Error Producción SAP:",
+    resultados[3].reason
+  );
+
+}
         if(
-      resultados[3].status ===
-      "fulfilled"
-    ){
+  resultados[4].status ===
+  "fulfilled"
+){
 
-      datosGerenciales =
-        resultados[3].value;
+  datosGerenciales =
+    resultados[4].value;
 
-    }else{
+}else{
 
-      datosGerenciales = null;
+  datosGerenciales = null;
 
-      errores.push(
-        "Indicadores Gerenciales"
-      );
+  errores.push(
+    "Indicadores Gerenciales"
+  );
 
-      console.error(
-        "Error Indicadores Gerenciales:",
-        resultados[3].reason
-      );
+  console.error(
+    "Error Indicadores Gerenciales:",
+    resultados[4].reason
+  );
 
-    }
-    
+}    
     /*
       Renderizado protegido.
     */
@@ -2017,9 +2053,11 @@ async function cargarDatos(){
       );
 
     const total =
-      registrosServicios.length +
-      registrosPreventivos.length +
-      registrosNotificaciones.length;
+      const total =
+  registrosServicios.length +
+  registrosPreventivos.length +
+  registrosNotificaciones.length +
+  registrosProduccion.length;
 
     document.getElementById(
       "estadoCarga"
@@ -5121,7 +5159,45 @@ function renderizarTodosLosSlides(){
 
       return;
     }
+if(
+  tipo ===
+  "produccion-buena"
+){
 
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="mensaje-central">
+        Cargando producción buena...
+      </div>
+
+    </div>
+
+  `;
+
+  return;
+}
+
+if(
+  tipo ===
+  "produccion-scrap"
+){
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="mensaje-central">
+        Cargando información de scrap...
+      </div>
+
+    </div>
+
+  `;
+
+  return;
+}
     if(
       tipo ===
       "gerencial-disponibilidad"
