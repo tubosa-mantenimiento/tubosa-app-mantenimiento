@@ -4474,9 +4474,9 @@ function numeroSAP(valor){
     const numeroDirecto =
       Number(valor);
 
-    return Math.abs(numeroDirecto) >= 10000
-      ? numeroDirecto / 1000
-      : numeroDirecto;
+    return Math.abs(numeroDirecto) > 3000
+  ? numeroDirecto / 1000
+  : numeroDirecto;
 
   }
 
@@ -4555,15 +4555,15 @@ function numeroSAP(valor){
     resultado =
       Number(texto);
 
-    if(
-      !isNaN(resultado) &&
-      Math.abs(resultado) >= 10000
-    ){
+   if(
+  !isNaN(resultado) &&
+  Math.abs(resultado) > 3000
+){
 
-      resultado =
-        resultado / 1000;
+  resultado =
+    resultado / 1000;
 
-    }
+}
 
   }
 
