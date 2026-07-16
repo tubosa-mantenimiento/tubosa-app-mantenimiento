@@ -835,43 +835,89 @@ body{
   text-align:right;
 }
 
-.gerencial-tecnicos-grid{
+/* =========================================================
+   DESEMPEÑO MANTENIMIENTO Y PLANTA
+========================================================= */
+
+.gerencial-desempeno-layout{
   flex:1;
   min-height:0;
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  grid-template-rows:repeat(3,1fr);
-  gap:16px;
+  gap:18px;
 }
 
-.gerencial-tecnico-card{
+.gerencial-desempeno-panel{
   min-height:0;
-  padding:20px 24px;
-  border-radius:21px;
-  background:rgba(0,31,91,.48);
-  border:1px solid rgba(255,255,255,.15);
+  padding:18px;
+  border-radius:22px;
+  background:rgba(0,31,91,.46);
+  border:1px solid rgba(255,255,255,.16);
+  display:flex;
+  flex-direction:column;
+}
+
+.gerencial-desempeno-panel.planta{
+  background:rgba(10,90,62,.34);
+  border-color:rgba(78,201,144,.32);
+}
+
+.gerencial-desempeno-titulo{
+  padding-bottom:13px;
+  margin-bottom:14px;
+  border-bottom:1px solid rgba(255,255,255,.16);
+  font-size:clamp(20px,1.8vw,31px);
+  font-weight:900;
+}
+
+.gerencial-desempeno-subtitulo{
+  margin-top:5px;
+  font-size:clamp(11px,.9vw,15px);
+  font-weight:600;
+  opacity:.72;
+}
+
+.gerencial-desempeno-grid{
+  flex:1;
+  min-height:0;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  grid-template-rows:repeat(2,1fr);
+  gap:12px;
+}
+
+.gerencial-desempeno-kpi{
+  min-height:0;
+  padding:15px 17px;
+  border-radius:17px;
+  background:rgba(0,31,91,.58);
+  border:1px solid rgba(255,255,255,.13);
   display:flex;
   flex-direction:column;
   justify-content:center;
 }
 
-.gerencial-tecnico-label{
-  font-size:clamp(16px,1.35vw,23px);
+.planta .gerencial-desempeno-kpi{
+  background:rgba(0,50,45,.48);
+}
+
+.gerencial-desempeno-label{
+  font-size:clamp(14px,1.15vw,20px);
   font-weight:900;
   opacity:.82;
 }
 
-.gerencial-tecnico-valor{
-  margin-top:16px;
-  font-size:clamp(36px,3.4vw,62px);
+.gerencial-desempeno-valor{
+  margin-top:10px;
+  font-size:clamp(29px,2.8vw,50px);
   font-weight:900;
   line-height:1;
 }
 
-.gerencial-tecnico-meta{
-  margin-top:12px;
-  font-size:clamp(13px,1.05vw,18px);
-  opacity:.78;
+.gerencial-desempeno-meta{
+  margin-top:9px;
+  font-size:clamp(11px,.88vw,15px);
+  opacity:.72;
 }
 
 .gerencial-grupos-grid{
@@ -6125,7 +6171,7 @@ function renderizarGerencialTecnicos(
 
     mensajeGerencialSinDatos(
       slide,
-      "Indicadores técnicos"
+      "Desempeño de mantenimiento y planta"
     );
 
     return;
@@ -6152,6 +6198,11 @@ function renderizarGerencialTecnicos(
       resumen.horasOperativas || 0
     );
 
+  const horasProgramadas =
+    Number(
+      resumen.horasProgramadas || 0
+    );
+
   const tiempoMuertoTotal =
     Number(
       resumen.tiempoMuerto || 0
@@ -6174,10 +6225,24 @@ function renderizarGerencialTecnicos(
         eventosMtto
       : 0;
 
-  const ff =
-    horasOperativas > 0
+  /*
+    Frecuencia de fallas atribuibles
+    a mantenimiento.
+  */
+  const ffMtto =
+    horasProgramadas > 0
       ? eventosMtto /
-        horasOperativas
+        horasProgramadas
+      : 0;
+
+  /*
+    Frecuencia general de novedades
+    o eventos de planta.
+  */
+  const ffGeneral =
+    horasProgramadas > 0
+      ? eventosTotal /
+        horasProgramadas
       : 0;
 
   const tpo =
@@ -6201,12 +6266,12 @@ function renderizarGerencialTecnicos(
         <div class="nombre-indicador">
 
           <h2>
-            Indicadores técnicos
+            Desempeño de mantenimiento y planta
           </h2>
 
           <p>
-            Cálculo conforme a las fórmulas definidas
-            en MAESTRO_INDICADORES.
+            Separación entre eventos atribuibles
+            a mantenimiento y comportamiento global de planta
           </p>
 
         </div>
@@ -6218,140 +6283,221 @@ function renderizarGerencialTecnicos(
 
       </div>
 
-      <div class="gerencial-tecnicos-grid">
+      <div class="gerencial-desempeno-layout">
 
-        <div class="gerencial-tecnico-card">
+        <!-- DESEMPEÑO DEL MANTENIMIENTO -->
 
-          <div class="gerencial-tecnico-label">
-            MTBF
+        <div class="gerencial-desempeno-panel">
+
+          <div class="gerencial-desempeno-titulo">
+
+            Desempeño del mantenimiento
+
+            <div class="gerencial-desempeno-subtitulo">
+              Eventos cuya responsabilidad corresponde
+              al área de mantenimiento
+            </div>
+
           </div>
 
-          <div class="gerencial-tecnico-valor">
-            ${
-              eventosMtto > 0
-                ? formatoHorasTV(mtbf)
-                : "—"
-            }
-          </div>
+          <div class="gerencial-desempeno-grid">
 
-          <div class="gerencial-tecnico-meta">
-            Meta:
-            ${formatoHorasTV(metas.mtbf)}
-          </div>
+            <div class="gerencial-desempeno-kpi">
 
-        </div>
+              <div class="gerencial-desempeno-label">
+                MTBF
+              </div>
 
-        <div class="gerencial-tecnico-card">
+              <div class="gerencial-desempeno-valor">
+                ${
+                  eventosMtto > 0
+                    ? formatoHorasTV(mtbf)
+                    : "—"
+                }
+              </div>
 
-          <div class="gerencial-tecnico-label">
-            MTTR
-          </div>
+              <div class="gerencial-desempeno-meta">
+                Meta:
+                ${formatoHorasTV(metas.mtbf)}
+              </div>
 
-          <div class="gerencial-tecnico-valor">
-            ${
-              eventosMtto > 0
-                ? formatoHorasTV(mttr)
-                : "—"
-            }
-          </div>
+            </div>
 
-          <div class="gerencial-tecnico-meta">
-            Meta: máximo
-            ${formatoHorasTV(metas.mttr)}
-          </div>
+            <div class="gerencial-desempeno-kpi">
 
-        </div>
+              <div class="gerencial-desempeno-label">
+                MTTR
+              </div>
 
-        <div class="gerencial-tecnico-card">
+              <div class="gerencial-desempeno-valor">
+                ${
+                  eventosMtto > 0
+                    ? formatoHorasTV(mttr)
+                    : "—"
+                }
+              </div>
 
-          <div class="gerencial-tecnico-label">
-            Frecuencia de fallas
-          </div>
+              <div class="gerencial-desempeno-meta">
+                Meta máxima:
+                ${formatoHorasTV(metas.mttr)}
+              </div>
 
-          <div class="gerencial-tecnico-valor">
-            ${
-              eventosMtto > 0 &&
-              horasOperativas > 0
-                ? formatoNumeroTV(
-                    ff,
-                    4
-                  ) +
-                  " fallas/h"
-                : "—"
-            }
-          </div>
+            </div>
 
-          <div class="gerencial-tecnico-meta">
-            Meta: máximo
-            ${formatoNumeroTV(
-              metas.ff,
-              4
-            )}
-            fallas/h
-          </div>
+            <div class="gerencial-desempeno-kpi">
 
-        </div>
+              <div class="gerencial-desempeno-label">
+                FF mantenimiento
+              </div>
 
-        <div class="gerencial-tecnico-card">
+              <div class="gerencial-desempeno-valor">
+                ${
+                  horasProgramadas > 0
+                    ? formatoNumeroTV(
+                        ffMtto,
+                        4
+                      ) +
+                      " fallas/h"
+                    : "—"
+                }
+              </div>
 
-          <div class="gerencial-tecnico-label">
-            TPO
-          </div>
+              <div class="gerencial-desempeno-meta">
+                Eventos de mantenimiento /
+                horas programadas
+              </div>
 
-          <div class="gerencial-tecnico-valor">
-            ${
-              eventosTotal > 0
-                ? formatoHorasTV(tpo)
-                : "—"
-            }
-          </div>
+            </div>
 
-          <div class="gerencial-tecnico-meta">
-            Promedio general entre eventos
-          </div>
+            <div class="gerencial-desempeno-kpi">
 
-        </div>
+              <div class="gerencial-desempeno-label">
+                Eventos de mantenimiento
+              </div>
 
-        <div class="gerencial-tecnico-card">
+              <div class="gerencial-desempeno-valor">
+                ${formatoNumeroTV(
+                  eventosMtto,
+                  0
+                )}
+              </div>
 
-          <div class="gerencial-tecnico-label">
-            TPFS
-          </div>
+              <div class="gerencial-desempeno-meta">
+                Eventos atribuibles a mantenimiento
+              </div>
 
-          <div class="gerencial-tecnico-valor">
-            ${
-              eventosTotal > 0
-                ? formatoHorasTV(tpfs)
-                : "—"
-            }
-          </div>
+            </div>
 
-          <div class="gerencial-tecnico-meta">
-            Meta: máximo
-            ${formatoHorasTV(metas.tpfs)}
           </div>
 
         </div>
 
-        <div class="gerencial-tecnico-card">
+        <!-- DESEMPEÑO DE LA PLANTA -->
 
-          <div class="gerencial-tecnico-label">
-            Eventos de mantenimiento
+        <div class="
+          gerencial-desempeno-panel
+          planta
+        ">
+
+          <div class="gerencial-desempeno-titulo">
+
+            Desempeño de la planta
+
+            <div class="gerencial-desempeno-subtitulo">
+              Todos los eventos registrados,
+              sin importar el responsable
+            </div>
+
           </div>
 
-          <div class="gerencial-tecnico-valor">
-            ${formatoNumeroTV(
-              eventosMtto,
-              0
-            )}
-          </div>
+          <div class="gerencial-desempeno-grid">
 
-          <div class="gerencial-tecnico-meta">
-            Eventos totales:
-            ${formatoNumeroTV(
-              eventosTotal,
-              0
-            )}
+            <div class="gerencial-desempeno-kpi">
+
+              <div class="gerencial-desempeno-label">
+                TPO
+              </div>
+
+              <div class="gerencial-desempeno-valor">
+                ${
+                  eventosTotal > 0
+                    ? formatoHorasTV(tpo)
+                    : "—"
+                }
+              </div>
+
+              <div class="gerencial-desempeno-meta">
+                Horas operativas /
+                eventos totales
+              </div>
+
+            </div>
+
+            <div class="gerencial-desempeno-kpi">
+
+              <div class="gerencial-desempeno-label">
+                TPFS
+              </div>
+
+              <div class="gerencial-desempeno-valor">
+                ${
+                  eventosTotal > 0
+                    ? formatoHorasTV(tpfs)
+                    : "—"
+                }
+              </div>
+
+              <div class="gerencial-desempeno-meta">
+                Meta máxima:
+                ${formatoHorasTV(metas.tpfs)}
+              </div>
+
+            </div>
+
+            <div class="gerencial-desempeno-kpi">
+
+              <div class="gerencial-desempeno-label">
+                FF general
+              </div>
+
+              <div class="gerencial-desempeno-valor">
+                ${
+                  horasProgramadas > 0
+                    ? formatoNumeroTV(
+                        ffGeneral,
+                        4
+                      ) +
+                      " eventos/h"
+                    : "—"
+                }
+              </div>
+
+              <div class="gerencial-desempeno-meta">
+                Eventos totales /
+                horas programadas
+              </div>
+
+            </div>
+
+            <div class="gerencial-desempeno-kpi">
+
+              <div class="gerencial-desempeno-label">
+                Eventos totales
+              </div>
+
+              <div class="gerencial-desempeno-valor">
+                ${formatoNumeroTV(
+                  eventosTotal,
+                  0
+                )}
+              </div>
+
+              <div class="gerencial-desempeno-meta">
+                Todas las novedades de planta
+              </div>
+
+            </div>
+
           </div>
 
         </div>
@@ -6361,6 +6507,7 @@ function renderizarGerencialTecnicos(
     </div>
 
   `;
+
 }
 
   function renderizarGerencialGrupos(
