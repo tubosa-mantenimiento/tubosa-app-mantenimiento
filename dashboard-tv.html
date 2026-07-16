@@ -5110,6 +5110,15 @@ function crearGraficaScrapLineas(
       )
     );
 
+const xPorcentaje =
+  ancho -
+  margenDerecho +
+  25;
+
+const xToneladas =
+  ancho -
+  25;
+  
   const filas =
     datos.map(
       (item,indice) => {
@@ -5170,12 +5179,13 @@ function crearGraficaScrapLineas(
           ></rect>
 
           <text
-            x="${ancho - margenDerecho + 20}"
-            y="${y + altoFila * .67}"
-            text-anchor="start"
-            font-size="17"
-            font-weight="900"
-            fill="${color}"
+  x="${ancho - margenDerecho + 25}"
+  y="${y + altoFila * .67}"
+  text-anchor="start"
+  font-size="17"
+  font-weight="900"
+  fill="${color}"
+>
           >
             ${formatearNumeroProduccion(
               item.porcentajeScrap,
@@ -5184,13 +5194,13 @@ function crearGraficaScrapLineas(
           </text>
 
           <text
-            x="${ancho - 20}"
-            y="${y + altoFila * .67}"
-            text-anchor="end"
-            font-size="16"
-            font-weight="800"
-            fill="#4c5c78"
-          >
+  x="${ancho - 25}"
+  y="${y + altoFila * .67}"
+  text-anchor="end"
+  font-size="16"
+  font-weight="800"
+  fill="#4c5c78"
+>
             ${formatearNumeroProduccion(
               item.toneladasScrap,
               2
