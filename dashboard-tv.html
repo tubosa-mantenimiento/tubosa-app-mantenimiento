@@ -623,6 +623,109 @@ body{
   background:white;
 }
 
+/* =========================================================
+   PRODUCCIÓN Y SCRAP
+========================================================= */
+
+.produccion-kpis{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:14px;
+}
+
+.produccion-kpi{
+  min-height:104px;
+  padding:14px 18px;
+  border-radius:18px;
+  background:white;
+  color:#001f5b;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+
+.produccion-kpi.destacado{
+  background:#e9f4ff;
+  border:2px solid #5aa9e6;
+}
+
+.produccion-kpi.scrap{
+  background:#fff0f0;
+  border:2px solid #ef7070;
+}
+
+.produccion-kpi-label{
+  font-size:clamp(12px,1vw,17px);
+  font-weight:900;
+  text-transform:uppercase;
+  opacity:.70;
+}
+
+.produccion-kpi-valor{
+  margin-top:7px;
+  font-size:clamp(30px,3vw,52px);
+  font-weight:900;
+  line-height:1;
+}
+
+.produccion-kpi-sub{
+  margin-top:7px;
+  font-size:clamp(11px,.9vw,15px);
+  font-weight:bold;
+  opacity:.68;
+}
+
+.produccion-chart-card{
+  flex:1;
+  min-height:0;
+  padding:12px 15px 9px;
+  border-radius:20px;
+  background:white;
+  color:#001f5b;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+.produccion-chart{
+  flex:1;
+  min-height:0;
+}
+
+.produccion-chart svg{
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+.produccion-chart-footer{
+  padding:4px 10px 2px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  font-size:clamp(11px,.95vw,15px);
+  font-weight:800;
+  color:#4c5c78;
+}
+
+.produccion-periodo{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 16px;
+  border-radius:14px;
+  background:rgba(22,169,224,.18);
+  border:1px solid rgba(22,169,224,.45);
+  color:#c9f1ff;
+  font-size:clamp(12px,1vw,17px);
+  font-weight:900;
+  white-space:nowrap;
+}
+  
   /* =========================================================
    INDICADORES GERENCIALES TV
 ========================================================= */
@@ -4342,6 +4445,1029 @@ function renderizarCorrectivosPendientes(slide){
 }
 
 /* =========================================================
+   PRODUCCIÓN Y SCRAP
+========================================================= */
+
+function numeroSAP(valor){
+
+  if(
+    valor === undefined ||
+    valor === null ||
+    valor === ""
+  ){
+    return 0;
+  }
+
+  /*
+    Cuando la API entrega un número real,
+    se utiliza directamente.
+  */
+  if(
+    typeof valor === "number" &&
+    !isNaN(valor)
+  ){
+    return valor;
+  }
+
+  let texto =
+    String(valor)
+      .trim()
+      .replace(/\s/g,"")
+      .replace("%","");
+
+  if(!texto){
+    return 0;
+  }
+
+  /*
+    Formato SAP colombiano:
+    1.436,000 = 1436 kg
+    594,000   = 594 kg
+  */
+  if(
+    texto.includes(".") &&
+    texto.includes(",")
+  ){
+
+    texto =
+      texto
+        .replace(/\./g,"")
+        .replace(",",".");
+  }
+  else if(texto.includes(",")){
+
+    texto =
+      texto.replace(",",".");
+  }
+
+  const resultado =
+    Number(texto);
+
+  return isNaN(resultado)
+    ? 0
+    : resultado;
+}
+
+
+function fechaHoraProduccion(registro){
+
+  const fecha =
+    primerValor(registro,[
+      "Fecha inicio ticket balanza",
+      "FechaInicioTicketBalanza",
+      "Fecha de status del ticket"
+    ]);
+
+  const hora =
+    primerValor(registro,[
+      "Hora inicio ticket balanza",
+      "HoraInicioTicketBalanza",
+      "Hora de status del ticket"
+    ]);
+
+  return fechaHoraObj(
+    fecha,
+    hora
+  );
+}
+
+
+function numeroLineaProduccion(registro){
+
+  const puesto =
+    textoNormalizado(
+      primerValor(registro,[
+        "Puesto de trabajo",
+        "PuestoTrabajo"
+      ])
+    );
+
+  const coincidencia =
+    puesto.match(/lin\s*0*(\d{1,2})/);
+
+  if(!coincidencia){
+    return null;
+  }
+
+  const linea =
+    Number(coincidencia[1]);
+
+  if(
+    linea < 3 ||
+    linea > 21
+  ){
+    return null;
+  }
+
+  return linea;
+}
+
+
+function esRegistroFinalizadoProduccion(registro){
+
+  const estatus =
+    textoNormalizado(
+      primerValor(registro,[
+        "Descripción de Estatus",
+        "Descripcion de Estatus",
+        "Estatus Ticket"
+      ])
+    );
+
+  return (
+    estatus.includes("finalizado") ||
+    estatus === "3"
+  );
+}
+
+
+function esRegistroScrap(registro){
+
+  const indicador =
+    textoNormalizado(
+      primerValor(registro,[
+        "Indicador de Scrap",
+        "Indicador Scrap"
+      ])
+    );
+
+  return indicador === "x";
+}
+
+
+function registrosProduccionMesActual(){
+
+  const inicio =
+    inicioMesActual();
+
+  const ahora =
+    new Date();
+
+  return registrosProduccion.filter(
+    registro => {
+
+      const fechaHora =
+        fechaHoraProduccion(
+          registro
+        );
+
+      const linea =
+        numeroLineaProduccion(
+          registro
+        );
+
+      return (
+        esRegistroFinalizadoProduccion(
+          registro
+        ) &&
+        fechaHora &&
+        !isNaN(
+          fechaHora.getTime()
+        ) &&
+        fechaHora.getTime() > 0 &&
+        fechaHora >= inicio &&
+        fechaHora <= ahora &&
+        linea !== null
+      );
+
+    }
+  );
+}
+
+
+function calcularProduccionSAP(){
+
+  const registrosMes =
+    registrosProduccionMesActual();
+
+  const lineas = {};
+
+  for(
+    let numeroLinea = 3;
+    numeroLinea <= 21;
+    numeroLinea++
+  ){
+
+    lineas[numeroLinea] = {
+      linea:numeroLinea,
+      kgBuenos:0,
+      kgScrap:0,
+      kgProcesados:0,
+      toneladasBuenas:0,
+      toneladasScrap:0,
+      porcentajeScrap:0
+    };
+
+  }
+
+  let kgBuenosTotal = 0;
+  let kgScrapTotal = 0;
+
+  registrosMes.forEach(registro => {
+
+    const linea =
+      numeroLineaProduccion(
+        registro
+      );
+
+    if(
+      linea === null ||
+      !lineas[linea]
+    ){
+      return;
+    }
+
+    const pesoNeto =
+      numeroSAP(
+        primerValor(registro,[
+          "Peso Neto",
+          "PesoNeto"
+        ])
+      );
+
+    if(pesoNeto <= 0){
+      return;
+    }
+
+    if(esRegistroScrap(registro)){
+
+      lineas[linea].kgScrap +=
+        pesoNeto;
+
+      kgScrapTotal +=
+        pesoNeto;
+
+    }else{
+
+      lineas[linea].kgBuenos +=
+        pesoNeto;
+
+      kgBuenosTotal +=
+        pesoNeto;
+
+    }
+
+  });
+
+  const datosLineas =
+    Object.values(lineas)
+      .map(item => {
+
+        const kgProcesados =
+          item.kgBuenos +
+          item.kgScrap;
+
+        const porcentajeScrap =
+          kgProcesados > 0
+            ? item.kgScrap /
+              kgProcesados *
+              100
+            : 0;
+
+        return {
+          linea:item.linea,
+          nombre:"L" + item.linea,
+          kgBuenos:item.kgBuenos,
+          kgScrap:item.kgScrap,
+          kgProcesados:kgProcesados,
+          toneladasBuenas:
+            item.kgBuenos / 1000,
+          toneladasScrap:
+            item.kgScrap / 1000,
+          porcentajeScrap:
+            porcentajeScrap
+        };
+
+      });
+
+  const kgProcesadosTotal =
+    kgBuenosTotal +
+    kgScrapTotal;
+
+  const porcentajeScrapTotal =
+    kgProcesadosTotal > 0
+      ? kgScrapTotal /
+        kgProcesadosTotal *
+        100
+      : 0;
+
+  const lineasScrapOrdenadas =
+    [...datosLineas]
+      .filter(
+        item =>
+          item.kgProcesados > 0
+      )
+      .sort(
+        (a,b) =>
+          b.porcentajeScrap -
+          a.porcentajeScrap
+      );
+
+  return {
+    registros:registrosMes.length,
+    kgBuenosTotal:kgBuenosTotal,
+    toneladasBuenasTotal:
+      kgBuenosTotal / 1000,
+    kgScrapTotal:kgScrapTotal,
+    toneladasScrapTotal:
+      kgScrapTotal / 1000,
+    kgProcesadosTotal:
+      kgProcesadosTotal,
+    toneladasProcesadasTotal:
+      kgProcesadosTotal / 1000,
+    porcentajeScrapTotal:
+      porcentajeScrapTotal,
+    lineas:datosLineas,
+    lineasScrap:
+      lineasScrapOrdenadas
+  };
+}
+
+
+function formatearNumeroProduccion(
+  valor,
+  decimales = 1
+){
+
+  return Number(valor || 0)
+    .toLocaleString(
+      "es-CO",
+      {
+        minimumFractionDigits:
+          decimales,
+        maximumFractionDigits:
+          decimales
+      }
+    );
+}
+
+
+function textoCorteProduccion(){
+
+  const inicio =
+    inicioMesActual();
+
+  const ahora =
+    new Date();
+
+  const inicioTexto =
+    inicio.toLocaleString(
+      "es-CO",
+      {
+        day:"2-digit",
+        month:"2-digit",
+        year:"numeric",
+        hour:"2-digit",
+        minute:"2-digit",
+        hour12:true
+      }
+    );
+
+  const finTexto =
+    ahora.toLocaleString(
+      "es-CO",
+      {
+        day:"2-digit",
+        month:"2-digit",
+        year:"numeric",
+        hour:"2-digit",
+        minute:"2-digit",
+        hour12:true
+      }
+    );
+
+  return (
+    inicioTexto +
+    " al " +
+    finTexto
+  );
+}
+
+
+/* =========================================================
+   GRÁFICA TONELADAS BUENAS POR LÍNEA
+========================================================= */
+
+function crearGraficaProduccionLineas(
+  datos
+){
+
+  const ancho = 1400;
+  const alto = 420;
+
+  const margenIzquierdo = 65;
+  const margenDerecho = 25;
+  const margenSuperior = 40;
+  const margenInferior = 55;
+
+  const anchoUtil =
+    ancho -
+    margenIzquierdo -
+    margenDerecho;
+
+  const altoUtil =
+    alto -
+    margenSuperior -
+    margenInferior;
+
+  const maximoReal =
+    Math.max(
+      0,
+      ...datos.map(
+        item =>
+          item.toneladasBuenas
+      )
+    );
+
+  const maximo =
+    maximoReal > 0
+      ? maximoReal * 1.15
+      : 1;
+
+  const espacio =
+    anchoUtil /
+    datos.length;
+
+  const anchoBarra =
+    Math.max(
+      18,
+      espacio * .62
+    );
+
+  const lineasGuia = 5;
+
+  let guias = "";
+
+  for(
+    let i = 0;
+    i <= lineasGuia;
+    i++
+  ){
+
+    const valor =
+      maximo *
+      (
+        1 -
+        i / lineasGuia
+      );
+
+    const y =
+      margenSuperior +
+      altoUtil *
+      i /
+      lineasGuia;
+
+    guias += `
+
+      <line
+        x1="${margenIzquierdo}"
+        y1="${y}"
+        x2="${ancho - margenDerecho}"
+        y2="${y}"
+        stroke="#d6deeb"
+        stroke-width="1"
+      ></line>
+
+      <text
+        x="${margenIzquierdo - 10}"
+        y="${y + 6}"
+        text-anchor="end"
+        font-size="15"
+        font-weight="700"
+        fill="#56647c"
+      >
+        ${formatearNumeroProduccion(
+          valor,
+          1
+        )}
+      </text>
+
+    `;
+
+  }
+
+  const barras =
+    datos.map(
+      (item,indice) => {
+
+        const x =
+          margenIzquierdo +
+          indice * espacio +
+          (
+            espacio -
+            anchoBarra
+          ) / 2;
+
+        const altura =
+          maximo > 0
+            ? item.toneladasBuenas /
+              maximo *
+              altoUtil
+            : 0;
+
+        const y =
+          margenSuperior +
+          altoUtil -
+          altura;
+
+        const valorVisible =
+          item.toneladasBuenas > 0
+            ? formatearNumeroProduccion(
+                item.toneladasBuenas,
+                1
+              )
+            : "0";
+
+        return `
+
+          <rect
+            x="${x}"
+            y="${y}"
+            width="${anchoBarra}"
+            height="${Math.max(
+              1,
+              altura
+            )}"
+            rx="7"
+            fill="#176fc2"
+          ></rect>
+
+          <text
+            x="${x + anchoBarra / 2}"
+            y="${Math.max(
+              22,
+              y - 9
+            )}"
+            text-anchor="middle"
+            font-size="16"
+            font-weight="900"
+            fill="#001f5b"
+          >
+            ${valorVisible}
+          </text>
+
+          <text
+            x="${x + anchoBarra / 2}"
+            y="${alto - 20}"
+            text-anchor="middle"
+            font-size="16"
+            font-weight="900"
+            fill="#43516c"
+          >
+            ${item.nombre}
+          </text>
+
+        `;
+
+      }
+    ).join("");
+
+  return `
+
+    <svg
+      viewBox="0 0 ${ancho} ${alto}"
+      preserveAspectRatio="none"
+      role="img"
+      aria-label="Toneladas buenas fabricadas por línea"
+    >
+
+      ${guias}
+
+      ${barras}
+
+    </svg>
+
+  `;
+}
+
+
+/* =========================================================
+   GRÁFICA SCRAP POR LÍNEA
+========================================================= */
+
+function colorScrapPorcentaje(valor){
+
+  if(valor <= 3){
+    return "#15972e";
+  }
+
+  if(valor <= 5){
+    return "#d18a00";
+  }
+
+  return "#d92020";
+}
+
+
+function crearGraficaScrapLineas(
+  datos
+){
+
+  if(!datos.length){
+
+    return `
+      <div class="mensaje-central">
+        No existen registros de producción
+        para calcular scrap.
+      </div>
+    `;
+
+  }
+
+  const ancho = 1400;
+  const alto = 430;
+
+  const margenIzquierdo = 110;
+  const margenDerecho = 170;
+  const margenSuperior = 20;
+  const margenInferior = 20;
+
+  const anchoUtil =
+    ancho -
+    margenIzquierdo -
+    margenDerecho;
+
+  const cantidad =
+    datos.length;
+
+  const altoFila =
+    Math.min(
+      44,
+      (
+        alto -
+        margenSuperior -
+        margenInferior
+      ) /
+      cantidad
+    );
+
+  const maximo =
+    Math.max(
+      1,
+      ...datos.map(
+        item =>
+          item.porcentajeScrap
+      )
+    );
+
+  const filas =
+    datos.map(
+      (item,indice) => {
+
+        const y =
+          margenSuperior +
+          indice *
+          altoFila;
+
+        const anchoBarra =
+          item.porcentajeScrap /
+          maximo *
+          anchoUtil;
+
+        const color =
+          colorScrapPorcentaje(
+            item.porcentajeScrap
+          );
+
+        return `
+
+          <text
+            x="${margenIzquierdo - 15}"
+            y="${y + altoFila * .67}"
+            text-anchor="end"
+            font-size="17"
+            font-weight="900"
+            fill="#001f5b"
+          >
+            L${item.linea}
+          </text>
+
+          <rect
+            x="${margenIzquierdo}"
+            y="${y + 7}"
+            width="${anchoUtil}"
+            height="${Math.max(
+              16,
+              altoFila - 13
+            )}"
+            rx="8"
+            fill="#e4e9f1"
+          ></rect>
+
+          <rect
+            x="${margenIzquierdo}"
+            y="${y + 7}"
+            width="${Math.max(
+              3,
+              anchoBarra
+            )}"
+            height="${Math.max(
+              16,
+              altoFila - 13
+            )}"
+            rx="8"
+            fill="${color}"
+          ></rect>
+
+          <text
+            x="${ancho - margenDerecho + 20}"
+            y="${y + altoFila * .67}"
+            text-anchor="start"
+            font-size="17"
+            font-weight="900"
+            fill="${color}"
+          >
+            ${formatearNumeroProduccion(
+              item.porcentajeScrap,
+              2
+            )}%
+          </text>
+
+          <text
+            x="${ancho - 20}"
+            y="${y + altoFila * .67}"
+            text-anchor="end"
+            font-size="16"
+            font-weight="800"
+            fill="#4c5c78"
+          >
+            ${formatearNumeroProduccion(
+              item.toneladasScrap,
+              2
+            )} t
+          </text>
+
+        `;
+
+      }
+    ).join("");
+
+  return `
+
+    <svg
+      viewBox="0 0 ${ancho} ${alto}"
+      preserveAspectRatio="none"
+      role="img"
+      aria-label="Porcentaje de scrap por línea"
+    >
+
+      ${filas}
+
+    </svg>
+
+  `;
+}
+
+
+/* =========================================================
+   RENDER PRODUCCIÓN BUENA
+========================================================= */
+
+function renderizarProduccionBuena(
+  slide
+){
+
+  const datos =
+    calcularProduccionSAP();
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>
+            Producción buena por línea
+          </h2>
+
+          <p>
+            Peso neto de producto bueno
+            registrado en báscula
+          </p>
+
+        </div>
+
+        <div class="produccion-periodo">
+          Corte:
+          ${textoCorteProduccion()}
+        </div>
+
+      </div>
+
+      <div class="produccion-kpis">
+
+        <div class="
+          produccion-kpi
+          destacado
+        ">
+
+          <div class="produccion-kpi-label">
+            Kilogramos buenos
+          </div>
+
+          <div class="produccion-kpi-valor">
+            ${formatearNumeroProduccion(
+              datos.kgBuenosTotal,
+              0
+            )} kg
+          </div>
+
+        </div>
+
+        <div class="produccion-kpi">
+
+          <div class="produccion-kpi-label">
+            Toneladas buenas
+          </div>
+
+          <div class="produccion-kpi-valor">
+            ${formatearNumeroProduccion(
+              datos.toneladasBuenasTotal,
+              1
+            )} t
+          </div>
+
+        </div>
+
+        <div class="produccion-kpi">
+
+          <div class="produccion-kpi-label">
+            Tickets considerados
+          </div>
+
+          <div class="produccion-kpi-valor">
+            ${datos.registros}
+          </div>
+
+          <div class="produccion-kpi-sub">
+            Tickets finalizados entre L3 y L21
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="produccion-chart-card">
+
+        <div class="produccion-chart">
+
+          ${crearGraficaProduccionLineas(
+            datos.lineas
+          )}
+
+        </div>
+
+        <div class="produccion-chart-footer">
+
+          <span>
+            Toneladas buenas por línea
+            en orden fijo L3–L21
+          </span>
+
+          <span>
+            Indicador de Scrap vacío =
+            producto bueno
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* =========================================================
+   RENDER SCRAP
+========================================================= */
+
+function renderizarProduccionScrap(
+  slide
+){
+
+  const datos =
+    calcularProduccionSAP();
+
+  slide.innerHTML = `
+
+    <div class="panel">
+
+      <div class="panel-header">
+
+        <div class="nombre-indicador">
+
+          <h2>
+            Scrap de producción
+          </h2>
+
+          <p>
+            Porcentaje y toneladas de scrap
+            por línea
+          </p>
+
+        </div>
+
+        <div class="produccion-periodo">
+          Corte:
+          ${textoCorteProduccion()}
+        </div>
+
+      </div>
+
+      <div class="produccion-kpis">
+
+        <div class="
+          produccion-kpi
+          scrap
+        ">
+
+          <div class="produccion-kpi-label">
+            Scrap total
+          </div>
+
+          <div class="produccion-kpi-valor">
+            ${formatearNumeroProduccion(
+              datos.porcentajeScrapTotal,
+              2
+            )}%
+          </div>
+
+        </div>
+
+        <div class="produccion-kpi">
+
+          <div class="produccion-kpi-label">
+            Toneladas de scrap
+          </div>
+
+          <div class="produccion-kpi-valor">
+            ${formatearNumeroProduccion(
+              datos.toneladasScrapTotal,
+              2
+            )} t
+          </div>
+
+        </div>
+
+        <div class="produccion-kpi">
+
+          <div class="produccion-kpi-label">
+            Toneladas procesadas
+          </div>
+
+          <div class="produccion-kpi-valor">
+            ${formatearNumeroProduccion(
+              datos.toneladasProcesadasTotal,
+              1
+            )} t
+          </div>
+
+          <div class="produccion-kpi-sub">
+            Producto bueno + scrap
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="produccion-chart-card">
+
+        <div class="produccion-chart">
+
+          ${crearGraficaScrapLineas(
+            datos.lineasScrap
+          )}
+
+        </div>
+
+        <div class="produccion-chart-footer">
+
+          <span>
+            Ordenado de mayor a menor
+            porcentaje de scrap
+          </span>
+
+          <span>
+            Verde ≤ 3% · Amarillo ≤ 5%
+            · Rojo &gt; 5%
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+  
+/* =========================================================
    FORMATO GERENCIAL TV
 ========================================================= */
 
@@ -5163,17 +6289,9 @@ if(
   "produccion-buena"
 ){
 
-  slide.innerHTML = `
-
-    <div class="panel">
-
-      <div class="mensaje-central">
-        Cargando producción buena...
-      </div>
-
-    </div>
-
-  `;
+  renderizarProduccionBuena(
+    slide
+  );
 
   return;
 }
@@ -5183,17 +6301,9 @@ if(
   "produccion-scrap"
 ){
 
-  slide.innerHTML = `
-
-    <div class="panel">
-
-      <div class="mensaje-central">
-        Cargando información de scrap...
-      </div>
-
-    </div>
-
-  `;
+  renderizarProduccionScrap(
+    slide
+  );
 
   return;
 }
