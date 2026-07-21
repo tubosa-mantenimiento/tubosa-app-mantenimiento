@@ -1594,38 +1594,166 @@ function fechaISO(valor){
     : fechaGenerica;
 
 }
-function horaA24(horaTexto){
+function horaA24(valorHora){
 
-  if(!horaTexto) return "00:00";
+  if(
+    valorHora === undefined ||
+    valorHora === null ||
+    valorHora === ""
+  ){
+    return "00:00";
+  }
 
-  let texto = String(horaTexto)
-    .trim()
-    .toLowerCase()
-    .replace(/\s/g,"")
-    .replace(/a\.\s*m\./g,"am")
-    .replace(/p\.\s*m\./g,"pm")
-    .replace(/a\.m\./g,"am")
-    .replace(/p\.m\./g,"pm")
-    .replace(/a\.m/g,"am")
-    .replace(/p\.m/g,"pm");
 
-  const esPM = texto.includes("pm");
-  const esAM = texto.includes("am");
+  /*
+    CASO 1:
+    La hora llega como objeto Date desde Google Sheets.
+  */
+  if(valorHora instanceof Date){
 
-  texto = texto
-    .replace("am","")
-    .replace("pm","");
+    if(isNaN(valorHora.getTime())){
+      return "00:00";
+    }
 
+    return (
+      String(valorHora.getHours()).padStart(2,"0") +
+      ":" +
+      String(valorHora.getMinutes()).padStart(2,"0")
+    );
+  }
+
+
+  /*
+    CASO 2:
+    La hora llega como número decimal de Excel o Sheets.
+
+    Ejemplo:
+    0.3916666667 = 09:24
+  */
+  if(
+    typeof valorHora === "number" &&
+    valorHora >= 0 &&
+    valorHora < 1
+  ){
+
+    const minutosTotales =
+      Math.round(valorHora * 24 * 60);
+
+    const horas =
+      Math.floor(minutosTotales / 60) % 24;
+
+    const minutos =
+      minutosTotales % 60;
+
+    return (
+      String(horas).padStart(2,"0") +
+      ":" +
+      String(minutos).padStart(2,"0")
+    );
+  }
+
+
+  const textoOriginal =
+    String(valorHora).trim();
+
+
+  /*
+    CASO 3:
+    La API envía una fecha completa ISO o GMT.
+
+    Ejemplos:
+    1899-12-30T14:24:00.000Z
+    Sat Dec 30 1899 09:24:00 GMT-0500
+  */
+  if(
+    textoOriginal.includes("T") ||
+    textoOriginal.includes("GMT")
+  ){
+
+    const fechaHora =
+      new Date(textoOriginal);
+
+    if(!isNaN(fechaHora.getTime())){
+
+      return (
+        String(fechaHora.getHours()).padStart(2,"0") +
+        ":" +
+        String(fechaHora.getMinutes()).padStart(2,"0")
+      );
+    }
+  }
+
+
+  /*
+    CASO 4:
+    Hora escrita como texto.
+
+    Ejemplos:
+    9:24 a. m.
+    09:24 AM
+    18:00
+  */
+  let texto =
+    textoOriginal
+      .toLowerCase()
+      .replace(/\s/g,"")
+      .replace(/a\.m\./g,"am")
+      .replace(/p\.m\./g,"pm")
+      .replace(/a\.m/g,"am")
+      .replace(/p\.m/g,"pm");
+
+
+  const esPM =
+    texto.includes("pm");
+
+  const esAM =
+    texto.includes("am");
+
+
+  texto =
+    texto
+      .replace("am","")
+      .replace("pm","");
+
+
+  /*
+    Busca específicamente una hora con dos puntos.
+    Ya no toma cualquier número de una fecha completa.
+  */
   const coincidencia =
-    texto.match(/(\d{1,2})(?::(\d{1,2}))?/);
+    texto.match(/(?:^|[^\d])(\d{1,2}):(\d{1,2})(?::\d{1,2})?/);
 
-  if(!coincidencia) return "00:00";
 
-  let horas = Number(coincidencia[1]);
-  let minutos = Number(coincidencia[2] || 0);
+  if(!coincidencia){
+    return "00:00";
+  }
 
-  if(esPM && horas < 12) horas += 12;
-  if(esAM && horas === 12) horas = 0;
+
+  let horas =
+    Number(coincidencia[1]);
+
+  let minutos =
+    Number(coincidencia[2]);
+
+
+  if(esPM && horas < 12){
+    horas += 12;
+  }
+
+  if(esAM && horas === 12){
+    horas = 0;
+  }
+
+
+  if(
+    horas < 0 ||
+    horas > 23 ||
+    minutos < 0 ||
+    minutos > 59
+  ){
+    return "00:00";
+  }
+
 
   return (
     String(horas).padStart(2,"0") +
@@ -1634,7 +1762,6 @@ function horaA24(horaTexto){
   );
 
 }
-
 function fechaHoraObj(fechaTexto,horaTexto){
 
   const fecha = fechaISO(fechaTexto);
