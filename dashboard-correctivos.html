@@ -180,6 +180,105 @@ h2{font-size:24px;margin-bottom:14px;}
   font-size:16px;
 }
 
+.tabla-tecnicos-wrap{
+  width:100%;
+  overflow-x:auto;
+}
+
+.tabla-tecnicos{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0 10px;
+  min-width:650px;
+}
+
+.tabla-tecnicos th{
+  padding:10px 8px;
+  text-align:center;
+  font-size:13px;
+  color:white;
+  opacity:.9;
+}
+
+.tabla-tecnicos th:first-child{
+  text-align:left;
+}
+
+.tabla-tecnicos td{
+  background:white;
+  color:#001f5b;
+  padding:14px 8px;
+  text-align:center;
+  font-weight:800;
+}
+
+.tabla-tecnicos td:first-child{
+  text-align:left;
+  border-radius:14px 0 0 14px;
+  font-weight:900;
+}
+
+.tabla-tecnicos td:last-child{
+  border-radius:0 14px 14px 0;
+}
+
+.puntos-tecnico{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:48px;
+  padding:6px 10px;
+  border-radius:20px;
+  background:#001f5b;
+  color:white;
+  font-weight:900;
+}
+
+.alerta-datos{
+  margin-top:12px;
+  padding:12px 14px;
+  background:#fff3cd;
+  color:#664d03;
+  border-radius:14px;
+  font-size:14px;
+  font-weight:bold;
+}
+
+.resumen-tecnicos{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.resumen-tecnico-card{
+  background:white;
+  color:#001f5b;
+  padding:12px;
+  border-radius:14px;
+  text-align:center;
+}
+
+.resumen-tecnico-num{
+  font-size:23px;
+  font-weight:900;
+}
+
+.resumen-tecnico-label{
+  font-size:11px;
+  font-weight:bold;
+  margin-top:4px;
+  opacity:.8;
+}
+
+@media(max-width:600px){
+
+  .resumen-tecnicos{
+    grid-template-columns:1fr;
+  }
+
+}
+  
 .footer{
   text-align:center;
   opacity:.7;
@@ -303,10 +402,19 @@ h2{font-size:24px;margin-bottom:14px;}
     <div id="topCausas"><div class="vacio">Cargando...</div></div>
   </div>
 
-  <div class="card">
-    <h2>Top técnicos por cierre</h2>
-    <div id="topTecnicos"><div class="vacio">Cargando...</div></div>
+ <div class="card">
+  <h2>Participación técnica en correctivos</h2>
+
+  <div class="subtitle">
+    Intervenciones cerradas, horas invertidas y nivel de participación
   </div>
+
+  <div id="topTecnicos">
+    <div class="vacio">Cargando...</div>
+  </div>
+
+  <div id="alertaTecnicosSinAsignar"></div>
+</div>
 
   <div class="card">
     <h2>Correctivos críticos / pendientes</h2>
@@ -506,6 +614,301 @@ function renderBarras(contenedorId, datos, sufijo){
     contenedor.appendChild(div);
   });
 }
+
+function renderParticipacionTecnicos(cerrados){
+
+  const contenedor =
+    document.getElementById("topTecnicos");
+
+  const alerta =
+    document.getElementById("alertaTecnicosSinAsignar");
+
+  contenedor.innerHTML = "";
+  alerta.innerHTML = "";
+
+  const tecnicos = {};
+
+  let sinTecnico = 0;
+
+  cerrados.forEach(n => {
+
+    const tecnico =
+      String(
+        obtenerCampo(n, "NombreTecnicoCierre") ||
+        obtenerCampo(n, "TecnicoCierre") ||
+        obtenerCampo(n, "NombreTecnicoRecibe") ||
+        obtenerCampo(n, "TecnicoRecibe") ||
+        ""
+      ).trim();
+
+    if(!tecnico){
+
+      sinTecnico++;
+      return;
+
+    }
+
+    /*
+    TiempoTotalIntervencion está almacenado
+    actualmente en minutos.
+    */
+
+    const minutos =
+      numero(
+        obtenerCampo(
+          n,
+          "TiempoTotalIntervencion"
+        )
+      );
+
+    if(!tecnicos[tecnico]){
+
+      tecnicos[tecnico] = {
+        nombre: tecnico,
+        intervenciones: 0,
+        minutos: 0
+      };
+
+    }
+
+    tecnicos[tecnico].intervenciones++;
+
+    tecnicos[tecnico].minutos += minutos;
+
+  });
+
+
+  let datos =
+    Object.values(tecnicos);
+
+
+  if(datos.length === 0){
+
+    contenedor.innerHTML = `
+      <div class="vacio">
+        No existen intervenciones cerradas con técnico asociado
+        para este periodo.
+      </div>
+    `;
+
+    if(sinTecnico > 0){
+
+      alerta.innerHTML = `
+        <div class="alerta-datos">
+          ⚠ ${sinTecnico} intervenciones cerradas no tienen
+          técnico responsable registrado.
+        </div>
+      `;
+
+    }
+
+    return;
+
+  }
+
+
+  const maxIntervenciones =
+    Math.max(
+      ...datos.map(
+        t => t.intervenciones
+      )
+    );
+
+
+  const maxMinutos =
+    Math.max(
+      ...datos.map(
+        t => t.minutos
+      ),
+      1
+    );
+
+
+  datos = datos.map(t => {
+
+    const horas =
+      t.minutos / 60;
+
+    const promedioHoras =
+      t.intervenciones > 0
+        ? horas / t.intervenciones
+        : 0;
+
+    const puntosIntervenciones =
+      maxIntervenciones > 0
+        ? (
+            t.intervenciones /
+            maxIntervenciones
+          ) * 50
+        : 0;
+
+    const puntosHoras =
+      maxMinutos > 0
+        ? (
+            t.minutos /
+            maxMinutos
+          ) * 50
+        : 0;
+
+    const puntos =
+      Math.round(
+        puntosIntervenciones +
+        puntosHoras
+      );
+
+    return {
+      ...t,
+      horas,
+      promedioHoras,
+      puntos
+    };
+
+  });
+
+
+  datos.sort((a,b) => {
+
+    if(b.puntos !== a.puntos){
+      return b.puntos - a.puntos;
+    }
+
+    if(b.horas !== a.horas){
+      return b.horas - a.horas;
+    }
+
+    return b.intervenciones - a.intervenciones;
+
+  });
+
+
+  const totalIntervenciones =
+    datos.reduce(
+      (acum,t) =>
+        acum + t.intervenciones,
+      0
+    );
+
+
+  const totalHoras =
+    datos.reduce(
+      (acum,t) =>
+        acum + t.horas,
+      0
+    );
+
+
+  const promedioGeneral =
+    totalIntervenciones > 0
+      ? totalHoras / totalIntervenciones
+      : 0;
+
+
+  const top =
+    datos.slice(0,10);
+
+
+  contenedor.innerHTML = `
+
+    <div class="resumen-tecnicos">
+
+      <div class="resumen-tecnico-card">
+        <div class="resumen-tecnico-num">
+          ${totalIntervenciones}
+        </div>
+        <div class="resumen-tecnico-label">
+          Intervenciones asignadas
+        </div>
+      </div>
+
+      <div class="resumen-tecnico-card">
+        <div class="resumen-tecnico-num">
+          ${totalHoras.toFixed(1)} h
+        </div>
+        <div class="resumen-tecnico-label">
+          Horas invertidas
+        </div>
+      </div>
+
+      <div class="resumen-tecnico-card">
+        <div class="resumen-tecnico-num">
+          ${promedioGeneral.toFixed(1)} h
+        </div>
+        <div class="resumen-tecnico-label">
+          Promedio por intervención
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tabla-tecnicos-wrap">
+
+      <table class="tabla-tecnicos">
+
+        <thead>
+
+          <tr>
+            <th>Técnico</th>
+            <th>Interv.</th>
+            <th>Horas</th>
+            <th>Promedio</th>
+            <th>Puntos</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${top.map(t => `
+
+            <tr>
+
+              <td>${t.nombre}</td>
+
+              <td>
+                ${t.intervenciones}
+              </td>
+
+              <td>
+                ${t.horas.toFixed(1)} h
+              </td>
+
+              <td>
+                ${t.promedioHoras.toFixed(1)} h
+              </td>
+
+              <td>
+                <span class="puntos-tecnico">
+                  ${t.puntos}
+                </span>
+              </td>
+
+            </tr>
+
+          `).join("")}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+
+  if(sinTecnico > 0){
+
+    alerta.innerHTML = `
+      <div class="alerta-datos">
+        ⚠ ${sinTecnico} intervenciones cerradas no tienen
+        técnico responsable registrado y no fueron incluidas
+        en la clasificación.
+      </div>
+    `;
+
+  }
+
+}
+  
   function renderDashboard(){
 
     const datosPeriodo = notificaciones.filter(n =>
@@ -621,34 +1024,13 @@ function renderBarras(contenedorId, datos, sufijo){
         contarPorCampo(datosPeriodo,"CausaProbable").slice(0,10)
     );
 
-    //======================
-    // TECNICOS
-    //======================
+   //======================
+// PARTICIPACION TECNICA
+//======================
 
-    const tecnicos={};
-
-    cerrados.forEach(n=>{
-
-        const tecnico=
-            obtenerCampo(n,"NombreTecnicoCierre") ||
-            obtenerCampo(n,"TecnicoCierre") ||
-            "Sin técnico";
-
-        tecnicos[tecnico]=(tecnicos[tecnico]||0)+1;
-
-    });
-
-    const datosTecnicos=
-        Object.entries(tecnicos)
-        .map(([nombre,valor])=>({nombre,valor}))
-        .sort((a,b)=>b.valor-a.valor)
-        .slice(0,10);
-
-    renderBarras(
-        "topTecnicos",
-        datosTecnicos
-    );
-
+renderParticipacionTecnicos(
+  cerrados
+);
     //======================
     // ALERTAS
     //======================
