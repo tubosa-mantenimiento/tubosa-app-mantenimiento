@@ -62,6 +62,41 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
 <label>Turno</label>
 <input id="Turno" class="readonly" readonly>
 
+<div class="campo">
+
+  <label for="SupervisorProduccion">
+    Supervisor de producción
+  </label>
+
+  <select
+    id="SupervisorProduccion"
+    name="SupervisorProduccion"
+    required
+  >
+    <option value="">
+      Seleccione...
+    </option>
+
+    <option value="Hernando Lopez">
+      Jorge Holguín
+    </option>
+
+    <option value="Jhonatan Castañeda">
+      Jorge Holguín
+    </option>
+
+    <option value="Andres Rivera">
+      Jorge Holguín
+    </option>
+
+    <option value="Carlos Garzon">
+      Andrés Vidal
+    </option>
+
+  </select>
+
+</div>
+  
 <label>Tipo de Extrusión</label>
 <select id="TipoExtrusion" onchange="cargarLineasPorTipo()">
 <option value="">Seleccione...</option>
