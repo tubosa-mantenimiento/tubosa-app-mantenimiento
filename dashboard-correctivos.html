@@ -246,7 +246,7 @@ h2{font-size:24px;margin-bottom:14px;}
 
 .resumen-tecnicos{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:10px;
   margin-bottom:12px;
 }
@@ -274,8 +274,8 @@ h2{font-size:24px;margin-bottom:14px;}
 @media(max-width:600px){
 
   .resumen-tecnicos{
-    grid-template-columns:1fr;
-  }
+  grid-template-columns:1fr 1fr;
+}
 
 }
   
@@ -356,7 +356,7 @@ h2{font-size:24px;margin-bottom:14px;}
 
     <div class="kpi">
       <div class="kpi-num" id="kpiTiempoTotal">0</div>
-      <div class="kpi-label">Tiempo total intervención min</div>
+     <div class="kpi-label">Horas-hombre invertidas</div>
     </div>
   </div>
 
@@ -405,9 +405,9 @@ h2{font-size:24px;margin-bottom:14px;}
  <div class="card">
   <h2>Participación técnica en correctivos</h2>
 
-  <div class="subtitle">
-    Intervenciones cerradas, horas invertidas y nivel de participación
-  </div>
+ <div class="subtitle">
+  Intervenciones realizadas y horas-hombre por tipo de participación
+</div>
 
   <div id="topTecnicos">
     <div class="vacio">Cargando...</div>
@@ -615,192 +615,378 @@ function renderBarras(contenedorId, datos, sufijo){
   });
 }
 
-function renderParticipacionTecnicos(cerrados){
+function renderParticipacionTecnicos(datosPeriodo){
 
   const contenedor =
     document.getElementById("topTecnicos");
 
   const alerta =
-    document.getElementById("alertaTecnicosSinAsignar");
+    document.getElementById(
+      "alertaTecnicosSinAsignar"
+    );
 
   contenedor.innerHTML = "";
   alerta.innerHTML = "";
 
   const tecnicos = {};
 
-  let sinTecnico = 0;
+  let registrosSinDetalle = 0;
+  let minutosSinDetalle = 0;
+  let registrosConDiferencia = 0;
 
-  cerrados.forEach(n => {
 
-    const tecnico =
-      String(
-        obtenerCampo(n, "NombreTecnicoCierre") ||
-        obtenerCampo(n, "TecnicoCierre") ||
-        obtenerCampo(n, "NombreTecnicoRecibe") ||
-        obtenerCampo(n, "TecnicoRecibe") ||
-        ""
-      ).trim();
+  function obtenerTecnico(nombre){
 
-    if(!tecnico){
+    const nombreVisible =
+      String(nombre || "").trim();
 
-      sinTecnico++;
-      return;
-
+    if(!nombreVisible){
+      return null;
     }
 
-    /*
-    TiempoTotalIntervencion está almacenado
-    actualmente en minutos.
-    */
+    const clave =
+      normalizar(nombreVisible);
 
-    const minutos =
-      numero(
-        obtenerCampo(
-          n,
-          "TiempoTotalIntervencion"
-        )
-      );
+    if(!tecnicos[clave]){
 
-    if(!tecnicos[tecnico]){
+      tecnicos[clave] = {
 
-      tecnicos[tecnico] = {
-        nombre: tecnico,
-        intervenciones: 0,
-        minutos: 0
+        nombre:
+          nombreVisible,
+
+        idsIntervenciones:
+          new Set(),
+
+        minutosPrincipal:
+          0,
+
+        minutosContinuidad:
+          0,
+
+        minutosAcompanamiento:
+          0,
+
+        minutosHistoricos:
+          0,
+
+        minutosTotales:
+          0
+
       };
 
     }
 
-    tecnicos[tecnico].intervenciones++;
+    return tecnicos[clave];
 
-    tecnicos[tecnico].minutos += minutos;
+  }
+
+
+  datosPeriodo.forEach((n, indice) => {
+
+    const idCorrectivo =
+      String(
+        obtenerCampo(
+          n,
+          "ID_Notificacion"
+        ) ||
+        "FILA-" + indice
+      ).trim();
+
+    const detalle =
+      String(
+        obtenerCampo(
+          n,
+          "DetalleHorasTecnicos"
+        ) || ""
+      ).trim();
+
+    const tiempoTotalReal =
+      numero(
+        obtenerCampo(
+          n,
+          "TiempoTotalRealIntervencion"
+        )
+      );
+
+    /*
+      Correctivos antiguos que tienen tiempo,
+      pero todavía no tienen detalle técnico.
+    */
+    if(!detalle){
+
+      if(tiempoTotalReal > 0){
+
+        registrosSinDetalle++;
+        minutosSinDetalle +=
+          tiempoTotalReal;
+
+      }
+
+      return;
+
+    }
+
+
+    let sumaDetalleFila = 0;
+
+    const lineas =
+      detalle.split(/\r?\n/);
+
+
+    lineas.forEach(linea => {
+
+      const partes =
+        linea
+          .split("|")
+          .map(parte =>
+            String(parte || "").trim()
+          );
+
+      if(partes.length < 3){
+        return;
+      }
+
+      const nombre =
+        partes[0];
+
+      const rol =
+        normalizar(
+          partes[1]
+        );
+
+      const minutos =
+        numero(
+          partes[2]
+        );
+
+      if(
+        !nombre ||
+        minutos <= 0
+      ){
+        return;
+      }
+
+      const tecnico =
+        obtenerTecnico(nombre);
+
+      if(!tecnico){
+        return;
+      }
+
+      /*
+        Un técnico cuenta solo una intervención
+        por ID, aunque haya participado más de una
+        vez en ese mismo correctivo.
+      */
+      tecnico
+        .idsIntervenciones
+        .add(idCorrectivo);
+
+      tecnico.minutosTotales +=
+        minutos;
+
+      sumaDetalleFila +=
+        minutos;
+
+
+      if(
+        rol === "principal"
+      ){
+
+        tecnico.minutosPrincipal +=
+          minutos;
+
+      }else if(
+        rol === "continuidad"
+      ){
+
+        tecnico.minutosContinuidad +=
+          minutos;
+
+      }else if(
+        rol === "acompanamiento"
+      ){
+
+        tecnico.minutosAcompanamiento +=
+          minutos;
+
+      }else if(
+        rol === "principal historico"
+      ){
+
+        tecnico.minutosPrincipal +=
+          minutos;
+
+        tecnico.minutosHistoricos +=
+          minutos;
+
+      }else{
+
+        /*
+          Cualquier rol histórico no reconocido
+          se conserva dentro del total.
+        */
+        tecnico.minutosHistoricos +=
+          minutos;
+
+      }
+
+    });
+
+
+    /*
+      Control de calidad:
+      la suma del detalle debe coincidir con
+      TiempoTotalRealIntervencion.
+    */
+    if(
+      tiempoTotalReal > 0 &&
+      Math.abs(
+        sumaDetalleFila -
+        tiempoTotalReal
+      ) > 0.01
+    ){
+
+      registrosConDiferencia++;
+
+    }
 
   });
 
 
   let datos =
-    Object.values(tecnicos);
+    Object.values(tecnicos)
+      .map(t => {
+
+        const intervenciones =
+          t.idsIntervenciones.size;
+
+        const horasPrincipal =
+          t.minutosPrincipal / 60;
+
+        const horasContinuidad =
+          t.minutosContinuidad / 60;
+
+        const horasAcompanamiento =
+          t.minutosAcompanamiento / 60;
+
+        const horasTotales =
+          t.minutosTotales / 60;
+
+        const promedioHoras =
+          intervenciones > 0
+            ? horasTotales /
+              intervenciones
+            : 0;
+
+        return {
+
+          nombre:
+            t.nombre,
+
+          intervenciones:
+            intervenciones,
+
+          horasPrincipal:
+            horasPrincipal,
+
+          horasContinuidad:
+            horasContinuidad,
+
+          horasAcompanamiento:
+            horasAcompanamiento,
+
+          horasTotales:
+            horasTotales,
+
+          promedioHoras:
+            promedioHoras
+
+        };
+
+      })
+      .sort((a,b) => {
+
+        if(
+          b.horasTotales !==
+          a.horasTotales
+        ){
+          return (
+            b.horasTotales -
+            a.horasTotales
+          );
+        }
+
+        return (
+          b.intervenciones -
+          a.intervenciones
+        );
+
+      });
 
 
   if(datos.length === 0){
 
     contenedor.innerHTML = `
       <div class="vacio">
-        No existen intervenciones cerradas con técnico asociado
+        No existen tiempos técnicos registrados
         para este periodo.
       </div>
     `;
-
-    if(sinTecnico > 0){
-
-      alerta.innerHTML = `
-        <div class="alerta-datos">
-          ⚠ ${sinTecnico} intervenciones cerradas no tienen
-          técnico responsable registrado.
-        </div>
-      `;
-
-    }
 
     return;
 
   }
 
 
-  const maxIntervenciones =
-    Math.max(
-      ...datos.map(
-        t => t.intervenciones
-      )
-    );
+  const totalIntervencionesUnicas =
+    new Set(
+      datosPeriodo
+        .filter(n =>
+          String(
+            obtenerCampo(
+              n,
+              "DetalleHorasTecnicos"
+            ) || ""
+          ).trim() !== ""
+        )
+        .map((n, indice) =>
+          String(
+            obtenerCampo(
+              n,
+              "ID_Notificacion"
+            ) ||
+            "FILA-" + indice
+          ).trim()
+        )
+    ).size;
 
 
-  const maxMinutos =
-    Math.max(
-      ...datos.map(
-        t => t.minutos
-      ),
-      1
-    );
-
-
-  datos = datos.map(t => {
-
-    const horas =
-      t.minutos / 60;
-
-    const promedioHoras =
-      t.intervenciones > 0
-        ? horas / t.intervenciones
-        : 0;
-
-    const puntosIntervenciones =
-      maxIntervenciones > 0
-        ? (
-            t.intervenciones /
-            maxIntervenciones
-          ) * 50
-        : 0;
-
-    const puntosHoras =
-      maxMinutos > 0
-        ? (
-            t.minutos /
-            maxMinutos
-          ) * 50
-        : 0;
-
-    const puntos =
-      Math.round(
-        puntosIntervenciones +
-        puntosHoras
-      );
-
-    return {
-      ...t,
-      horas,
-      promedioHoras,
-      puntos
-    };
-
-  });
-
-
-  datos.sort((a,b) => {
-
-    if(b.puntos !== a.puntos){
-      return b.puntos - a.puntos;
-    }
-
-    if(b.horas !== a.horas){
-      return b.horas - a.horas;
-    }
-
-    return b.intervenciones - a.intervenciones;
-
-  });
-
-
-  const totalIntervenciones =
+  const totalParticipaciones =
     datos.reduce(
-      (acum,t) =>
-        acum + t.intervenciones,
+      (total,t) =>
+        total +
+        t.intervenciones,
       0
     );
 
 
   const totalHoras =
     datos.reduce(
-      (acum,t) =>
-        acum + t.horas,
+      (total,t) =>
+        total +
+        t.horasTotales,
       0
     );
 
 
-  const promedioGeneral =
-    totalIntervenciones > 0
-      ? totalHoras / totalIntervenciones
-      : 0;
+  const totalHorasAcompanamiento =
+    datos.reduce(
+      (total,t) =>
+        total +
+        t.horasAcompanamiento,
+      0
+    );
 
 
   const top =
@@ -812,33 +998,58 @@ function renderParticipacionTecnicos(cerrados){
     <div class="resumen-tecnicos">
 
       <div class="resumen-tecnico-card">
+
         <div class="resumen-tecnico-num">
-          ${totalIntervenciones}
+          ${totalIntervencionesUnicas}
         </div>
+
         <div class="resumen-tecnico-label">
-          Intervenciones asignadas
+          Correctivos con tiempo
         </div>
+
       </div>
 
+
       <div class="resumen-tecnico-card">
+
+        <div class="resumen-tecnico-num">
+          ${totalParticipaciones}
+        </div>
+
+        <div class="resumen-tecnico-label">
+          Participaciones técnicas
+        </div>
+
+      </div>
+
+
+      <div class="resumen-tecnico-card">
+
         <div class="resumen-tecnico-num">
           ${totalHoras.toFixed(1)} h
         </div>
+
         <div class="resumen-tecnico-label">
-          Horas invertidas
+          Horas-hombre totales
         </div>
+
       </div>
 
+
       <div class="resumen-tecnico-card">
+
         <div class="resumen-tecnico-num">
-          ${promedioGeneral.toFixed(1)} h
+          ${totalHorasAcompanamiento.toFixed(1)} h
         </div>
+
         <div class="resumen-tecnico-label">
-          Promedio por intervención
+          Horas de acompañamiento
         </div>
+
       </div>
 
     </div>
+
 
     <div class="tabla-tecnicos-wrap">
 
@@ -849,9 +1060,11 @@ function renderParticipacionTecnicos(cerrados){
           <tr>
             <th>Técnico</th>
             <th>Interv.</th>
-            <th>Horas</th>
+            <th>Principal</th>
+            <th>Continuidad</th>
+            <th>Acompañamiento</th>
+            <th>Total HH</th>
             <th>Promedio</th>
-            <th>Puntos</th>
           </tr>
 
         </thead>
@@ -862,24 +1075,34 @@ function renderParticipacionTecnicos(cerrados){
 
             <tr>
 
-              <td>${t.nombre}</td>
+              <td>
+                ${t.nombre}
+              </td>
 
               <td>
                 ${t.intervenciones}
               </td>
 
               <td>
-                ${t.horas.toFixed(1)} h
+                ${t.horasPrincipal.toFixed(1)} h
               </td>
 
               <td>
-                ${t.promedioHoras.toFixed(1)} h
+                ${t.horasContinuidad.toFixed(1)} h
+              </td>
+
+              <td>
+                ${t.horasAcompanamiento.toFixed(1)} h
               </td>
 
               <td>
                 <span class="puntos-tecnico">
-                  ${t.puntos}
+                  ${t.horasTotales.toFixed(1)} h
                 </span>
+              </td>
+
+              <td>
+                ${t.promedioHoras.toFixed(1)} h
               </td>
 
             </tr>
@@ -895,20 +1118,44 @@ function renderParticipacionTecnicos(cerrados){
   `;
 
 
-  if(sinTecnico > 0){
+  let mensajesAlerta = [];
+
+
+  if(registrosSinDetalle > 0){
+
+    mensajesAlerta.push(
+      registrosSinDetalle +
+      " correctivos tienen tiempo total, pero no tienen " +
+      "DetalleHorasTecnicos. Tiempo pendiente de asignación: " +
+      (minutosSinDetalle / 60).toFixed(1) +
+      " h."
+    );
+
+  }
+
+
+  if(registrosConDiferencia > 0){
+
+    mensajesAlerta.push(
+      registrosConDiferencia +
+      " correctivos presentan diferencia entre el detalle " +
+      "por técnico y el tiempo total real."
+    );
+
+  }
+
+
+  if(mensajesAlerta.length > 0){
 
     alerta.innerHTML = `
       <div class="alerta-datos">
-        ⚠ ${sinTecnico} intervenciones cerradas no tienen
-        técnico responsable registrado y no fueron incluidas
-        en la clasificación.
+        ⚠ ${mensajesAlerta.join("<br>⚠ ")}
       </div>
     `;
 
   }
 
 }
-  
   function renderDashboard(){
 
     const datosPeriodo = notificaciones.filter(n =>
@@ -925,13 +1172,42 @@ function renderParticipacionTecnicos(cerrados){
 
     const ordenesSAP = datosPeriodo.filter(tieneOrdenSAP);
 
-    const tiempos = cerrados
-        .map(n => numero(obtenerCampo(n,"TiempoTotalIntervencion")))
-        .filter(n => n>0);
+    /*
+  MTTR: tiempo calendario de los correctivos cerrados.
+*/
+const tiemposMTTR = cerrados
+  .map(n =>
+    numero(
+      obtenerCampo(
+        n,
+        "TiempoTotalIntervencion"
+      )
+    )
+  )
+  .filter(n => n > 0);
 
-    const tiempoTotal = suma(tiempos);
+const mttr =
+  promedio(tiemposMTTR);
 
-    const mttr = promedio(tiempos);
+
+/*
+  Carga total: horas-hombre de todos los trabajos
+  registrados dentro del periodo.
+*/
+const minutosHombre =
+  datosPeriodo
+    .map(n =>
+      numero(
+        obtenerCampo(
+          n,
+          "TiempoTotalRealIntervencion"
+        )
+      )
+    )
+    .filter(n => n > 0);
+
+const tiempoTotalHoras =
+  suma(minutosHombre) / 60;
 
     const cumplimiento =
         datosPeriodo.length>0
@@ -969,8 +1245,10 @@ function renderParticipacionTecnicos(cerrados){
     document.getElementById("kpiMTTR").innerText =
         mttr;
 
-    document.getElementById("kpiTiempoTotal").innerText =
-        tiempoTotal;
+    document.getElementById(
+  "kpiTiempoTotal"
+).innerText =
+  tiempoTotalHoras.toFixed(1) + " h";
 
     //======================
     // ESTADOS
@@ -1029,7 +1307,7 @@ function renderParticipacionTecnicos(cerrados){
 //======================
 
 renderParticipacionTecnicos(
-  cerrados
+  datosPeriodo
 );
     //======================
     // ALERTAS
