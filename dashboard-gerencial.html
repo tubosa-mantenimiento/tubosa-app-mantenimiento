@@ -289,9 +289,11 @@ body{
 
 .main-grid{
   display:grid;
-  grid-template-columns:minmax(420px,1.1fr) minmax(420px,.9fr);
+  grid-template-columns:1fr;
   gap:18px;
   margin-bottom:18px;
+}
+  gin-bottom:18px;
 }
 
 .section-title{
@@ -420,7 +422,170 @@ body{
   font-size:12px;
 }
 
+  /* =========================================================
+   DESEMPEÑO MANTENIMIENTO Y PLANTA
+========================================================= */
 
+.performance-card{
+  background:var(--azul-tarjeta);
+  border:1px solid var(--borde);
+  border-radius:24px;
+  padding:24px;
+  margin-bottom:18px;
+}
+
+.performance-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+}
+
+.performance-panel{
+  border-radius:22px;
+  padding:22px;
+  border:1px solid rgba(255,255,255,.15);
+}
+
+.performance-panel.maintenance{
+  background:rgba(0,31,91,.48);
+}
+
+.performance-panel.plant{
+  background:rgba(3,70,75,.58);
+  border-color:rgba(32,178,107,.35);
+}
+
+.performance-title{
+  font-size:24px;
+  font-weight:900;
+  margin-bottom:5px;
+}
+
+.performance-subtitle{
+  min-height:36px;
+  color:var(--texto-secundario);
+  font-size:13px;
+  font-weight:bold;
+  line-height:1.4;
+  padding-bottom:15px;
+  margin-bottom:16px;
+  border-bottom:1px solid rgba(255,255,255,.13);
+}
+
+.performance-kpis{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:13px;
+}
+
+.performance-kpi{
+  min-height:130px;
+  padding:17px;
+  border-radius:18px;
+  background:rgba(0,18,58,.35);
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.plant .performance-kpi{
+  background:rgba(0,44,49,.43);
+}
+
+.performance-kpi-label{
+  color:var(--texto-secundario);
+  font-size:14px;
+  font-weight:900;
+}
+
+.performance-kpi-value{
+  margin-top:13px;
+  font-size:30px;
+  line-height:1.05;
+  font-weight:900;
+}
+
+.performance-kpi-detail{
+  margin-top:8px;
+  color:var(--texto-secundario);
+  font-size:12px;
+  line-height:1.35;
+}
+/* =========================================================
+   TENDENCIA MENSUAL
+========================================================= */
+
+.trends-section{
+  margin-bottom:18px;
+}
+
+.trends-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+}
+
+.trend-card{
+  min-width:0;
+  padding:18px;
+  border-radius:20px;
+  background:rgba(0,31,91,.43);
+  border:1px solid rgba(255,255,255,.13);
+}
+
+.trend-title{
+  font-size:18px;
+  font-weight:900;
+}
+
+.trend-description{
+  min-height:34px;
+  margin-top:5px;
+  margin-bottom:10px;
+  color:var(--texto-secundario);
+  font-size:12px;
+  line-height:1.35;
+}
+
+.trend-chart{
+  width:100%;
+  overflow:hidden;
+}
+
+.trend-chart svg{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+.trend-table-wrap{
+  margin-top:18px;
+  overflow-x:auto;
+}
+
+.trend-table{
+  width:100%;
+  min-width:700px;
+  border-collapse:collapse;
+}
+
+.trend-table th{
+  padding:11px;
+  background:#082d69;
+  color:#ccecff;
+  font-size:12px;
+  text-align:center;
+}
+
+.trend-table td{
+  padding:11px;
+  border-bottom:1px solid rgba(255,255,255,.09);
+  text-align:center;
+  font-size:13px;
+}
+
+.trend-current{
+  background:rgba(22,169,224,.12);
+  font-weight:bold;
+}
 /* =========================================================
    GRUPOS
 ========================================================= */
@@ -664,6 +829,9 @@ body{
   .main-grid{
     grid-template-columns:1fr;
   }
+  .trends-grid{
+  grid-template-columns:1fr;
+}
 }
 
 @media(max-width:850px){
@@ -672,6 +840,10 @@ body{
     padding:16px;
   }
 
+  .performance-grid{
+  grid-template-columns:1fr;
+}
+  
   .filters{
     grid-template-columns:1fr 1fr;
   }
@@ -699,6 +871,13 @@ body{
 
 @media(max-width:540px){
 
+  .performance-kpis{
+  grid-template-columns:1fr 1fr;
+}
+
+.performance-kpi-value{
+  font-size:25px;
+}
   .logo{
     font-size:34px;
   }
@@ -1214,11 +1393,350 @@ body{
 
   </div>
 
+  <!-- =====================================================
+     DESEMPEÑO MANTENIMIENTO Y PLANTA
+====================================================== -->
+
+<div class="performance-card">
+
+  <h2 class="section-title">
+    Desempeño de mantenimiento y planta
+  </h2>
+
+  <div class="section-subtitle">
+    Separación entre eventos atribuibles a mantenimiento
+    y comportamiento global de la planta.
+  </div>
+
+
+  <div class="performance-grid">
+
+    <!-- MANTENIMIENTO -->
+
+    <div class="performance-panel maintenance">
+
+      <div class="performance-title">
+        Desempeño del mantenimiento
+      </div>
+
+      <div class="performance-subtitle">
+        Eventos cuya responsabilidad corresponde
+        al área de mantenimiento
+      </div>
+
+
+      <div class="performance-kpis">
+
+        <div class="performance-kpi">
+
+          <div class="performance-kpi-label">
+            MTBF
+          </div>
+
+          <div
+            class="performance-kpi-value"
+            id="kpiMTBF"
+          >
+            —
+          </div>
+
+          <div
+            class="performance-kpi-detail"
+            id="metaMTBF"
+          >
+            Meta: —
+          </div>
+
+        </div>
+
+
+        <div class="performance-kpi">
+
+          <div class="performance-kpi-label">
+            MTTR
+          </div>
+
+          <div
+            class="performance-kpi-value"
+            id="kpiMTTR"
+          >
+            —
+          </div>
+
+          <div
+            class="performance-kpi-detail"
+            id="metaMTTR"
+          >
+            Meta: —
+          </div>
+
+        </div>
+
+
+        <div class="performance-kpi">
+
+          <div class="performance-kpi-label">
+            FF mantenimiento
+          </div>
+
+          <div
+            class="performance-kpi-value"
+            id="kpiFFMantenimiento"
+          >
+            —
+          </div>
+
+          <div class="performance-kpi-detail">
+            Eventos mantenimiento / horas programadas
+          </div>
+
+        </div>
+
+
+        <div class="performance-kpi">
+
+          <div class="performance-kpi-label">
+            Eventos de mantenimiento
+          </div>
+
+          <div
+            class="performance-kpi-value"
+            id="kpiEventosMantenimiento"
+          >
+            —
+          </div>
+
+          <div class="performance-kpi-detail">
+            Eventos atribuibles a mantenimiento
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- PLANTA -->
+
+    <div class="performance-panel plant">
+
+      <div class="performance-title">
+        Desempeño de la planta
+      </div>
+
+      <div class="performance-subtitle">
+        Todos los eventos registrados,
+        sin importar el responsable
+      </div>
+
+
+      <div class="performance-kpis">
+
+        <div class="performance-kpi">
+
+          <div class="performance-kpi-label">
+            TPO
+          </div>
+
+          <div
+            class="performance-kpi-value"
+            id="kpiTPO"
+          >
+            —
+          </div>
+
+          <div class="performance-kpi-detail">
+            Horas operativas / eventos totales
+          </div>
+
+        </div>
+
+
+        <div class="performance-kpi">
+
+          <div class="performance-kpi-label">
+            TPFS
+          </div>
+
+          <div
+            class="performance-kpi-value"
+            id="kpiTPFS"
+          >
+            —
+          </div>
+
+          <div
+            class="performance-kpi-detail"
+            id="metaTPFS"
+          >
+            Meta: —
+          </div>
+
+        </div>
+
+
+        <div class="performance-kpi">
+
+          <div class="performance-kpi-label">
+            FF general
+          </div>
+
+          <div
+            class="performance-kpi-value"
+            id="kpiFFGeneral"
+          >
+            —
+          </div>
+
+          <div class="performance-kpi-detail">
+            Eventos totales / horas programadas
+          </div>
+
+        </div>
+
+
+        <div class="performance-kpi">
+
+          <div class="performance-kpi-label">
+            Eventos totales
+          </div>
+
+          <div
+            class="performance-kpi-value"
+            id="kpiEventosTotales"
+          >
+            —
+          </div>
+
+          <div class="performance-kpi-detail">
+            Todas las novedades de planta
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
   <!-- =====================================================
        COMPARATIVO DE GRUPOS
   ====================================================== -->
 
+<!-- =====================================================
+     TENDENCIA MENSUAL
+====================================================== -->
+
+<div class="card trends-section">
+
+  <h2 class="section-title">
+    Tendencia mensual de indicadores
+  </h2>
+
+  <div class="section-subtitle">
+    Comportamiento de disponibilidad, MTTR y MTBF
+    durante los últimos seis meses.
+  </div>
+
+
+  <div class="trends-grid">
+
+    <div class="trend-card">
+
+      <div class="trend-title">
+        Disponibilidad mensual
+      </div>
+
+      <div class="trend-description">
+        Porcentaje de horas operativas
+        frente a horas programadas.
+      </div>
+
+      <div
+        class="trend-chart"
+        id="graficaDisponibilidad"
+      ></div>
+
+    </div>
+
+
+    <div class="trend-card">
+
+      <div class="trend-title">
+        MTTR mensual
+      </div>
+
+      <div class="trend-description">
+        Tiempo promedio de reparación
+        atribuible a mantenimiento.
+      </div>
+
+      <div
+        class="trend-chart"
+        id="graficaMTTR"
+      ></div>
+
+    </div>
+
+
+    <div class="trend-card">
+
+      <div class="trend-title">
+        MTBF mensual
+      </div>
+
+      <div class="trend-description">
+        Horas operativas promedio
+        entre eventos de mantenimiento.
+      </div>
+
+      <div
+        class="trend-chart"
+        id="graficaMTBF"
+      ></div>
+
+    </div>
+
+  </div>
+
+
+  <div class="trend-table-wrap">
+
+    <table class="trend-table">
+
+      <thead>
+
+        <tr>
+          <th>Mes</th>
+          <th>Disponibilidad</th>
+          <th>MTTR</th>
+          <th>MTBF</th>
+          <th>Eventos mantenimiento</th>
+          <th>Eventos totales</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="tendenciaBody">
+
+        <tr>
+          <td colspan="6">
+            Cargando tendencia...
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+  
   <div class="card groups-section">
 
     <h2 class="section-title">
@@ -1686,6 +2204,10 @@ function renderizarDashboard(data){
     data
   );
 
+  renderizarTendenciaMensual(
+  data
+);
+
   renderizarTorta(
     data
   );
@@ -1803,110 +2325,150 @@ function renderizarIndicadoresTecnicos(data){
   const metas =
     data.metas || {};
 
-  const eventosTotal =
-  Number(
-    resumen.cantidadEventosTotal || 0
-  );
 
-const eventosMtto =
-  Number(
-    resumen.cantidadEventosMantenimiento || 0
-  );
+  const eventosTotales =
+    Number(
+      resumen.cantidadEventosTotal || 0
+    );
 
-const horasProgramadas =
-  Number(
-    resumen.horasProgramadas || 0
-  );
+  const eventosMantenimiento =
+    Number(
+      resumen.cantidadEventosMantenimiento || 0
+    );
 
-const tiempoMuertoTotal =
-  Number(
-    resumen.tiempoMuerto || 0
-  );
+  const horasProgramadas =
+    Number(
+      resumen.horasProgramadas || 0
+    );
 
-const tiempoMuertoMtto =
-  Number(
-    resumen.tiempoMuertoMantenimiento || 0
-  );
+  const horasOperativas =
+    Number(
+      resumen.horasOperativas || 0
+    );
 
-const horasOperativas =
-  Number(
-    resumen.horasOperativas || 0
-  );
+  const tiempoMuertoTotal =
+    Number(
+      resumen.tiempoMuerto || 0
+    );
 
-
-const mtbf =
-  eventosMtto > 0
-    ? horasOperativas / eventosMtto
-    : 0;
+  const tiempoMuertoMantenimiento =
+    Number(
+      resumen.tiempoMuertoMantenimiento || 0
+    );
 
 
-const mttr =
-  eventosMtto > 0
-    ? tiempoMuertoMtto / eventosMtto
-    : 0;
+  // =====================================================
+  // INDICADORES DE MANTENIMIENTO
+  // =====================================================
+
+  const mtbf =
+    eventosMantenimiento > 0
+      ? horasOperativas /
+        eventosMantenimiento
+      : 0;
+
+  const mttr =
+    eventosMantenimiento > 0
+      ? tiempoMuertoMantenimiento /
+        eventosMantenimiento
+      : 0;
+
+  const ffMantenimiento =
+    horasProgramadas > 0
+      ? eventosMantenimiento /
+        horasProgramadas
+      : 0;
 
 
-const ff =
-  horasOperativas > 0
-    ? eventosMtto / horasOperativas
-    : 0;
+  // =====================================================
+  // INDICADORES GENERALES DE PLANTA
+  // =====================================================
 
+  const tpo =
+    eventosTotales > 0
+      ? horasOperativas /
+        eventosTotales
+      : 0;
 
-const tpo =
-  eventosTotal > 0
-    ? horasOperativas / eventosTotal
-    : 0;
+  const tpfs =
+    eventosTotales > 0
+      ? tiempoMuertoTotal /
+        eventosTotales
+      : 0;
 
+  const ffGeneral =
+    horasProgramadas > 0
+      ? eventosTotales /
+        horasProgramadas
+      : 0;
 
-const tpfs =
-  eventosTotal > 0
-    ? tiempoMuertoTotal / eventosTotal
-    : 0;
 
   setTexto(
-  "kpiMTBF",
-  eventosMtto > 0
-    ? formatoHoras(mtbf)
-    : "—"
-);
+    "kpiMTBF",
+    eventosMantenimiento > 0
+      ? formatoHoras(mtbf)
+      : "—"
+  );
 
-setTexto(
-  "kpiMTTR",
-  eventosMtto > 0
-    ? formatoHoras(mttr)
-    : "—"
-);
-
-setTexto(
-  "kpiFF",
-  eventosMtto > 0 && horasOperativas > 0
-    ? formatoDecimal(ff, 4) + " fallas/h"
-    : "—"
-);
-
-setTexto(
-  "kpiTPO",
-  eventosTotal > 0
-    ? formatoHoras(tpo)
-    : "—"
-);
-
-setTexto(
-  "kpiTPFS",
-  eventosTotal > 0
-    ? formatoHoras(tpfs)
-    : "—"
-);
-
-setTexto(
-  "kpiEventos",
-  formatoNumero(eventosMtto, 0)
-);
   setTexto(
-  "detalleEventos",
-  "Eventos totales: " +
-  formatoNumero(eventosTotal, 0)
-);
+    "kpiMTTR",
+    eventosMantenimiento > 0
+      ? formatoHoras(mttr)
+      : "—"
+  );
+
+  setTexto(
+    "kpiFFMantenimiento",
+    horasProgramadas > 0
+      ? formatoDecimal(
+          ffMantenimiento,
+          4
+        ) + " fallas/h"
+      : "—"
+  );
+
+  setTexto(
+    "kpiEventosMantenimiento",
+    formatoNumero(
+      eventosMantenimiento,
+      0
+    )
+  );
+
+
+  setTexto(
+    "kpiTPO",
+    eventosTotales > 0
+      ? formatoHoras(tpo)
+      : "—"
+  );
+
+  setTexto(
+    "kpiTPFS",
+    eventosTotales > 0
+      ? formatoHoras(tpfs)
+      : "—"
+  );
+
+  setTexto(
+    "kpiFFGeneral",
+    horasProgramadas > 0
+      ? formatoDecimal(
+          ffGeneral,
+          4
+        ) + " eventos/h"
+      : "—"
+  );
+
+  setTexto(
+    "kpiEventosTotales",
+    formatoNumero(
+      eventosTotales,
+      0
+    )
+  );
+
+
   setTexto(
     "metaMTBF",
     "Meta: " +
@@ -1917,37 +2479,496 @@ setTexto(
 
   setTexto(
     "metaMTTR",
-    "Meta: máximo " +
+    "Meta máxima: " +
     formatoHoras(
       metas.mttr
     )
   );
 
   setTexto(
-    "metaFF",
-    "Meta: máximo " +
-    formatoDecimal(
-      metas.ff,
-      4
-    ) +
-    " fallas/h"
-  );
-
-  setTexto(
-  "metaTPO",
-  "Promedio general entre eventos"
-);
-
-  setTexto(
     "metaTPFS",
-    "Meta: máximo " +
+    "Meta máxima: " +
     formatoHoras(
       metas.tpfs
     )
   );
+
+}
+
+/* =========================================================
+   TENDENCIA MENSUAL
+========================================================= */
+
+function renderizarTendenciaMensual(data){
+
+  const tendencia =
+    Array.isArray(
+      data.tendenciaMensual
+    )
+      ? data.tendenciaMensual
+      : [];
+
+  renderizarGraficaLinea(
+    "graficaDisponibilidad",
+    tendencia,
+    "disponibilidad",
+    "%",
+    2,
+    data.metas
+      ? Number(
+          data.metas.disponibilidad || 95
+        )
+      : 95
+  );
+
+  renderizarGraficaLinea(
+    "graficaMTTR",
+    tendencia,
+    "mttr",
+    " h",
+    2,
+    data.metas
+      ? Number(
+          data.metas.mttr || 3
+        )
+      : 3
+  );
+
+  renderizarGraficaLinea(
+    "graficaMTBF",
+    tendencia,
+    "mtbf",
+    " h",
+    2,
+    data.metas
+      ? Number(
+          data.metas.mtbf || 24
+        )
+      : 24
+  );
+
+
+  const tbody =
+    document.getElementById(
+      "tendenciaBody"
+    );
+
+
+  if(!tendencia.length){
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          No existe información mensual
+          para el alcance seleccionado.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+
+  tbody.innerHTML =
+    tendencia
+      .map(item => `
+
+        <tr
+          class="${
+            item.periodoEnCurso
+              ? "trend-current"
+              : ""
+          }"
+        >
+
+          <td>
+            ${escaparHTML(item.mes)}
+          </td>
+
+          <td>
+            ${formatoPorcentaje(
+              item.disponibilidad
+            )}
+          </td>
+
+          <td>
+            ${
+              Number(
+                item.eventosMantenimiento || 0
+              ) > 0
+                ? formatoHoras(item.mttr)
+                : "—"
+            }
+          </td>
+
+          <td>
+            ${
+              Number(
+                item.eventosMantenimiento || 0
+              ) > 0
+                ? formatoHoras(item.mtbf)
+                : "—"
+            }
+          </td>
+
+          <td>
+            ${formatoNumero(
+              item.eventosMantenimiento,
+              0
+            )}
+          </td>
+
+          <td>
+            ${formatoNumero(
+              item.eventosTotales,
+              0
+            )}
+          </td>
+
+        </tr>
+
+      `)
+      .join("");
+
 }
 
 
+function renderizarGraficaLinea(
+  contenedorId,
+  datos,
+  campo,
+  unidad,
+  decimales,
+  meta
+){
+
+  const contenedor =
+    document.getElementById(
+      contenedorId
+    );
+
+  if(!contenedor){
+    return;
+  }
+
+  if(!datos.length){
+
+    contenedor.innerHTML = `
+      <div class="empty-message">
+        Sin datos
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const ancho = 520;
+  const alto = 260;
+
+  const margen = {
+    superior:35,
+    derecho:22,
+    inferior:48,
+    izquierdo:52
+  };
+
+  const anchoUtil =
+    ancho -
+    margen.izquierdo -
+    margen.derecho;
+
+  const altoUtil =
+    alto -
+    margen.superior -
+    margen.inferior;
+
+
+  const valores =
+    datos.map(item =>
+      Number(
+        item[campo] || 0
+      )
+    );
+
+
+  let valorMaximo =
+    Math.max(
+      ...valores,
+      Number(meta || 0),
+      1
+    );
+
+  let valorMinimo =
+    Math.min(
+      ...valores,
+      0
+    );
+
+
+  if(campo === "disponibilidad"){
+
+    valorMinimo =
+      Math.max(
+        Math.min(...valores) - 5,
+        0
+      );
+
+    valorMaximo = 100;
+
+  }else{
+
+    valorMaximo =
+      valorMaximo * 1.18;
+
+  }
+
+
+  const rango =
+    Math.max(
+      valorMaximo - valorMinimo,
+      1
+    );
+
+
+  const obtenerX =
+    indice => {
+
+      if(datos.length === 1){
+        return (
+          margen.izquierdo +
+          anchoUtil / 2
+        );
+      }
+
+      return (
+        margen.izquierdo +
+        (
+          indice /
+          (datos.length - 1)
+        ) *
+        anchoUtil
+      );
+
+    };
+
+
+  const obtenerY =
+    valor => {
+
+      return (
+        margen.superior +
+        altoUtil -
+        (
+          (
+            valor -
+            valorMinimo
+          ) /
+          rango
+        ) *
+        altoUtil
+      );
+
+    };
+
+
+  const puntos =
+    datos.map(
+      (item,indice) => ({
+
+        x:
+          obtenerX(indice),
+
+        y:
+          obtenerY(
+            Number(
+              item[campo] || 0
+            )
+          ),
+
+        valor:
+          Number(
+            item[campo] || 0
+          ),
+
+        mes:
+          item.mes
+
+      })
+    );
+
+
+  const ruta =
+    puntos
+      .map(
+        (punto,indice) =>
+          (
+            indice === 0
+              ? "M"
+              : "L"
+          ) +
+          punto.x +
+          " " +
+          punto.y
+      )
+      .join(" ");
+
+
+  const lineasGuia = [];
+
+  for(let i = 0; i <= 4; i++){
+
+    const valor =
+      valorMinimo +
+      (
+        rango *
+        i /
+        4
+      );
+
+    const y =
+      obtenerY(valor);
+
+    lineasGuia.push(`
+
+      <line
+        x1="${margen.izquierdo}"
+        y1="${y}"
+        x2="${ancho - margen.derecho}"
+        y2="${y}"
+        stroke="rgba(255,255,255,.12)"
+        stroke-width="1"
+      ></line>
+
+      <text
+        x="${margen.izquierdo - 8}"
+        y="${y + 4}"
+        text-anchor="end"
+        fill="rgba(255,255,255,.65)"
+        font-size="11"
+      >
+        ${formatoNumero(valor,1)}
+      </text>
+
+    `);
+
+  }
+
+
+  let lineaMeta = "";
+
+  if(
+    Number(meta) >= valorMinimo &&
+    Number(meta) <= valorMaximo
+  ){
+
+    const yMeta =
+      obtenerY(
+        Number(meta)
+      );
+
+    lineaMeta = `
+
+      <line
+        x1="${margen.izquierdo}"
+        y1="${yMeta}"
+        x2="${ancho - margen.derecho}"
+        y2="${yMeta}"
+        stroke="#f2c94c"
+        stroke-width="2"
+        stroke-dasharray="7 6"
+      ></line>
+
+      <text
+        x="${ancho - margen.derecho}"
+        y="${yMeta - 6}"
+        text-anchor="end"
+        fill="#f2c94c"
+        font-size="11"
+        font-weight="bold"
+      >
+        Meta ${formatoNumero(meta,2)}${unidad}
+      </text>
+
+    `;
+
+  }
+
+
+  const puntosSVG =
+    puntos.map(punto => `
+
+      <circle
+        cx="${punto.x}"
+        cy="${punto.y}"
+        r="5"
+        fill="#16a9e0"
+        stroke="#ffffff"
+        stroke-width="2"
+      ></circle>
+
+      <text
+        x="${punto.x}"
+        y="${punto.y - 12}"
+        text-anchor="middle"
+        fill="#ffffff"
+        font-size="11"
+        font-weight="bold"
+      >
+        ${formatoNumero(
+          punto.valor,
+          decimales
+        )}${unidad}
+      </text>
+
+      <text
+        x="${punto.x}"
+        y="${alto - 18}"
+        text-anchor="middle"
+        fill="rgba(255,255,255,.72)"
+        font-size="11"
+      >
+        ${escaparHTML(
+          punto.mes
+            .replace(
+              /\s+\d{4}$/,
+              ""
+            )
+        )}
+      </text>
+
+    `).join("");
+
+
+  contenedor.innerHTML = `
+
+    <svg
+      viewBox="0 0 ${ancho} ${alto}"
+      role="img"
+      aria-label="Gráfica mensual"
+    >
+
+      ${lineasGuia.join("")}
+
+      ${lineaMeta}
+
+      <path
+        d="${ruta}"
+        fill="none"
+        stroke="#16a9e0"
+        stroke-width="4"
+        stroke-linejoin="round"
+        stroke-linecap="round"
+      ></path>
+
+      ${puntosSVG}
+
+    </svg>
+
+  `;
+
+}
+  
 /* =========================================================
    GRÁFICO TORTA
 ========================================================= */
