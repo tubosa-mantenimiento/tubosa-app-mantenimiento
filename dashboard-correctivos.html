@@ -392,17 +392,7 @@ h2{font-size:24px;margin-bottom:14px;}
     <div id="topEquipos"><div class="vacio">Cargando...</div></div>
   </div>
 
-  <div class="card">
-    <h2>Modo de falla</h2>
-    <div id="topModos"><div class="vacio">Cargando...</div></div>
-  </div>
-
-  <div class="card">
-    <h2>Causa probable</h2>
-    <div id="topCausas"><div class="vacio">Cargando...</div></div>
-  </div>
-
- <div class="card">
+   <div class="card">
   <h2>Participación técnica en correctivos</h2>
 
  <div class="subtitle">
@@ -416,12 +406,7 @@ h2{font-size:24px;margin-bottom:14px;}
   <div id="alertaTecnicosSinAsignar"></div>
 </div>
 
-  <div class="card">
-    <h2>Correctivos críticos / pendientes</h2>
-    <div id="listaAlertas"><div class="vacio">Cargando...</div></div>
-  </div>
-
-  <div class="footer">
+    <div class="footer">
     TUBOSA - Sistema de Mantenimiento<br>
     Versión 1.0
   </div>
@@ -1283,25 +1268,6 @@ const tiempoTotalHoras =
         "topEquipos",
         contarPorCampo(datosPeriodo,"Equipo").slice(0,10)
     );
-
-    //======================
-    // MODOS DE FALLA
-    //======================
-
-    renderBarras(
-        "topModos",
-        contarPorCampo(datosPeriodo,"ModoFalla").slice(0,10)
-    );
-
-    //======================
-    // CAUSAS
-    //======================
-
-    renderBarras(
-        "topCausas",
-        contarPorCampo(datosPeriodo,"CausaProbable").slice(0,10)
-    );
-
    //======================
 // PARTICIPACION TECNICA
 //======================
@@ -1309,14 +1275,7 @@ const tiempoTotalHoras =
 renderParticipacionTecnicos(
   datosPeriodo
 );
-    //======================
-    // ALERTAS
-    //======================
-
-    renderAlertas(
-        pendientes
-    );
-
+   
     document.getElementById("estadoCarga").innerText =
         "Información actualizada correctamente.";
 
