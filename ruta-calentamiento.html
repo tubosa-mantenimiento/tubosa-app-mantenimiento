@@ -286,8 +286,21 @@ async function guardarCalentamiento(){
   btn.disabled = true;
   btn.innerText = "GUARDANDO...";
 
-  const tipoExtrusion = document.getElementById("TipoExtrusion").value;
-  const linea = document.getElementById("Linea").value;
+  const supervisorProduccion =
+  document.getElementById("SupervisorProduccion").value.trim();
+
+const tipoExtrusion =
+  document.getElementById("TipoExtrusion").value;
+
+const linea =
+  document.getElementById("Linea").value;
+
+  if(!supervisorProduccion){
+  alert("Debe seleccionar el supervisor de producción.");
+  btn.disabled = false;
+  btn.innerText = "GUARDAR Y GENERAR PDF";
+  return;
+}
 
   if(!tipoExtrusion){
     alert("Debe seleccionar el tipo de extrusión.");
@@ -304,17 +317,20 @@ async function guardarCalentamiento(){
   }
 
   const datos = {
-    hoja: "Rutas_Calentamiento",
-    ID: "CAL-" + Date.now(),
-    Fecha: document.getElementById("Fecha").value,
-    Hora: document.getElementById("Hora").value,
-    Tecnico: usuario.codigo,
-    Turno: document.getElementById("Turno").value,
-    TipoExtrusion: tipoExtrusion,
-    Linea: linea,
-    Observaciones: document.getElementById("Observaciones").value,
-    PDF_URL: ""
-  };
+  hoja: "Rutas_Calentamiento",
+  ID: "CAL-" + Date.now(),
+  Fecha: document.getElementById("Fecha").value,
+  Hora: document.getElementById("Hora").value,
+  Tecnico: usuario.codigo,
+  Turno: document.getElementById("Turno").value,
+
+  SupervisorProduccion: supervisorProduccion,
+
+  TipoExtrusion: tipoExtrusion,
+  Linea: linea,
+  Observaciones: document.getElementById("Observaciones").value,
+  PDF_URL: ""
+};
 
   agregarDatosZona(datos, "Barril", 8);
   agregarDatosZona(datos, "Adaptador", 2);
