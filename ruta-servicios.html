@@ -116,7 +116,12 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
 <label>Observaciones</label>
 <textarea id="observaciones" placeholder="Ingrese novedades, condiciones anormales o pendientes..."></textarea>
 
-<button id="btnGuardar" onclick="guardarRuta()">GUARDAR RUTA</button>
+<button
+  id="btnGuardar"
+  type="button"
+  onclick="guardarRuta()">
+  GUARDAR RUTA
+</button>
 </div>
 
 <div class="footer">
@@ -129,6 +134,9 @@ Versión 1.0
 <script>
 const URL_API = "https://script.google.com/macros/s/AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA/exec";
 
+let guardadoEnProceso = false;
+const ID_RUTA_ACTUAL = "RS-" + Date.now();
+  
 const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
 
 if(!usuario){
@@ -148,58 +156,139 @@ function cargarInicial(){
 
 async function guardarRuta(){
 
-  const btn = document.getElementById("btnGuardar");
-  btn.disabled = true;
-  btn.innerText = "GUARDANDO...";
-
-  const turno = document.getElementById("turno").value;
-
-  if(!turno){
-    alert("Debe seleccionar el turno.");
-    btn.disabled = false;
-    btn.innerText = "GUARDAR RUTA";
+  /*
+  Evita que la función vuelva a ejecutarse
+  mientras existe un guardado en curso.
+  */
+  if(guardadoEnProceso){
+    console.warn("Se ignoró un intento de guardado duplicado.");
     return;
   }
 
+  const btn = document.getElementById("btnGuardar");
+  const turno = document.getElementById("turno").value;
+
+  /*
+  Primero validamos los campos.
+  Todavía no bloqueamos el botón.
+  */
+  if(!turno){
+    alert("Debe seleccionar el turno.");
+    return;
+  }
+
+  /*
+  A partir de este punto solamente se permite
+  una ejecución de la función.
+  */
+  guardadoEnProceso = true;
+  btn.disabled = true;
+  btn.innerText = "GUARDANDO...";
+
   const datos = {
     hoja: "Rutas_Servicios",
-    ID_Ruta: "RS-" + Date.now(),
+
+    /*
+    El ID fue creado una sola vez cuando
+    se abrió la ruta.
+    */
+    ID_Ruta: ID_RUTA_ACTUAL,
+
     Fecha: document.getElementById("fecha").value,
     Hora: document.getElementById("hora").value,
     Tecnico: usuario.codigo,
     Turno: turno,
 
-    Amperaje_Trafo2000_Antigua: document.getElementById("trafo2000Antigua").value,
-    Amperaje_Trafo1000_1600: document.getElementById("trafo1000_1600").value,
-    Amperaje_Trafo1000_2000: document.getElementById("trafo1000_2000").value,
-    Amperaje_Trafo2000_Nueva: document.getElementById("trafo2000Nueva").value,
+    Amperaje_Trafo2000_Antigua:
+      document.getElementById("trafo2000Antigua").value,
 
-    Presion_Aire_SAM: document.getElementById("presionAire").value,
-    Caudal_Aire: document.getElementById("caudalAire").value,
+    Amperaje_Trafo1000_1600:
+      document.getElementById("trafo1000_1600").value,
 
-    Presion_Bombas: document.getElementById("presionBombas").value,
-    Temperatura_Chiller: document.getElementById("temperaturaChiller").value,
-    Carga_Compresores: document.getElementById("cargaCompresores").value,
+    Amperaje_Trafo1000_2000:
+      document.getElementById("trafo1000_2000").value,
 
-    Observaciones: document.getElementById("observaciones").value
+    Amperaje_Trafo2000_Nueva:
+      document.getElementById("trafo2000Nueva").value,
+
+    Presion_Aire_SAM:
+      document.getElementById("presionAire").value,
+
+    Caudal_Aire:
+      document.getElementById("caudalAire").value,
+
+    Presion_Bombas:
+      document.getElementById("presionBombas").value,
+
+    Temperatura_Chiller:
+      document.getElementById("temperaturaChiller").value,
+
+    Carga_Compresores:
+      document.getElementById("cargaCompresores").value,
+
+    Observaciones:
+      document.getElementById("observaciones").value
   };
 
   try{
+
     const params = new URLSearchParams(datos);
-    const respuesta = await fetch(URL_API + "?" + params.toString());
+
+    const respuesta = await fetch(
+      URL_API + "?" + params.toString(),
+      {
+        method: "GET",
+        cache: "no-store"
+      }
+    );
+
+    if(!respuesta.ok){
+      throw new Error(
+        "El servidor respondió con estado " + respuesta.status
+      );
+    }
+
     const resultado = await respuesta.json();
 
     if(resultado.ok){
-      alert("Ruta de Servicios Industriales guardada correctamente.");
-      window.location.href = "rutas.html";
+
+      /*
+      No se vuelve a habilitar el botón.
+      El usuario es enviado inmediatamente
+      al menú de rutas.
+      */
+      btn.innerText = "RUTA GUARDADA";
+
+      alert(
+        resultado.duplicado
+          ? "La ruta ya había sido registrada. No se creó otro registro."
+          : "Ruta de Servicios Industriales guardada correctamente."
+      );
+
+      window.location.replace("rutas.html");
+
     }else{
-      alert("Error: " + resultado.mensaje);
-      btn.disabled = false;
-      btn.innerText = "GUARDAR RUTA";
+
+      throw new Error(
+        resultado.mensaje ||
+        "No fue posible guardar la ruta."
+      );
     }
 
   }catch(error){
-    alert("Error guardando ruta: " + error);
+
+    console.error("Error guardando ruta:", error);
+
+    alert(
+      "No fue posible guardar la ruta.\n\n" +
+      error.message
+    );
+
+    /*
+    Solamente permitimos reintentar cuando
+    el servidor produjo un error real.
+    */
+    guardadoEnProceso = false;
     btn.disabled = false;
     btn.innerText = "GUARDAR RUTA";
   }
