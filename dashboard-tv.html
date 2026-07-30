@@ -3998,43 +3998,66 @@ contiene el acumulado total de horas.
 */
 let tiempoTotalHoras = 0;
 
-for(let i = registrosMes.length - 1; i >= 0; i--){
+/*
+  Tiempos reales de todos los correctivos
+  reportados durante el mes actual.
 
-  const valorTiempoTotal =
-    numero(
-      primerValor(registrosMes[i],[
-        "TiempoTotalRealIntervencion",
-        "Tiempo Total Real Intervencion",
-        "Tiempo Total Real Intervención"
-      ])
-    );
+  TiempoTotalRealIntervencion está expresado
+  en minutos.
+*/
+const tiemposRealesMinutos =
+  registrosMes
+    .map(registro => {
 
-  if(
-    valorTiempoTotal !== null &&
-    !isNaN(valorTiempoTotal) &&
-    valorTiempoTotal >= 0
-  ){
-    tiempoTotalHoras =
-      redondear(valorTiempoTotal);
+      return numero(
+        primerValor(registro,[
+          "TiempoTotalRealIntervencion",
+          "Tiempo Total Real Intervencion",
+          "Tiempo Total Real Intervención"
+        ])
+      );
 
-    break;
-  }
-}
+    })
+    .filter(valor => {
+
+      return (
+        valor !== null &&
+        !isNaN(valor) &&
+        valor >= 0
+      );
+
+    });
 
 
 /*
-El promedio se calcula utilizando el mismo
-tiempo total real.
+  Suma total de minutos del mes.
+*/
+const tiempoTotalMinutos =
+  tiemposRealesMinutos.reduce(
+    (acumulado,valor) =>
+      acumulado + valor,
+    0
+  );
 
-Resultado:
-horas totales × 60 / correctivos cerrados
+
+/*
+  Total convertido a horas.
+*/
+const tiempoTotalHoras =
+  redondear(
+    tiempoTotalMinutos / 60
+  );
+
+
+/*
+  Promedio calculado con exactamente
+  los mismos registros utilizados en el total.
 */
 const tiempoPromedio =
-  cerradosMes.length > 0
+  tiemposRealesMinutos.length > 0
     ? redondear(
-        tiempoTotalHoras *
-        60 /
-        cerradosMes.length
+        tiempoTotalMinutos /
+        tiemposRealesMinutos.length
       )
     : 0;
 
