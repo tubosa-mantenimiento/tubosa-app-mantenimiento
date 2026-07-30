@@ -4040,6 +4040,18 @@ function estadisticasCorrectivos(){
         )
       : 0;
 
+  const tiempoTotalMinutos =
+  tiempos.reduce(
+    (acumulado,valor) =>
+      acumulado + valor,
+    0
+  );
+
+const tiempoTotalHoras =
+  redondear(
+    tiempoTotalMinutos / 60
+  );
+
   const tasaCierre =
     registrosMes.length > 0
       ? redondear(
@@ -4049,15 +4061,16 @@ function estadisticasCorrectivos(){
         )
       : 0;
 
-  return {
-    reportados: registrosMes.length,
-    cerrados: cerradosMes.length,
-    abiertos: abiertos.length,
-    pendientes: pendientes,
-    criticos: criticos,
-    tiempoPromedio: tiempoPromedio,
-    tasaCierre: tasaCierre
-  };
+ return {
+  reportados: registrosMes.length,
+  cerrados: cerradosMes.length,
+  abiertos: abiertos.length,
+  pendientes: pendientes,
+  criticos: criticos,
+  tiempoPromedio: tiempoPromedio,
+  tiempoTotalHoras: tiempoTotalHoras,
+  tasaCierre: tasaCierre
+};
 
 }
 function renderizarCorrectivosResumen(slide){
@@ -4177,21 +4190,93 @@ function renderizarCorrectivosResumen(slide){
 
       <div class="preventivo-layout">
 
-        <div class="cumplimiento-card">
+        <div
+  class="cumplimiento-card"
+  style="
+    padding:0;
+    overflow:hidden;
+  "
+>
 
-          <div class="cumplimiento-titulo">
-            Tiempo promedio de intervención
-          </div>
+  <div
+    style="
+      flex:1;
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:15px 20px;
+      border-bottom:2px solid #d8dfeb;
+    "
+  >
 
-          <div class="cumplimiento-valor">
-            ${datos.tiempoPromedio}
-          </div>
+    <div class="cumplimiento-titulo">
+      Tiempo promedio de intervención
+    </div>
 
-          <div class="cumplimiento-estado estado-sindato">
-            Minutos
-          </div>
+    <div
+      class="cumplimiento-valor"
+      style="
+        margin-top:8px;
+        font-size:clamp(46px,5vw,82px);
+      "
+    >
+      ${datos.tiempoPromedio}
+    </div>
 
-        </div>
+    <div
+      class="cumplimiento-estado estado-sindato"
+      style="
+        margin-top:8px;
+        padding:7px 16px;
+      "
+    >
+      Minutos
+    </div>
+
+  </div>
+
+
+  <div
+    style="
+      flex:1;
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:15px 20px;
+    "
+  >
+
+    <div class="cumplimiento-titulo">
+      Tiempo total en correctivos
+    </div>
+
+    <div
+      class="cumplimiento-valor"
+      style="
+        margin-top:8px;
+        font-size:clamp(46px,5vw,82px);
+      "
+    >
+      ${datos.tiempoTotalHoras}
+    </div>
+
+    <div
+      class="cumplimiento-estado estado-sindato"
+      style="
+        margin-top:8px;
+        padding:7px 16px;
+      "
+    >
+      Horas
+    </div>
+
+  </div>
+
+</div>
 
         <div class="cumplimiento-card">
 
