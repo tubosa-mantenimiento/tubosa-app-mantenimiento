@@ -3989,68 +3989,54 @@ function estadisticasCorrectivos(){
       esPrioridadCritica
     ).length;
 
-  const tiempos = [];
+ /*
+Obtiene el último valor válido de la columna
+TiempoTotalRealIntervencion.
 
-  cerradosMes.forEach(registro => {
+Se toma el último valor porque esta columna
+contiene el acumulado total de horas.
+*/
+let tiempoTotalHoras = 0;
 
-    let tiempo =
-      numero(
-        primerValor(registro,[
-          "TiempoTotalIntervencion",
-          "Tiempo total intervención",
-          "TiempoIntervencion",
-          "TiempoCierrePendiente"
-        ])
-      );
+for(let i = registrosMes.length - 1; i >= 0; i--){
 
-    if(tiempo === null){
+  const valorTiempoTotal =
+    numero(
+      primerValor(registrosMes[i],[
+        "TiempoTotalRealIntervencion",
+        "Tiempo Total Real Intervencion",
+        "Tiempo Total Real Intervención"
+      ])
+    );
 
-      const inicio =
-        fechaReporteCorrectivo(registro);
+  if(
+    valorTiempoTotal !== null &&
+    !isNaN(valorTiempoTotal) &&
+    valorTiempoTotal >= 0
+  ){
+    tiempoTotalHoras =
+      redondear(valorTiempoTotal);
 
-      const fin =
-        fechaCierreCorrectivo(registro);
+    break;
+  }
+}
 
-      tiempo =
-        diferenciaMinutos(
-          inicio,
-          fin
-        );
 
-    }
+/*
+El promedio se calcula utilizando el mismo
+tiempo total real.
 
-    if(
-      tiempo !== null &&
-      !isNaN(tiempo) &&
-      tiempo >= 0
-    ){
-      tiempos.push(tiempo);
-    }
-
-  });
-
-  const tiempoPromedio =
-    tiempos.length > 0
-      ? redondear(
-          tiempos.reduce(
-            (acumulado,valor) =>
-              acumulado + valor,
-            0
-          ) / tiempos.length
-        )
-      : 0;
-
-  const tiempoTotalMinutos =
-  tiempos.reduce(
-    (acumulado,valor) =>
-      acumulado + valor,
-    0
-  );
-
-const tiempoTotalHoras =
-  redondear(
-    tiempoTotalMinutos / 60
-  );
+Resultado:
+horas totales × 60 / correctivos cerrados
+*/
+const tiempoPromedio =
+  cerradosMes.length > 0
+    ? redondear(
+        tiempoTotalHoras *
+        60 /
+        cerradosMes.length
+      )
+    : 0;
 
   const tasaCierre =
     registrosMes.length > 0
