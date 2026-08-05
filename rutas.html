@@ -1,12 +1,42 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rutas de Inspección - TUBOSA</title>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<meta
+  http-equiv="Cache-Control"
+  content="no-cache, no-store, must-revalidate"
+>
+
+<meta
+  http-equiv="Pragma"
+  content="no-cache"
+>
+
+<meta
+  http-equiv="Expires"
+  content="0"
+>
+
+<title>
+Rutas de Inspección - TUBOSA
+</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
 
 body{
   background:#001f5b;
@@ -67,6 +97,14 @@ h1{
   margin-bottom:16px;
   color:white;
   text-decoration:none;
+  transition:
+    transform .15s ease,
+    background .15s ease;
+}
+
+.route-card:active{
+  transform:scale(.98);
+  background:#104185;
 }
 
 .route-title{
@@ -78,6 +116,33 @@ h1{
 .route-desc{
   font-size:16px;
   opacity:.85;
+  line-height:1.4;
+}
+
+/*
+  La tarjeta inicia completamente oculta.
+  Solo JavaScript puede mostrarla cuando
+  el usuario esté autorizado.
+*/
+#rutaCalentamientosRealizados{
+  display:none;
+}
+
+.separador-supervision{
+  display:none;
+  margin:26px 0 14px;
+  padding-top:20px;
+  border-top:1px solid rgba(255,255,255,.18);
+}
+
+.separador-supervision h2{
+  font-size:19px;
+  margin-bottom:5px;
+}
+
+.separador-supervision p{
+  font-size:14px;
+  opacity:.75;
 }
 
 .footer{
@@ -86,7 +151,9 @@ h1{
   font-size:13px;
   margin-top:24px;
 }
+
 </style>
+
 </head>
 
 <body>
@@ -94,45 +161,285 @@ h1{
 <div class="container">
 
   <div class="header">
-    <a class="back" href="menu.html">‹</a>
-    <div class="logo">TUBOSA</div>
+
+    <a
+      class="back"
+      href="menu.html"
+      aria-label="Volver al menú"
+    >
+      ‹
+    </a>
+
+    <div class="logo">
+      TUBOSA
+    </div>
+
     <div style="width:42px;"></div>
+
   </div>
 
   <div class="card">
-    <h1>Rutas de Inspección</h1>
-    <div class="subtitle">Seleccione la ruta que va a ejecutar durante el turno</div>
+
+    <h1>
+      Rutas de Inspección
+    </h1>
+
+    <div class="subtitle">
+      Seleccione la ruta que va a ejecutar durante el turno
+    </div>
+
   </div>
 
-  <a class="route-card" href="ruta-servicios.html">
-    <div class="route-title">⚡ Servicios Industriales</div>
-    <div class="route-desc">Subestación, compresores, chiller y sistema de agua fría</div>
+  <a
+    class="route-card"
+    href="ruta-servicios.html"
+  >
+
+    <div class="route-title">
+      ⚡ Servicios Industriales
+    </div>
+
+    <div class="route-desc">
+      Subestación, compresores, chiller y sistema de agua fría
+    </div>
+
   </a>
 
-  <a class="route-card" href="ruta-calentamiento.html">
-    <div class="route-title">🔥 Calentamiento de Línea</div>
-    <div class="route-desc">Registro de calentamiento y amperajes de resistencias</div>
+  <a
+    class="route-card"
+    href="ruta-calentamiento.html"
+  >
+
+    <div class="route-title">
+      🔥 Calentamiento de Línea
+    </div>
+
+    <div class="route-desc">
+      Registro de calentamiento y amperajes de resistencias
+    </div>
+
   </a>
 
-  <a class="route-card" href="ruta-piab.html">
-    <div class="route-title">🌀 Bombas PIAB</div>
-    <div class="route-desc">Inspección diaria de bombas de vacío PIAB</div>
+  <a
+    class="route-card"
+    href="ruta-piab.html"
+  >
+
+    <div class="route-title">
+      🌀 Bombas PIAB
+    </div>
+
+    <div class="route-desc">
+      Inspección diaria de bombas de vacío PIAB
+    </div>
+
   </a>
+
+
+  <!-- ==================================================
+       SECCIÓN EXCLUSIVA PARA SUPERVISORES Y ADMINISTRADORES
+       ================================================== -->
+
+  <div
+    id="seccionSupervision"
+    class="separador-supervision"
+  >
+
+    <h2>
+      Consulta y supervisión
+    </h2>
+
+    <p>
+      Opciones disponibles según el perfil del usuario
+    </p>
+
+  </div>
+
+
+  <a
+    id="rutaCalentamientosRealizados"
+    class="route-card"
+    href="rutas-calentamiento-realizadas.html"
+  >
+
+    <div class="route-title">
+      📄 Rutas de calentamiento realizadas
+    </div>
+
+    <div class="route-desc">
+      Consultar los PDF generados, desde la última ruta realizada hacia atrás
+    </div>
+
+  </a>
+
 
   <div class="footer">
-    TUBOSA - Sistema de Mantenimiento<br>
+
+    TUBOSA - Sistema de Mantenimiento
+    <br>
     Versión 1.0
+
   </div>
 
 </div>
 
+
 <script>
-const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
+
+/* =====================================================
+   SESIÓN DEL USUARIO
+===================================================== */
+
+const usuario =
+  JSON.parse(
+    localStorage.getItem("usuarioActivo")
+  );
+
 
 if(!usuario){
-  window.location.href = "index.html";
+
+  window.location.replace(
+    "index.html"
+  );
+
 }
+
+
+/* =====================================================
+   NORMALIZAR TEXTO
+===================================================== */
+
+function normalizarTexto(valor){
+
+  return String(valor || "")
+    .trim()
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    );
+
+}
+
+
+/* =====================================================
+   OBTENER ROL DEL USUARIO
+===================================================== */
+
+function obtenerRolUsuario(){
+
+  if(!usuario){
+    return "";
+  }
+
+  /*
+    Revisamos diferentes nombres posibles
+    porque todavía debemos confirmar cómo
+    se almacena exactamente el rol en login.
+  */
+  return normalizarTexto(
+
+    usuario.rol ||
+
+    usuario.Rol ||
+
+    usuario.cargo ||
+
+    usuario.Cargo ||
+
+    usuario.perfil ||
+
+    usuario.Perfil ||
+
+    usuario.tipoUsuario ||
+
+    usuario.TipoUsuario ||
+
+    ""
+
+  );
+
+}
+
+
+/* =====================================================
+   VALIDAR PERMISO
+===================================================== */
+
+function usuarioPuedeConsultarRutas(){
+
+  const rol =
+    obtenerRolUsuario();
+
+  return (
+
+    rol.includes(
+      "SUPERVISOR"
+    ) ||
+
+    rol.includes(
+      "ADMINISTRADOR"
+    ) ||
+
+    rol === "ADMIN"
+
+  );
+
+}
+
+
+/* =====================================================
+   MOSTRAR OPCIÓN AUTORIZADA
+===================================================== */
+
+function configurarOpcionesPorRol(){
+
+  const tarjeta =
+    document.getElementById(
+      "rutaCalentamientosRealizados"
+    );
+
+  const seccion =
+    document.getElementById(
+      "seccionSupervision"
+    );
+
+  if(
+    !tarjeta ||
+    !seccion
+  ){
+    return;
+  }
+
+  const autorizado =
+    usuarioPuedeConsultarRutas();
+
+  if(autorizado){
+
+    tarjeta.style.display =
+      "block";
+
+    seccion.style.display =
+      "block";
+
+  }else{
+
+    tarjeta.style.display =
+      "none";
+
+    seccion.style.display =
+      "none";
+
+  }
+
+}
+
+
+configurarOpcionesPorRol();
+
 </script>
 
 </body>
+
 </html>
