@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<meta
+  http-equiv="Cache-Control"
+  content="no-cache, no-store, must-revalidate"
+>
+
+<meta
+  http-equiv="Pragma"
+  content="no-cache"
+>
+
+<meta
+  http-equiv="Expires"
+  content="0"
+>
+
+<title>
+Rutas de Calentamiento Realizadas - TUBOSA
+</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#001f5b;
+  color:white;
+  min-height:100vh;
+  padding:22px;
+}
+
+.container{
+  max-width:620px;
+  margin:auto;
+}
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:24px;
+}
+
+.back{
+  color:white;
+  text-decoration:none;
+  font-size:42px;
+  font-weight:bold;
+}
+
+.logo{
+  font-size:46px;
+  font-weight:900;
+}
+
+.card{
+  background:#0b3475;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:24px;
+  padding:22px;
+  margin-bottom:18px;
+}
+
+h1{
+  font-size:29px;
+  margin-bottom:8px;
+}
+
+.subtitle{
+  font-size:16px;
+  opacity:.85;
+  line-height:1.4;
+}
+
+.filtros{
+  background:#0b3475;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:22px;
+  padding:18px;
+  margin-bottom:18px;
+}
+
+label{
+  display:block;
+  font-size:15px;
+  font-weight:bold;
+  margin-bottom:6px;
+}
+
+input,
+select{
+  width:100%;
+  border:none;
+  border-radius:14px;
+  padding:14px;
+  font-size:16px;
+  color:#001f5b;
+  background:white;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:12px;
+}
+
+.resumen{
+  font-size:14px;
+  opacity:.82;
+  margin:4px 2px 15px;
+}
+
+.documento{
+  background:#0b3475;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:22px;
+  padding:20px;
+  margin-bottom:16px;
+}
+
+.documento-superior{
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+}
+
+.documento-icono{
+  width:48px;
+  min-width:48px;
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,.1);
+  border-radius:13px;
+  font-size:27px;
+}
+
+.documento-info{
+  flex:1;
+  min-width:0;
+}
+
+.documento-titulo{
+  font-size:21px;
+  font-weight:900;
+  margin-bottom:6px;
+}
+
+.documento-fecha{
+  font-size:15px;
+  opacity:.85;
+  margin-bottom:10px;
+}
+
+.documento-dato{
+  font-size:14px;
+  line-height:1.55;
+  overflow-wrap:anywhere;
+}
+
+.documento-dato strong{
+  color:white;
+}
+
+.observaciones{
+  border-top:1px solid rgba(255,255,255,.16);
+  margin-top:13px;
+  padding-top:12px;
+  font-size:14px;
+  line-height:1.45;
+  opacity:.9;
+  white-space:pre-line;
+}
+
+.btn-pdf{
+  display:block;
+  width:100%;
+  padding:15px;
+  margin-top:16px;
+  border:none;
+  border-radius:14px;
+  background:white;
+  color:#001f5b;
+  text-align:center;
+  text-decoration:none;
+  font-size:17px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.btn-pdf:active{
+  transform:scale(.98);
+}
+
+.estado{
+  background:#0b3475;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:22px;
+  padding:24px;
+  text-align:center;
+  line-height:1.5;
+}
+
+.estado-error{
+  background:#71313a;
+}
+
+.cargando{
+  display:inline-block;
+  width:30px;
+  height:30px;
+  margin-bottom:12px;
+  border:4px solid rgba(255,255,255,.25);
+  border-top-color:white;
+  border-radius:50%;
+  animation:girar .8s linear infinite;
+}
+
+@keyframes girar{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+.footer{
+  text-align:center;
+  opacity:.7;
+  font-size:13px;
+  margin-top:24px;
+}
+
+@media(max-width:520px){
+
+  body{
+    padding:17px;
+  }
+
+  .logo{
+    font-size:38px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .documento-titulo{
+    font-size:19px;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+
+    <a
+      class="back"
+      href="rutas.html"
+      aria-label="Volver a rutas"
+    >
+      ‹
+    </a>
+
+    <div class="logo">
+      TUBOSA
+    </div>
+
+    <div style="width:42px;"></div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h1>
+      Rutas de calentamiento realizadas
+    </h1>
+
+    <div class="subtitle">
+      Consulta los PDF generados en las rutas de calentamiento
+    </div>
+
+  </div>
+
+
+  <div class="filtros">
+
+    <label for="buscar">
+      Buscar ruta
+    </label>
+
+    <input
+      id="buscar"
+      type="search"
+      placeholder="Línea, técnico, supervisor o fecha"
+      autocomplete="off"
+    >
+
+    <div class="grid">
+
+      <div>
+
+        <label for="filtroLinea">
+          Línea
+        </label>
+
+        <select id="filtroLinea">
+
+          <option value="">
+            Todas las líneas
+          </option>
+
+        </select>
+
+      </div>
+
+      <div>
+
+        <label for="filtroMes">
+          Mes
+        </label>
+
+        <select id="filtroMes">
+
+          <option value="">
+            Todos los meses
+          </option>
+
+        </select>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div
+    id="resumen"
+    class="resumen"
+  >
+  </div>
+
+
+  <div id="listaDocumentos">
+
+    <div class="estado">
+
+      <div class="cargando"></div>
+
+      <div>
+        Cargando rutas de calentamiento...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="footer">
+
+    TUBOSA - Sistema de Mantenimiento
+    <br>
+    Versión 1.0
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   CONFIGURACIÓN
+===================================================== */
+
+const URL_API =
+  "https://script.google.com/macros/s/" +
+  "AKfycbzeqAn-7ljMVh6lWLY2EsbQUyPIfXPGiQi8DGhMaULr8smReTfUm2BzGgXFFoPyJdI5DA" +
+  "/exec";
+
+
+const usuario =
+  JSON.parse(
+    localStorage.getItem("usuarioActivo")
+  );
+
+
+let rutas = [];
+
+let mapaTecnicos = {};
+
+
+/* =====================================================
+   VALIDACIÓN DE SESIÓN
+===================================================== */
+
+if(!usuario){
+
+  window.location.replace(
+    "index.html"
+  );
+
+}
+
+
+/* =====================================================
+   CONTROL DE ACCESO
+===================================================== */
+
+function normalizarTexto(valor){
+
+  return String(valor || "")
+    .trim()
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    );
+
+}
+
+
+function obtenerRolUsuario(){
+
+  if(!usuario){
+    return "";
+  }
+
+  return normalizarTexto(
+
+    usuario.rol ||
+
+    usuario.Rol ||
+
+    usuario.cargo ||
+
+    usuario.Cargo ||
+
+    usuario.perfil ||
+
+    usuario.Perfil ||
+
+    usuario.tipoUsuario ||
+
+    usuario.TipoUsuario ||
+
+    ""
+
+  );
+
+}
+
+
+function usuarioAutorizado(){
+
+  const rol =
+    obtenerRolUsuario();
+
+  return (
+
+    rol.includes("SUPERVISOR") ||
+
+    rol.includes("ADMINISTRADOR") ||
+
+    rol === "ADMIN"
+
+  );
+
+}
+
+
+if(
+  usuario &&
+  !usuarioAutorizado()
+){
+
+  alert(
+    "Esta sección está disponible únicamente " +
+    "para supervisores y administradores."
+  );
+
+  window.location.replace(
+    "rutas.html"
+  );
+
+}
+
+
+/* =====================================================
+   CONSULTA SEGURA DEL SERVIDOR
+===================================================== */
+
+async function consultarAPI(parametros){
+
+  const url =
+    URL_API +
+    "?" +
+    parametros.toString() +
+    "&_=" +
+    Date.now();
+
+  const respuesta =
+    await fetch(
+      url,
+      {
+        method:"GET",
+        cache:"no-store",
+        redirect:"follow"
+      }
+    );
+
+  const texto =
+    await respuesta.text();
+
+  if(!respuesta.ok){
+
+    throw new Error(
+      "El servidor respondió con estado " +
+      respuesta.status
+    );
+
+  }
+
+  if(
+    texto.trim().startsWith("<")
+  ){
+
+    throw new Error(
+      "El servidor devolvió una página HTML " +
+      "en lugar de los datos esperados."
+    );
+
+  }
+
+  let resultado;
+
+  try{
+
+    resultado =
+      JSON.parse(texto);
+
+  }catch(error){
+
+    console.error(
+      "Respuesta inválida:",
+      texto
+    );
+
+    throw new Error(
+      "La respuesta del servidor no tiene un formato válido."
+    );
+
+  }
+
+  if(!resultado.ok){
+
+    throw new Error(
+      resultado.mensaje ||
+      "No fue posible consultar la información."
+    );
+
+  }
+
+  return resultado;
+
+}
+
+
+/* =====================================================
+   CARGAR USUARIOS Y CREAR MAPA DE TÉCNICOS
+===================================================== */
+
+async function cargarTecnicos(){
+
+  const parametros =
+    new URLSearchParams({
+      accion:"listar",
+      hoja:"Usuarios"
+    });
+
+  const resultado =
+    await consultarAPI(
+      parametros
+    );
+
+  const usuarios =
+    Array.isArray(resultado.datos)
+      ? resultado.datos
+      : [];
+
+  mapaTecnicos = {};
+
+  usuarios.forEach(item => {
+
+    const codigo =
+      String(
+
+        item.Codigo ||
+
+        item.Código ||
+
+        item.CODIGO ||
+
+        item.codigo ||
+
+        item.CodigoTecnico ||
+
+        item.Codigo_Tecnico ||
+
+        item.ID_Tecnico ||
+
+        item.ID ||
+
+        ""
+
+      ).trim();
+
+    const nombre =
+      String(
+
+        item.Nombre ||
+
+        item.NOMBRE ||
+
+        item.nombre ||
+
+        item.NombreCompleto ||
+
+        item.Nombre_Completo ||
+
+        item.NombreTecnico ||
+
+        item.Tecnico ||
+
+        ""
+
+      ).trim();
+
+    if(
+      codigo &&
+      nombre
+    ){
+
+      mapaTecnicos[
+        normalizarTexto(codigo)
+      ] = nombre;
+
+    }
+
+  });
+
+}
+
+
+/* =====================================================
+   CARGAR RUTAS
+===================================================== */
+
+async function cargarRutas(){
+
+  const parametros =
+    new URLSearchParams({
+      accion:
+        "listar_rutas_calentamiento"
+    });
+
+  const resultado =
+    await consultarAPI(
+      parametros
+    );
+
+  rutas =
+    Array.isArray(resultado.datos)
+      ? resultado.datos
+      : [];
+
+}
+
+
+/* =====================================================
+   OBTENER NOMBRE DEL TÉCNICO
+===================================================== */
+
+function obtenerNombreTecnico(ruta){
+
+  const nombreGuardado =
+    String(
+      ruta.tecnicoNombre || ""
+    ).trim();
+
+  if(nombreGuardado){
+    return nombreGuardado;
+  }
+
+  const codigo =
+    String(
+      ruta.tecnico || ""
+    ).trim();
+
+  if(!codigo){
+    return "Sin información";
+  }
+
+  return (
+    mapaTecnicos[
+      normalizarTexto(codigo)
+    ] ||
+    codigo
+  );
+
+}
+
+
+/* =====================================================
+   FILTROS
+===================================================== */
+
+function cargarFiltros(){
+
+  const filtroLinea =
+    document.getElementById(
+      "filtroLinea"
+    );
+
+  const filtroMes =
+    document.getElementById(
+      "filtroMes"
+    );
+
+  filtroLinea.innerHTML = `
+    <option value="">
+      Todas las líneas
+    </option>
+  `;
+
+  filtroMes.innerHTML = `
+    <option value="">
+      Todos los meses
+    </option>
+  `;
+
+
+  const lineas = [
+
+    ...new Set(
+
+      rutas
+        .map(ruta =>
+          String(
+            ruta.linea || ""
+          ).trim()
+        )
+        .filter(Boolean)
+
+    )
+
+  ].sort(ordenarLineas);
+
+
+  lineas.forEach(linea => {
+
+    const opcion =
+      document.createElement(
+        "option"
+      );
+
+    opcion.value =
+      linea;
+
+    opcion.textContent =
+      linea;
+
+    filtroLinea.appendChild(
+      opcion
+    );
+
+  });
+
+
+  const meses = [
+
+    ...new Set(
+
+      rutas
+        .map(ruta =>
+          obtenerClaveMes(
+            ruta.fecha
+          )
+        )
+        .filter(Boolean)
+
+    )
+
+  ];
+
+
+  meses.forEach(mes => {
+
+    const opcion =
+      document.createElement(
+        "option"
+      );
+
+    opcion.value =
+      mes;
+
+    opcion.textContent =
+      obtenerNombreMes(
+        mes
+      );
+
+    filtroMes.appendChild(
+      opcion
+    );
+
+  });
+
+}
+
+
+function aplicarFiltros(){
+
+  const busqueda =
+    normalizarTexto(
+      document
+        .getElementById("buscar")
+        .value
+    );
+
+  const linea =
+    document
+      .getElementById("filtroLinea")
+      .value;
+
+  const mes =
+    document
+      .getElementById("filtroMes")
+      .value;
+
+
+  const filtradas =
+    rutas.filter(ruta => {
+
+      const nombreTecnico =
+        obtenerNombreTecnico(
+          ruta
+        );
+
+      const textoRuta =
+        normalizarTexto([
+
+          ruta.id,
+
+          ruta.fecha,
+
+          ruta.hora,
+
+          ruta.linea,
+
+          ruta.turno,
+
+          ruta.supervisor,
+
+          ruta.observaciones,
+
+          ruta.tecnico,
+
+          nombreTecnico
+
+        ].join(" "));
+
+
+      const coincideBusqueda =
+        !busqueda ||
+        textoRuta.includes(
+          busqueda
+        );
+
+      const coincideLinea =
+        !linea ||
+        String(ruta.linea) === linea;
+
+      const coincideMes =
+        !mes ||
+        obtenerClaveMes(
+          ruta.fecha
+        ) === mes;
+
+
+      return (
+        coincideBusqueda &&
+        coincideLinea &&
+        coincideMes
+      );
+
+    });
+
+
+  renderizarRutas(
+    filtradas
+  );
+
+}
+
+
+/* =====================================================
+   RENDERIZAR DOCUMENTOS
+===================================================== */
+
+function renderizarRutas(lista){
+
+  const contenedor =
+    document.getElementById(
+      "listaDocumentos"
+    );
+
+  const resumen =
+    document.getElementById(
+      "resumen"
+    );
+
+
+  resumen.textContent =
+    lista.length === 1
+      ? "1 ruta encontrada"
+      : lista.length +
+        " rutas encontradas";
+
+
+  if(!lista.length){
+
+    contenedor.innerHTML = `
+      <div class="estado">
+        No se encontraron rutas con los filtros seleccionados.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  contenedor.innerHTML =
+    lista.map(ruta => {
+
+      const nombreTecnico =
+        obtenerNombreTecnico(
+          ruta
+        );
+
+      const observaciones =
+        String(
+          ruta.observaciones || ""
+        ).trim();
+
+      const bloqueObservaciones =
+        observaciones
+          ? `
+            <div class="observaciones">
+              <strong>Observaciones:</strong>
+              <br>
+              ${escaparHTML(observaciones)}
+            </div>
+          `
+          : "";
+
+      return `
+        <article class="documento">
+
+          <div class="documento-superior">
+
+            <div class="documento-icono">
+              📄
+            </div>
+
+            <div class="documento-info">
+
+              <div class="documento-titulo">
+                Ruta de calentamiento
+                ${escaparHTML(
+                  ruta.linea ||
+                  "Sin línea"
+                )}
+              </div>
+
+              <div class="documento-fecha">
+
+                ${escaparHTML(
+                  ruta.fecha || ""
+                )}
+
+                ${ruta.hora ? " · " : ""}
+
+                ${escaparHTML(
+                  ruta.hora || ""
+                )}
+
+              </div>
+
+              <div class="documento-dato">
+
+                <strong>
+                  Técnico:
+                </strong>
+
+                ${escaparHTML(
+                  nombreTecnico
+                )}
+
+              </div>
+
+              <div class="documento-dato">
+
+                <strong>
+                  Turno:
+                </strong>
+
+                ${escaparHTML(
+                  ruta.turno ||
+                  "Sin información"
+                )}
+
+              </div>
+
+              <div class="documento-dato">
+
+                <strong>
+                  Supervisor:
+                </strong>
+
+                ${escaparHTML(
+                  ruta.supervisor ||
+                  "Sin información"
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
+
+          ${bloqueObservaciones}
+
+          <a
+            class="btn-pdf"
+            href="${escaparAtributo(
+              ruta.pdfUrl
+            )}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            🔍 Ver PDF
+          </a>
+
+        </article>
+      `;
+
+    }).join("");
+
+}
+
+
+/* =====================================================
+   UTILIDADES
+===================================================== */
+
+function escaparHTML(valor){
+
+  return String(valor || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function escaparAtributo(valor){
+
+  return escaparHTML(
+    valor
+  );
+
+}
+
+
+function ordenarLineas(a,b){
+
+  const numeroA =
+    Number(
+      String(a)
+        .replace(/\D/g,"")
+    );
+
+  const numeroB =
+    Number(
+      String(b)
+        .replace(/\D/g,"")
+    );
+
+  return numeroA - numeroB;
+
+}
+
+
+function obtenerClaveMes(fecha){
+
+  const partes =
+    String(fecha || "")
+      .trim()
+      .split("/");
+
+  if(partes.length !== 3){
+    return "";
+  }
+
+  const mes =
+    String(
+      partes[1]
+    ).padStart(2,"0");
+
+  const anio =
+    String(
+      partes[2]
+    ).trim();
+
+  return (
+    anio +
+    "-" +
+    mes
+  );
+
+}
+
+
+function obtenerNombreMes(clave){
+
+  const partes =
+    String(clave || "")
+      .split("-");
+
+  if(partes.length !== 2){
+    return clave;
+  }
+
+  const meses = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre"
+  ];
+
+  const anio =
+    partes[0];
+
+  const indiceMes =
+    Number(
+      partes[1]
+    ) - 1;
+
+  return (
+    (
+      meses[indiceMes] ||
+      partes[1]
+    ) +
+    " " +
+    anio
+  );
+
+}
+
+
+/* =====================================================
+   EVENTOS
+===================================================== */
+
+document
+  .getElementById("buscar")
+  .addEventListener(
+    "input",
+    aplicarFiltros
+  );
+
+
+document
+  .getElementById("filtroLinea")
+  .addEventListener(
+    "change",
+    aplicarFiltros
+  );
+
+
+document
+  .getElementById("filtroMes")
+  .addEventListener(
+    "change",
+    aplicarFiltros
+  );
+
+
+/* =====================================================
+   INICIO
+===================================================== */
+
+async function iniciarPantalla(){
+
+  const contenedor =
+    document.getElementById(
+      "listaDocumentos"
+    );
+
+  try{
+
+    /*
+      Se realizan las dos consultas una sola vez:
+      usuarios y rutas.
+    */
+    await Promise.all([
+      cargarTecnicos(),
+      cargarRutas()
+    ]);
+
+    cargarFiltros();
+
+    aplicarFiltros();
+
+  }catch(error){
+
+    console.error(
+      "Error iniciando pantalla:",
+      error
+    );
+
+    contenedor.innerHTML = `
+      <div class="estado estado-error">
+
+        No fue posible cargar las rutas.
+
+        <br><br>
+
+        ${escaparHTML(
+          error.message
+        )}
+
+      </div>
+    `;
+
+  }
+
+}
+
+
+iniciarPantalla();
+
+</script>
+
+</body>
+
+</html>
