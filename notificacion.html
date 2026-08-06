@@ -202,6 +202,19 @@ if(!usuario){
 
 let equiposBD = [];
 let usuariosBD = [];
+  /*
+  Impide que la misma pantalla ejecute
+  dos procesos de guardado simultáneos.
+*/
+let guardadoEnProceso = false;
+
+/*
+  El ID se crea una sola vez cuando se abre
+  la pantalla, no cada vez que se presiona
+  el botón.
+*/
+const ID_NOTIFICACION_ACTUAL =
+  "NOT-" + Date.now();
 
 function textoSelect(id){
   const select = document.getElementById(id);
@@ -478,120 +491,460 @@ function llenarEquipo(){
 
 async function guardarNovedad(){
 
-  const btn = document.getElementById("btnGuardar");
+  /*
+    Si ya existe un guardado en curso,
+    se ignoran nuevos clics.
+  */
+  if(guardadoEnProceso){
+    console.warn(
+      "Se ignoró un intento de guardado duplicado."
+    );
+    return;
+  }
+
+  const btn =
+    document.getElementById(
+      "btnGuardar"
+    );
+
+  const consecuenciaTexto =
+    textoSelect(
+      "consecuenciaProduccion"
+    );
+
+  const supervisorAsignado =
+    actualizarSupervisor();
+
+  const tecnicoRecibe =
+    obtenerTecnicoRecibe();
+
+  const quedaPendiente =
+    document.getElementById(
+      "quedaPendiente"
+    ).value;
+
+  const trabajoPendiente =
+    document.getElementById(
+      "trabajoPendiente"
+    ).value;
+
+  const realizadoConCompanero =
+    document.getElementById(
+      "realizadoConCompanero"
+    ).value;
+
+  const tecnicoCompanero =
+    obtenerTecnicoCompanero();
+
+
+  const datos = {
+
+    hoja:
+      "Notificaciones",
+
+    /*
+      Se reutiliza siempre el mismo ID
+      mientras esta pantalla permanezca abierta.
+    */
+    ID_Notificacion:
+      ID_NOTIFICACION_ACTUAL,
+
+    FechaReporte:
+      document.getElementById(
+        "fecha"
+      ).value,
+
+    Horareporte:
+      document.getElementById(
+        "hora"
+      ).value,
+
+    ReportadoPor:
+      usuario.codigo,
+
+    NombreReportadoPor:
+      usuario.nombre,
+
+    Turno:
+      document.getElementById(
+        "turno"
+      ).value,
+
+    Origenreporte:
+      document.getElementById(
+        "origen"
+      ).value,
+
+    ClaseTrabajo:
+      "CT01",
+
+    Linea:
+      document.getElementById(
+        "linea"
+      ).value,
+
+    Equipo:
+      document.getElementById(
+        "equipo"
+      ).value,
+
+    Area:
+      document.getElementById(
+        "area"
+      ).value,
+
+    ID_Equipo:
+      document.getElementById(
+        "idEquipo"
+      ).value,
+
+    DescripcionFalla:
+      document.getElementById(
+        "descripcion"
+      ).value,
+
+    TrabajoRealizado:
+      "",
+
+    EquipoParado:
+      document.getElementById(
+        "equipoParado"
+      ).value,
+
+    TiempoParadaInicial:
+      document.getElementById(
+        "tiempoParada"
+      ).value,
+
+    quedapendiente:
+      quedaPendiente,
+
+    Prioridad:
+      document.getElementById(
+        "prioridad"
+      ).value,
+
+    ModoFalla:
+      "",
+
+    CausaProbable:
+      "",
+
+    ConsecuenciaProduccion:
+      consecuenciaTexto,
+
+    Estado:
+      quedaPendiente === "Sí"
+        ? "Pendiente por continuar"
+        : "Reportado",
+
+    OrdenSAP:
+      document.getElementById(
+        "ordenSAP"
+      ).value,
+
+    AvisoSap:
+      document.getElementById(
+        "avisoSAP"
+      ).value,
+
+    Supervisor:
+      supervisorAsignado.codigo,
+
+    NombreSupervisor:
+      supervisorAsignado.nombre,
+
+    FechaRevisionSupervisor:
+      "",
+
+    TecnicoRecibe:
+      quedaPendiente === "Sí"
+        ? tecnicoRecibe.codigo
+        : "",
+
+    NombreTecnicoRecibe:
+      quedaPendiente === "Sí"
+        ? tecnicoRecibe.nombre
+        : "",
+
+    TrabajoPendiente:
+      quedaPendiente === "Sí"
+        ? trabajoPendiente
+        : "",
+
+    ActividadTerminada:
+      quedaPendiente === "Sí"
+        ? "No"
+        : "Sí",
+
+    RealizadoConCompanero:
+      realizadoConCompanero,
+
+    TecnicoCompanero:
+      realizadoConCompanero === "Sí"
+        ? tecnicoCompanero.codigo
+        : "",
+
+    NombreTecnicoCompanero:
+      realizadoConCompanero === "Sí"
+        ? tecnicoCompanero.nombre
+        : "",
+
+    EstadoPendienteCompanero:
+      realizadoConCompanero === "Sí"
+        ? "Pendiente"
+        : "",
+
+    TiempoCompanero:
+      "",
+
+    ObservacionCompanero:
+      "",
+
+    FechaRegistroCompanero:
+      "",
+
+    HistorialIntervenciones:
+      "",
+
+    FechaCierre:
+      "",
+
+    ObservacionCierre:
+      ""
+
+  };
+
+
+  /* =====================================================
+     VALIDACIONES ANTES DE BLOQUEAR EL BOTÓN
+  ===================================================== */
+
+  if(
+    !datos.Turno ||
+    !datos.Origenreporte ||
+    !datos.Linea ||
+    !datos.Equipo ||
+    !datos.DescripcionFalla.trim()
+  ){
+
+    alert(
+      "Debe completar turno, origen, línea, " +
+      "equipo y descripción."
+    );
+
+    return;
+
+  }
+
+
+  if(!datos.Supervisor){
+
+    alert(
+      "El área seleccionada no tiene supervisor asignado. " +
+      "Revise el área del equipo."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    quedaPendiente === "Sí" &&
+    (
+      !tecnicoRecibe.codigo ||
+      !trabajoPendiente.trim()
+    )
+  ){
+
+    alert(
+      "Debe seleccionar el técnico que recibe " +
+      "y describir el trabajo pendiente."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    realizadoConCompanero === "Sí" &&
+    !tecnicoCompanero.codigo
+  ){
+
+    alert(
+      "Debe seleccionar el compañero que " +
+      "participó en el trabajo."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !document.getElementById(
+      "consecuenciaProduccion"
+    ).value
+  ){
+
+    alert(
+      "Debe seleccionar la consecuencia de producción."
+    );
+
+    return;
+
+  }
+
+
+  /* =====================================================
+     BLOQUEO DEFINITIVO DEL BOTÓN
+  ===================================================== */
+
+  guardadoEnProceso = true;
+
   btn.disabled = true;
   btn.innerText = "GUARDANDO...";
 
-  const consecuenciaTexto = textoSelect("consecuenciaProduccion");
-  const supervisorAsignado = actualizarSupervisor();
-  const tecnicoRecibe = obtenerTecnicoRecibe();
-  const quedaPendiente = document.getElementById("quedaPendiente").value;
-  const trabajoPendiente = document.getElementById("trabajoPendiente").value;
-  const realizadoConCompanero = document.getElementById("realizadoConCompanero").value;
-  const tecnicoCompanero = obtenerTecnicoCompanero();
-  
-  const datos = {
-    hoja: "Notificaciones",
-    ID_Notificacion: "NOT-" + Date.now(),
-    FechaReporte: document.getElementById("fecha").value,
-    Horareporte: document.getElementById("hora").value,
-    ReportadoPor: usuario.codigo,
-    NombreReportadoPor: usuario.nombre,
-    Turno: document.getElementById("turno").value,
-    Origenreporte: document.getElementById("origen").value,
-    ClaseTrabajo: "CT01",
-    Linea: document.getElementById("linea").value,
-    Equipo: document.getElementById("equipo").value,
-    Area: document.getElementById("area").value,
-    ID_Equipo: document.getElementById("idEquipo").value,
-    DescripcionFalla: document.getElementById("descripcion").value,
-    TrabajoRealizado: "",
-    EquipoParado: document.getElementById("equipoParado").value,
-    TiempoParadaInicial: document.getElementById("tiempoParada").value,
-    quedapendiente: quedaPendiente,
-    Prioridad: document.getElementById("prioridad").value,
-    ModoFalla: "",
-    CausaProbable: "",
-    ConsecuenciaProduccion: consecuenciaTexto,
-    Estado: quedaPendiente === "Sí" ? "Pendiente por continuar" : "Reportado",
-    OrdenSAP: document.getElementById("ordenSAP").value,
-    AvisoSap: document.getElementById("avisoSAP").value,
-    Supervisor: supervisorAsignado.codigo,
-    NombreSupervisor: supervisorAsignado.nombre,
-    FechaRevisionSupervisor: "",
-    TecnicoRecibe: quedaPendiente === "Sí" ? tecnicoRecibe.codigo : "",
-    NombreTecnicoRecibe: quedaPendiente === "Sí" ? tecnicoRecibe.nombre : "",
-    TrabajoPendiente: quedaPendiente === "Sí" ? trabajoPendiente : "",
-    ActividadTerminada: quedaPendiente === "Sí" ? "No" : "Sí",
-    RealizadoConCompanero: realizadoConCompanero,
-    TecnicoCompanero: realizadoConCompanero === "Sí" ? tecnicoCompanero.codigo : "",
-    NombreTecnicoCompanero: realizadoConCompanero === "Sí" ? tecnicoCompanero.nombre : "",
-    EstadoPendienteCompanero: realizadoConCompanero === "Sí" ? "Pendiente" : "",
-
-    TiempoCompanero: "",
-    ObservacionCompanero: "",
-    FechaRegistroCompanero: "",
-    HistorialIntervenciones: "",
-
-    FechaCierre: "",
-    ObservacionCierre: ""
-  };
-
-  if(!datos.Turno || !datos.Origenreporte || !datos.Linea || !datos.Equipo || !datos.DescripcionFalla){
-    alert("Debe completar turno, origen, línea, equipo y descripción.");
-    btn.disabled = false;
-    btn.innerText = "GUARDAR NOVEDAD";
-    return;
-  }
-
-  if(!datos.Supervisor){
-    alert("El área seleccionada no tiene supervisor asignado. Revise el área del equipo.");
-    btn.disabled = false;
-    btn.innerText = "GUARDAR NOVEDAD";
-    return;
-  }
-
-  if(quedaPendiente === "Sí" && (!tecnicoRecibe.codigo || !trabajoPendiente.trim())){
-    alert("Debe seleccionar el técnico que recibe y describir el trabajo pendiente.");
-    btn.disabled = false;
-    btn.innerText = "GUARDAR NOVEDAD";
-    return;
-  }
-if(
-  realizadoConCompanero === "Sí" &&
-  !tecnicoCompanero.codigo
-){
-  alert("Debe seleccionar el compañero que participó en el trabajo.");
-  btn.disabled = false;
-  btn.innerText = "GUARDAR NOVEDAD";
-  return;
-}
-  if(!document.getElementById("consecuenciaProduccion").value){
-    alert("Debe seleccionar la consecuencia de producción.");
-    btn.disabled = false;
-    btn.innerText = "GUARDAR NOVEDAD";
-    return;
-  }
 
   try{
-    const params = new URLSearchParams(datos);
-    const respuesta = await fetch(URL_API + "?" + params.toString());
-    const resultado = await respuesta.json();
 
-    if(resultado.ok){
-      alert("Novedad guardada correctamente. Supervisor asignado: " + supervisorAsignado.nombre);
-      window.location.href = "menu.html";
-    }else{
-      alert("Error: " + resultado.mensaje);
-      btn.disabled = false;
-      btn.innerText = "GUARDAR NOVEDAD";
+    const params =
+      new URLSearchParams(
+        datos
+      );
+
+    const respuesta =
+      await fetch(
+        URL_API +
+        "?" +
+        params.toString() +
+        "&_=" +
+        Date.now(),
+        {
+          method:
+            "GET",
+
+          cache:
+            "no-store",
+
+          redirect:
+            "follow"
+        }
+      );
+
+    const texto =
+      await respuesta.text();
+
+    if(!respuesta.ok){
+
+      throw new Error(
+        "El servidor respondió con estado " +
+        respuesta.status
+      );
+
     }
 
+    if(
+      texto.trim().startsWith("<")
+    ){
+
+      throw new Error(
+        "El servidor devolvió HTML en lugar de JSON."
+      );
+
+    }
+
+    let resultado;
+
+    try{
+
+      resultado =
+        JSON.parse(
+          texto
+        );
+
+    }catch(error){
+
+      console.error(
+        "Respuesta recibida:",
+        texto
+      );
+
+      throw new Error(
+        "La respuesta del servidor no es válida."
+      );
+
+    }
+
+
+    if(!resultado.ok){
+
+      throw new Error(
+        resultado.mensaje ||
+        "No fue posible guardar la novedad."
+      );
+
+    }
+
+
+    if(resultado.duplicado){
+
+      btn.innerText =
+        "NOVEDAD YA REGISTRADA";
+
+      alert(
+        "Esta novedad ya había sido registrada. " +
+        "No se creó otro registro."
+      );
+
+    }else{
+
+      btn.innerText =
+        "NOVEDAD GUARDADA";
+
+      alert(
+        "Novedad guardada correctamente. " +
+        "Supervisor asignado: " +
+        supervisorAsignado.nombre
+      );
+
+    }
+
+    /*
+      replace evita regresar con el botón Atrás
+      a una pantalla que ya fue guardada.
+    */
+    window.location.replace(
+      "menu.html"
+    );
+
+
   }catch(error){
-    alert("Error guardando novedad: " + error);
+
+    console.error(
+      "Error guardando novedad:",
+      error
+    );
+
+    alert(
+      "No fue posible guardar la novedad.\n\n" +
+      error.message
+    );
+
+    /*
+      Solo habilitamos nuevamente cuando hubo
+      un error real y no se confirmó el guardado.
+    */
+    guardadoEnProceso = false;
+
     btn.disabled = false;
-    btn.innerText = "GUARDAR NOVEDAD";
+    btn.innerText =
+      "GUARDAR NOVEDAD";
+
   }
+
 }
 
 cargarInicial();
