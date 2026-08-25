@@ -3316,18 +3316,17 @@ function estadisticasPreventivos(){
 
     }).length;
 
-  const baseCumplimiento =
-    registrosMes.length - cancelados;
+ const baseCumplimiento =
+  registrosMes.length;
 
-  const cumplimiento =
-    baseCumplimiento > 0
-      ? redondear(
-          ejecutados /
-          baseCumplimiento *
-          100
-        )
-      : 0;
-
+const cumplimiento =
+  baseCumplimiento > 0
+    ? redondear(
+        ejecutados /
+        baseCumplimiento *
+        100
+      )
+    : 0;
   return {
     total: registrosMes.length,
     ejecutados: ejecutados,
@@ -3604,17 +3603,16 @@ function cumplimientoPreventivoPorArea(){
     .map(([area,dato]) => {
 
       const base =
-        dato.total -
-        dato.cancelados;
+  dato.total;
 
-      const cumplimiento =
-        base > 0
-          ? redondear(
-              dato.ejecutados /
-              base *
-              100
-            )
-          : 0;
+const cumplimiento =
+  base > 0
+    ? redondear(
+        dato.ejecutados /
+        base *
+        100
+      )
+    : 0;
 
       return {
         area: area,
