@@ -608,11 +608,17 @@ function renderDashboard(){
   document.getElementById("kpiReprogramados").innerText = reprogramados.length;
   document.getElementById("kpiPromTiempo").innerText = promedio(tiempos);
 
-  document.getElementById("estadoPendiente").innerText = pendientes.length;
-  document.getElementById("estadoAsignado").innerText = asignados.length;
-  document.getElementById("estadoEjecucion").innerText = enEjecucion.length;
-  document.getElementById("estadoEjecutado").innerText = preventivos.filter(esEjecutado).length;
+  document.getElementById("estadoPendiente").innerText =
+  pendientes.length;
 
+document.getElementById("estadoAsignado").innerText =
+  asignados.length;
+
+document.getElementById("estadoEjecucion").innerText =
+  enEjecucion.length;
+
+document.getElementById("estadoEjecutado").innerText =
+  ejecutadosPeriodo.length;
   renderCumplimientoArea(datosPeriodo);
   renderPreventivosTecnico(datosPeriodo);
   renderBacklogArea(backlog);
