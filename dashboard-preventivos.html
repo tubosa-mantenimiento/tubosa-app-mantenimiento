@@ -291,24 +291,42 @@ function fechaFinPreventivo(p){
 
 function estadoPreventivo(p){
   const estado = normalizar(obtenerCampo(p, "Estado"));
-  const estadoEjecucion = normalizar(obtenerCampo(p, "EstadoEjecucion"));
 
-  if(estadoEjecucion === "en ejecucion") return "ejecucion";
-  if(estadoEjecucion === "ejecutado") return "ejecutado";
+  // La columna Estado es la única fuente oficial
+  // para determinar la situación actual del preventivo.
 
-  if(estado === "" || estado === "programado" || estado.includes("pendiente")) return "pendiente";
-  if(estado === "asignado") return "asignado";
-  if(estado.includes("ejecucion")) return "ejecucion";
   if(estado === "ejecutado") return "ejecutado";
-  if(estado === "cancelado") return "cancelado";
+
+  if(estado === "no realizado") return "no_realizado";
+
+  if(estado === "en ejecucion") return "ejecucion";
+
+  if(estado === "asignado") return "asignado";
+
   if(estado === "reprogramado") return "reprogramado";
 
-  return estado || "pendiente";
+  if(estado === "cancelado") return "cancelado";
+
+  if(
+    estado === "" ||
+    estado === "programado" ||
+    estado.includes("pendiente")
+  ){
+    return "pendiente";
+  }
+
+  return estado;
 }
 
 function esActivo(p){
   const e = estadoPreventivo(p);
-  return ["pendiente","asignado","ejecucion","reprogramado"].includes(e);
+
+  return [
+    "pendiente",
+    "asignado",
+    "ejecucion",
+    "reprogramado"
+  ].includes(e);
 }
 
 function esEjecutado(p){
@@ -316,10 +334,24 @@ function esEjecutado(p){
 }
 
 function esVencido(p){
-  if(esEjecutado(p) || estadoPreventivo(p) === "cancelado") return false;
+
+  const estado = estadoPreventivo(p);
+
+  // Estados finalizados: jamás pueden aparecer
+  // como vencidos activos.
+  if(
+    estado === "ejecutado" ||
+    estado === "no_realizado" ||
+    estado === "cancelado"
+  ){
+    return false;
+  }
 
   const fecha = fechaISO(fechaFinPreventivo(p));
-  if(!fecha || isNaN(fecha)) return false;
+
+  if(!fecha || isNaN(fecha)){
+    return false;
+  }
 
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
@@ -342,20 +374,34 @@ function diasAtraso(p){
 }
 
 function esProximoAVencer(p){
-  if(esEjecutado(p) || estadoPreventivo(p) === "cancelado") return false;
+
+  const estado = estadoPreventivo(p);
+
+  if(
+    estado === "ejecutado" ||
+    estado === "no_realizado" ||
+    estado === "cancelado"
+  ){
+    return false;
+  }
 
   const fecha = fechaISO(fechaFinPreventivo(p));
-  if(!fecha || isNaN(fecha)) return false;
+
+  if(!fecha || isNaN(fecha)){
+    return false;
+  }
 
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
 
   fecha.setHours(0,0,0,0);
 
-  const dias = Math.round((fecha - hoy) / (1000*60*60*24));
+  const dias = Math.round(
+    (fecha - hoy) / (1000 * 60 * 60 * 24)
+  );
+
   return dias >= 0 && dias <= 3;
 }
-
 function diasParaVencer(p){
   const fecha = fechaISO(fechaFinPreventivo(p));
   if(!fecha || isNaN(fecha)) return 0;
@@ -393,9 +439,16 @@ function renderDashboard(){
   const reprogramados = preventivos.filter(esReprogramado);
 
   const baseCumplimiento = datosPeriodo.filter(p => {
-    const e = estadoPreventivo(p);
-    return ["pendiente","asignado","ejecucion","ejecutado"].includes(e);
-  });
+  const e = estadoPreventivo(p);
+
+  return [
+    "pendiente",
+    "asignado",
+    "ejecucion",
+    "ejecutado",
+    "no_realizado"
+  ].includes(e);
+});
 
   const cumplimiento = baseCumplimiento.length > 0
     ? Math.round((ejecutadosPeriodo.length / baseCumplimiento.length) * 100)
