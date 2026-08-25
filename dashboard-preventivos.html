@@ -23,6 +23,36 @@ h2{font-size:24px;margin-bottom:14px;}
 .filtros button{padding:14px;border:none;border-radius:14px;background:white;color:#001f5b;font-size:16px;font-weight:900;}
 .filtros button.activo{background:#dbe4f5;}
 
+  .navegacion-mes{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  margin-top:14px;
+}
+
+.navegacion-mes button{
+  width:48px;
+  height:42px;
+  border:none;
+  border-radius:12px;
+  background:white;
+  color:#001f5b;
+  font-size:26px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.nombre-mes{
+  min-width:210px;
+  text-align:center;
+  padding:11px 16px;
+  border-radius:12px;
+  background:rgba(255,255,255,.12);
+  font-size:18px;
+  font-weight:900;
+}
+
 .main-kpi{background:white;color:#001f5b;border-radius:24px;padding:22px;margin-bottom:18px;}
 .main-title{font-size:18px;font-weight:900;}
 .main-num{font-size:46px;font-weight:900;margin-top:8px;}
@@ -69,10 +99,19 @@ h2{font-size:24px;margin-bottom:14px;}
     <div class="info" id="estadoCarga">Cargando información...</div>
 
     <div class="filtros">
-      <button id="btnHoy" class="activo" onclick="cambiarFiltro('hoy')">Hoy</button>
+    <button id="btnHoy" onclick="cambiarFiltro('hoy')">Hoy</button>
       <button id="btnSemana" onclick="cambiarFiltro('semana')">Semana</button>
-      <button id="btnMes" onclick="cambiarFiltro('mes')">Mes</button>
+     <button id="btnMes" class="activo" onclick="cambiarFiltro('mes')">Mes</button>
     </div>
+    <div id="navegacionMes" class="navegacion-mes">
+  <button onclick="mesAnterior()">‹</button>
+
+  <div id="nombreMes" class="nombre-mes">
+    Mes actual
+  </div>
+
+  <button id="btnMesSiguiente" onclick="mesSiguiente()">›</button>
+</div>
   </div>
 
   <div class="main-kpi">
@@ -148,9 +187,13 @@ const usuario = JSON.parse(localStorage.getItem("usuarioActivo"));
 if(!usuario){
   window.location.href = "index.html";
 }
-
-let filtroActual = "hoy";
+let filtroActual = "mes";
 let preventivos = [];
+
+const fechaActualGlobal = new Date();
+
+let mesSeleccionado = fechaActualGlobal.getMonth();
+let anioSeleccionado = fechaActualGlobal.getFullYear();
 
 //===========================
 // UTILIDADES GENERALES
@@ -239,8 +282,12 @@ function formatearFecha(fechaTexto){
 }
 
 function estaEnFiltro(fechaTexto){
+
   const fecha = fechaISO(fechaTexto);
-  if(!fecha || isNaN(fecha)) return false;
+
+  if(!fecha || isNaN(fecha)){
+    return false;
+  }
 
   const hoy = new Date();
   hoy.setHours(0,0,0,0);
@@ -248,20 +295,56 @@ function estaEnFiltro(fechaTexto){
   const f = new Date(fecha);
   f.setHours(0,0,0,0);
 
+  //===========================
+  // HOY
+  //===========================
+
   if(filtroActual === "hoy"){
-    return f.getTime() === hoy.getTime();
+
+    return (
+      f.getTime() === hoy.getTime()
+    );
   }
+
+  //===========================
+  // SEMANA ACTUAL
+  // lunes hasta hoy
+  //===========================
 
   if(filtroActual === "semana"){
-    const hace7 = new Date(hoy);
-    hace7.setDate(hoy.getDate() - 7);
-    return f >= hace7 && f <= hoy;
+
+    const diaSemana = hoy.getDay();
+
+    const diferenciaLunes =
+      diaSemana === 0
+        ? -6
+        : 1 - diaSemana;
+
+    const inicioSemana =
+      new Date(hoy);
+
+    inicioSemana.setDate(
+      hoy.getDate() + diferenciaLunes
+    );
+
+    inicioSemana.setHours(0,0,0,0);
+
+    return (
+      f >= inicioSemana &&
+      f <= hoy
+    );
   }
 
+  //===========================
+  // MES CALENDARIO
+  //===========================
+
   if(filtroActual === "mes"){
-    const hace30 = new Date(hoy);
-    hace30.setDate(hoy.getDate() - 30);
-    return f >= hace30 && f <= hoy;
+
+    return (
+      f.getFullYear() === anioSeleccionado &&
+      f.getMonth() === mesSeleccionado
+    );
   }
 
   return true;
@@ -278,10 +361,13 @@ async function cargarHoja(nombreHoja){
 //===========================
 
 function fechaReferencia(p){
-  return obtenerCampo(p, "FechaEjecucion") ||
-         obtenerCampo(p, "FechaAsignacion") ||
-         obtenerCampo(p, "Fe.inic.extrema") ||
-         obtenerCampo(p, "Fe.fin extrema");
+
+  // El preventivo pertenece al periodo
+  // en el que fue programado en SAP.
+  return (
+    obtenerCampo(p, "Fe.inic.extrema") ||
+    obtenerCampo(p, "Fe.fin extrema")
+  );
 }
 
 function fechaFinPreventivo(p){
@@ -425,19 +511,67 @@ function esReprogramado(p){
 // RENDER PRINCIPAL
 //===========================
 
-function renderDashboard(){
-  const datosPeriodo = preventivos.filter(p => estaEnFiltro(fechaReferencia(p)));
+ffunction renderDashboard(){
 
-  const pendientes = preventivos.filter(p => estadoPreventivo(p) === "pendiente");
-  const asignados = preventivos.filter(p => estadoPreventivo(p) === "asignado");
-  const enEjecucion = preventivos.filter(p => estadoPreventivo(p) === "ejecucion");
-  const ejecutadosPeriodo = datosPeriodo.filter(esEjecutado);
+  const datosPeriodo =
+    preventivos.filter(
+      p => estaEnFiltro(
+        fechaReferencia(p)
+      )
+    );
 
-  const vencidos = preventivos.filter(esVencido);
-  const proximos = preventivos.filter(esProximoAVencer);
-  const activos = preventivos.filter(esActivo);
-  const reprogramados = preventivos.filter(esReprogramado);
+  const pendientes =
+    datosPeriodo.filter(
+      p =>
+        estadoPreventivo(p) ===
+        "pendiente"
+    );
 
+  const asignados =
+    datosPeriodo.filter(
+      p =>
+        estadoPreventivo(p) ===
+        "asignado"
+    );
+
+  const enEjecucion =
+    datosPeriodo.filter(
+      p =>
+        estadoPreventivo(p) ===
+        "ejecucion"
+    );
+
+  const ejecutadosPeriodo =
+    datosPeriodo.filter(
+      esEjecutado
+    );
+
+  const vencidos =
+    datosPeriodo.filter(
+      esVencido
+    );
+
+  const proximos =
+    datosPeriodo.filter(
+      esProximoAVencer
+    );
+
+  const activos =
+    datosPeriodo.filter(
+      esActivo
+    );
+
+  const backlog =
+    datosPeriodo.filter(
+      p =>
+        esActivo(p) &&
+        esVencido(p)
+    );
+
+  const reprogramados =
+    datosPeriodo.filter(
+      esReprogramado
+    );
   const baseCumplimiento = datosPeriodo.filter(p => {
   const e = estadoPreventivo(p);
 
@@ -468,7 +602,9 @@ function renderDashboard(){
   document.getElementById("kpiEjecutados").innerText = ejecutadosPeriodo.length;
   document.getElementById("kpiVencidos").innerText = vencidos.length;
   document.getElementById("kpiPorVencer").innerText = proximos.length;
-  document.getElementById("kpiBacklog").innerText = activos.length;
+ document.getElementById(
+  "kpiBacklog"
+).innerText = backlog.length;
   document.getElementById("kpiReprogramados").innerText = reprogramados.length;
   document.getElementById("kpiPromTiempo").innerText = promedio(tiempos);
 
@@ -479,7 +615,7 @@ function renderDashboard(){
 
   renderCumplimientoArea(datosPeriodo);
   renderPreventivosTecnico(datosPeriodo);
-  renderBacklogArea(activos);
+  renderBacklogArea(backlog);
   renderPreventivosLinea(datosPeriodo);
   renderProximosVencer(proximos);
   renderVencidos(vencidos);
@@ -718,21 +854,187 @@ function renderReprogramaciones(reprogramados){
       contenedor.appendChild(div);
     });
 }
+function actualizarNombreMes(){
 
+  const fecha =
+    new Date(
+      anioSeleccionado,
+      mesSeleccionado,
+      1
+    );
+
+  let nombre =
+    fecha.toLocaleDateString(
+      "es-CO",
+      {
+        month:"long",
+        year:"numeric"
+      }
+    );
+
+  nombre =
+    nombre.charAt(0).toUpperCase() +
+    nombre.slice(1);
+
+  document.getElementById(
+    "nombreMes"
+  ).innerText = nombre;
+
+  actualizarEstadoBotonMesSiguiente();
+}
+
+
+function actualizarEstadoBotonMesSiguiente(){
+
+  const actual = new Date();
+
+  const mesActual =
+    new Date(
+      actual.getFullYear(),
+      actual.getMonth(),
+      1
+    );
+
+  const seleccionado =
+    new Date(
+      anioSeleccionado,
+      mesSeleccionado,
+      1
+    );
+
+  const boton =
+    document.getElementById(
+      "btnMesSiguiente"
+    );
+
+  if(seleccionado >= mesActual){
+
+    boton.disabled = true;
+    boton.style.opacity = ".35";
+    boton.style.cursor = "default";
+
+  }else{
+
+    boton.disabled = false;
+    boton.style.opacity = "1";
+    boton.style.cursor = "pointer";
+  }
+}
+
+
+function mesAnterior(){
+
+  mesSeleccionado--;
+
+  if(mesSeleccionado < 0){
+
+    mesSeleccionado = 11;
+    anioSeleccionado--;
+  }
+
+  filtroActual = "mes";
+
+  actualizarBotonesFiltro();
+  actualizarNombreMes();
+  renderDashboard();
+}
+
+
+function mesSiguiente(){
+
+  const actual =
+    new Date();
+
+  const mesActual =
+    new Date(
+      actual.getFullYear(),
+      actual.getMonth(),
+      1
+    );
+
+  const siguiente =
+    new Date(
+      anioSeleccionado,
+      mesSeleccionado + 1,
+      1
+    );
+
+  // No permite navegar al futuro
+  if(siguiente > mesActual){
+    return;
+  }
+
+  mesSeleccionado++;
+
+  if(mesSeleccionado > 11){
+
+    mesSeleccionado = 0;
+    anioSeleccionado++;
+  }
+
+  filtroActual = "mes";
+
+  actualizarBotonesFiltro();
+  actualizarNombreMes();
+  renderDashboard();
+}
 //===========================
 // FILTROS
 //===========================
 
+function actualizarBotonesFiltro(){
+
+  document
+    .getElementById("btnHoy")
+    .classList.remove("activo");
+
+  document
+    .getElementById("btnSemana")
+    .classList.remove("activo");
+
+  document
+    .getElementById("btnMes")
+    .classList.remove("activo");
+
+  if(filtroActual === "hoy"){
+    document
+      .getElementById("btnHoy")
+      .classList.add("activo");
+  }
+
+  if(filtroActual === "semana"){
+    document
+      .getElementById("btnSemana")
+      .classList.add("activo");
+  }
+
+  if(filtroActual === "mes"){
+    document
+      .getElementById("btnMes")
+      .classList.add("activo");
+  }
+}
+
+
 function cambiarFiltro(filtro){
+
   filtroActual = filtro;
 
-  document.getElementById("btnHoy").classList.remove("activo");
-  document.getElementById("btnSemana").classList.remove("activo");
-  document.getElementById("btnMes").classList.remove("activo");
+  // Al pulsar MES vuelve al mes actual.
+  if(filtro === "mes"){
 
-  if(filtro === "hoy") document.getElementById("btnHoy").classList.add("activo");
-  if(filtro === "semana") document.getElementById("btnSemana").classList.add("activo");
-  if(filtro === "mes") document.getElementById("btnMes").classList.add("activo");
+    const hoy = new Date();
+
+    mesSeleccionado =
+      hoy.getMonth();
+
+    anioSeleccionado =
+      hoy.getFullYear();
+
+    actualizarNombreMes();
+  }
+
+  actualizarBotonesFiltro();
 
   renderDashboard();
 }
@@ -742,11 +1044,24 @@ function cambiarFiltro(filtro){
 //===========================
 
 async function cargarDashboard(){
+
   try{
-    preventivos = await cargarHoja("Preventivos");
+
+    preventivos =
+      await cargarHoja("Preventivos");
+
+    actualizarBotonesFiltro();
+    actualizarNombreMes();
+
     renderDashboard();
+
   }catch(error){
-    document.getElementById("estadoCarga").innerText = "Error cargando dashboard: " + error;
+
+    document.getElementById(
+      "estadoCarga"
+    ).innerText =
+      "Error cargando dashboard: " +
+      error;
   }
 }
 
