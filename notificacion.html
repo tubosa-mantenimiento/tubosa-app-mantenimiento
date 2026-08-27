@@ -231,25 +231,9 @@ function normalizarTexto(texto){
 }
 
 function obtenerSupervisorPorArea(area){
-  const a = normalizarTexto(area);
-
-  if(a.includes("extrusion") || a.includes("servicios industriales") || a.includes("corrugado")){
-    return {
-      codigo: "SUP-JH",
-      nombre: "Jorge Holguín"
-    };
-  }
-
-  if(a.includes("mezclas") || a.includes("molinos") || a.includes("pulverizado")){
-    return {
-      codigo: "SUP-AV",
-      nombre: "Andrés Vidal"
-    };
-  }
-
   return {
-    codigo: "",
-    nombre: "Sin supervisor asignado"
+    codigo: "SUP-JH",
+    nombre: "Jorge Holguín"
   };
 }
 
