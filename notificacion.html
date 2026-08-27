@@ -100,7 +100,7 @@ button{width:100%;padding:19px;border:none;border-radius:16px;background:white;c
     </div>
 
     <label>Supervisor responsable</label>
-    <input id="nombreSupervisor" class="readonly" readonly placeholder="Se asigna automáticamente por área">
+   <input id="nombreSupervisor" class="readonly" readonly value="Jorge Holguín">
 
     <label>Descripción de la falla</label>
     <textarea id="descripcion" placeholder="Describa claramente la novedad..."></textarea>
@@ -240,7 +240,7 @@ function obtenerSupervisorPorArea(area){
 function actualizarSupervisor(){
   const area = document.getElementById("area").value;
   const supervisor = obtenerSupervisorPorArea(area);
-  document.getElementById("nombreSupervisor").value = supervisor.nombre;
+  document.getElementById("nombreSupervisor").value = "Jorge Holguín";
   return supervisor;
 }
 
